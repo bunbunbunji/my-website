@@ -1,4 +1,4 @@
-﻿body {
+body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
     margin: 0;
@@ -25,12 +25,6 @@ header {
 
 .header-text {
     text-align: left; /* Left-aligns the text */
-}
-
-.title-link,
-.subtitle-link {
-    text-decoration: none; /* Remove underline from links */
-    color: inherit; /* Inherit text color from parent */
 }
 
 h1 {
