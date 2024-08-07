@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>オレのヘルスケア - 新規登録</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>オレのヘルスケア</h1>
+        <p class="subtitle">～集え、我らが同胞達よ～</p>
+        <nav>
+            <ul>
+                <li><a href="index.html">ホーム</a></li>
+                <li><a href="dash.html">ダッシュボード</a></li>
+                <li><a href="profile.html">プロフィール</a></li>
+                <li><a href="settings.html">設定</a></li>
+                <li><a href="contact.html">問い合わせ</a></li>
+                <li><a href="login.html">ログアウト</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>新規登録</h2>
+            <form action="/register" method="post">
+                <label for="username">ユーザー名:</label>
+                <input type="text" id="username" name="username" required>
+                
+                <label for="email">メールアドレス:</label>
+                <input type="email" id="email" name="email" required>
+                
+                <label for="password">パスワード:</label>
+                <input type="password" id="password" name="password" required>
+                
+                <button type="submit">登録</button>
+            </form>
+        </section>
+    </main>
+    <footer>
+        <ul>
+            <li><a href="#">プライバシーポリシー</a></li>
+            <li><a href="#">利用規約</a></li>
+            <li><a href="#">コンタクト</a></li>
+        </ul>
+    </footer>
+</body>
+</html>
