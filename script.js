@@ -1,4 +1,3 @@
-// script.js
 document.addEventListener('DOMContentLoaded', () => {
     const subtitles = [
         "～共に立ち上がろう、我らの未来のために～",
@@ -11,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "～共に歩み、成功の扉を開こう～",
         "～愛と絆で、困難を乗り越えよう～",
         "～希望の旗を掲げ、未来を切り開こう～",
-        "～集え、我らが同胞達よ～"
+        "～来たれ、健康体を目指さんとす、我らが同胞よ～"
     ];
 
     const subtitleElement = document.getElementById('subtitle');
