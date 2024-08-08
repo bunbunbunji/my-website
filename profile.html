@@ -4,46 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>プロフィール</title>
-    <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
 </head>
 <body>
     <header>
-        <h1>オレのヘルスケア</h1>
-        <p class="subtitle">～集え、我らが同胞達よ～</p>
-        <nav>
-            <ul>
-                <li><a href="index.html">ホーム</a></li>
-                <li><a href="dash.html">ダッシュボード</a></li>
-                <li><a href="profile.html">プロフィール</a></li>
-                <li><a href="settings.html">設定</a></li>
-                <li><a href="contact.html">問い合わせ</a></li>
-                <li><a href="login.html">ログアウト</a></li>
-            </ul>
-        </nav>
+        <h1>魂と脂肪を燃やせ！漢ヘルスケア</h1>
+        <p class="subtitle" id="subtitle"></p> <!-- 初期値を空に設定 -->
     </header>
-    <main>
-        <section>
-            <h2>プロフィール</h2>
-            <form id="profile-form">
-                <label for="username">ユーザー名:</label>
-                <input type="text" id="username" name="username" required>
-                <label for="email">メールアドレス:</label>
-                <input type="email" id="email" name="email" required>
-                <label for="password">パスワード:</label>
-                <input type="password" id="password" name="password" required>
-                <button type="submit">保存</button>
-            </form>
-        </section>
-    </main>
+    <div class="container">
+        <aside>
+            <nav>
+                <ul>
+                    <li><a href="index.html">ホーム</a></li>
+                    <li><a href="profile.html">プロフィール</a></li>
+                    <li><a href="settings.html">設定</a></li>
+                    <li><a href="contact.html">問い合わせ</a></li>
+                    <li><a href="login.html">ログアウト</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <main>
+            <section>
+                <h2>プロフィール</h2>
+                <form id="profile-form">
+                    <label for="username">ユーザー名:</label>
+                    <input type="text" id="username" name="username" required>
+                    <label for="email">メールアドレス:</label>
+                    <input type="email" id="email" name="email" required>
+                    <label for="password">パスワード:</label>
+                    <input type="password" id="password" name="password" required>
+                    <button type="submit">保存</button>
+                </form>
+            </section>
+        </main>
+    </div>
     <footer>
         <ul>
-            <li><a href="#">プライバシーポリシー</a></li>
-            <li><a href="#">利用規約</a></li>
-            <li><a href="#">コンタクト</a></li>
+            <li><a href="privacy.html">プライバシーポリシー</a></li>
+            <li><a href="terms.html">利用規約</a></li>
         </ul>
+        <p>&copy; 2024 魂と脂肪を燃やせ！漢ヘルスケア. All rights reserved.</p>
     </footer>
 </body>
 </html>
