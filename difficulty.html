@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>難易度選択</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- 共通スタイル -->
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    /* ページ固有の微調整 */
+    .title {
+      font-size: 22px;
+      line-height: 1.2;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="box">
+    <h2 class="title">難易度を選択</h2>
+
+    <button onclick="selectDifficulty('easy')">やさしい</button>
+    <button onclick="selectDifficulty('normal')">ふつう</button>
+    <button onclick="selectDifficulty('hard')">むずかしい</button>
+  </div>
+
+  <script>
+    function selectDifficulty(level) {
+      const state = JSON.parse(localStorage.getItem("quizState"));
+
+      if (!state || !state.group) {
+        // 不正遷移対策
+        location.href = "group.html";
+        return;
+      }
+
+      state.difficulty = level;
+      localStorage.setItem("quizState", JSON.stringify(state));
+
+      // 次のページに遷移
+      location.href = "confirm.html";
+    }
+  </script>
+
+</body>
+</html>
