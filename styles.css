@@ -100,3 +100,29 @@ button.submit.flash-red {
 .member-btn:active {
   transform: scale(0.95);
 }
+
+/* 結果表示アニメーション */
+@keyframes result-pop {
+  0% { opacity: 0; transform: scale(0.8); }
+  50% { opacity: 1.2; transform: scale(1.2); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+#result.animate {
+  animation: result-pop 0.5s ease-out;
+  padding: 8px 12px;
+  border-radius: 8px;
+  display: inline-block;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* 正解/不正解用クラス */
+#result.correct {
+  background-color: #4caf50;
+  color: white;
+}
+
+#result.incorrect {
+  background-color: #f44336;
+  color: white;
+}
