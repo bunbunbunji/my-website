@@ -2,101 +2,38 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>フルーツジッパー 歌割りクイズ</title>
+  <title>KAWAII LAB検定 「この歌割り、だれが歌ってる？？」</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Supabase JS -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-    body {
-      font-family: sans-serif;
-      background: #f7f7f7;
-      padding: 20px;
-    }
-    .quiz-box {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      max-width: 500px;
-      margin: auto;
-    }
-    button {
-      display: block;
-      width: 100%;
-      margin: 8px 0;
-      padding: 10px;
-      font-size: 16px;
-    }
-  </style>
+  <!-- 外部CSS読み込み -->
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-  <div class="quiz-box">
-    <h2 id="song">読み込み中…</h2>
-    <p id="lyrics"></p>
+  <div class="box">
+    <h1 class="title">
+      <span class="title-line1">KAWAII LAB検定</span>
+      <span class="title-line2">「この歌割り、だれが歌ってる？？」</span>
+    </h1>
 
-    <button id="c1"></button>
-    <button id="c2"></button>
-    <button id="c3"></button>
-    <button id="c4"></button>
-
-    <p id="result"></p>
+    <button onclick="startQuiz()">検定開始！</button>
   </div>
 
   <script>
-    // Supabase 設定
-    const supabaseUrl = "https://atinpqtedmrfrtdlkpkd.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0aW5wcXRlZG1yZnJ0ZGxrcGtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwOTU0NjcsImV4cCI6MjA4NDY3MTQ2N30.Oor6oUuuIxa0pSxIRuwEw7ZzGYM4hOGfywHqv2FaBHg";
+    function startQuiz() {
+      // quizState 初期化
+      const quizState = {
+        group: null,
+        difficulty: null,
+        currentIndex: 0,
+        correctCount: 0,
+        quizIds: []
+      };
+      localStorage.setItem("quizState", JSON.stringify(quizState));
 
-    const supabaseClient = window.supabase.createClient(
-      supabaseUrl,
-      supabaseKey
-    );
-
-    async function loadQuiz() {
-      console.log("loadQuiz start");
-
-      const { data, error } = await supabaseClient
-        .from("quizzes")
-        .select("*")
-        .limit(1);
-
-      console.log("data:", data);
-      console.log("error:", error);
-
-      if (error || !data || data.length === 0) {
-        document.getElementById("song").textContent = "問題を取得できません";
-        return;
-      }
-
-      const quiz = data[0];
-
-      document.getElementById("song").textContent = quiz.song_title;
-      document.getElementById("lyrics").textContent = quiz.lyrics;
-
-      const choices = [
-        quiz.choice_1,
-        quiz.choice_2,
-        quiz.choice_3,
-        quiz.choice_4,
-      ];
-
-      ["c1", "c2", "c3", "c4"].forEach((id, index) => {
-        const btn = document.getElementById(id);
-        btn.textContent = choices[index];
-        btn.onclick = () => {
-          if (choices[index] === quiz.correct_member) {
-            document.getElementById("result").textContent = "⭕ 正解！";
-          } else {
-            document.getElementById("result").textContent =
-              "❌ 不正解（正解：" + quiz.correct_member + "）";
-          }
-        };
-      });
+      // グループ選択画面に遷移
+      location.href = "group.html";
     }
-
-    loadQuiz();
   </script>
 
 </body>
