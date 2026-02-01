@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>グループ選択</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- 共通スタイル読み込み -->
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    /* ページ固有の微調整 */
+    .title {
+      font-size: 22px;
+      line-height: 1.2;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="box">
+    <h2 class="title">グループを選択</h2>
+
+    <button onclick="selectGroup('FRUITS ZIPPER')">FRUITS ZIPPER</button>
+    <button onclick="selectGroup('CANDY TUNE')">CANDY TUNE</button>
+    <button onclick="selectGroup('SWEET STEADY')">SWEET STEADY</button>
+    <button onclick="selectGroup('CUTIE STREET')">CUTIE STREET</button>
+    <button onclick="selectGroup('MORE STAR')">MORE STAR</button>
+  </div>
+
+  <script>
+    function selectGroup(groupName) {
+      const quizState = {
+        group: groupName,
+        difficulty: null,
+        currentIndex: 0,
+        correctCount: 0,
+        quizIds: []
+      };
+
+      localStorage.setItem("quizState", JSON.stringify(quizState));
+      location.href = "difficulty.html";
+    }
+  </script>
+
+</body>
+</html>
