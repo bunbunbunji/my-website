@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>出題内容の確認</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- 共通スタイル -->
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    /* ページ固有微調整 */
+    .title {
+      font-size: 22px;
+      line-height: 1.2;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    #status {
+      margin: 16px 0;
+      font-weight: bold;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="box">
+    <h2 class="title">出題内容の確認</h2>
+
+    <p id="group"></p>
+    <p id="difficulty"></p>
+    <p id="status">問題を準備しています…</p>
+
+    <button id="startBtn" disabled>クイズを始める</button>
+  </div>
+
+  <script>
+    // ===== Supabase 設定 =====
+    const supabaseUrl = "https://atinpqtedmrfrtdlkpkd.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0aW5wcXRlZG1yZnJ0ZGxrcGtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwOTU0NjcsImV4cCI6MjA4NDY3MTQ2N30.Oor6oUuuIxa0pSxIRuwEw7ZzGYM4hOGfywHqv2FaBHg";
+    const supabaseClient = window.supabase.createClient(
+      supabaseUrl,
+      supabaseKey
+    );
+
+    // ===== 状態取得 =====
+    const state = JSON.parse(localStorage.getItem("quizState"));
+
+    if (!state || !state.group || !state.difficulty) {
+      location.href = "group.html";
+    }
+
+    // 表示
+    document.getElementById("group").textContent =
+      "グループ： " + state.group;
+
+    const difficultyLabel = {
+      easy: "やさしい",
+      normal: "ふつう",
+      hard: "むずかしい"
+    };
+
+    document.getElementById("difficulty").textContent =
+      "難易度： " + difficultyLabel[state.difficulty];
+
+    // ===== クイズ取得 =====
+    async function prepareQuiz() {
+      const { data, error } = await supabaseClient
+        .from("quizzes")
+        .select("id")
+        .eq("group_name", state.group)
+        .eq("difficulty", state.difficulty);
+
+      if (error || !data || data.length === 0) {
+        document.getElementById("status").textContent =
+          "問題が見つかりませんでした";
+        return;
+      }
+
+      // シャッフル
+      const shuffled = data
+        .map(q => q.id)
+        .sort(() => Math.random() - 0.5);
+
+      // 最大10問まで
+      state.quizIds = shuffled.slice(0, 10);
+      localStorage.setItem("quizState", JSON.stringify(state));
+
+      document.getElementById("status").textContent =
+        `${state.quizIds.length}問のクイズを用意しました`;
+
+      const btn = document.getElementById("startBtn");
+      btn.disabled = false;
+      btn.onclick = () => {
+        location.href = "quiz.html";
+      };
+    }
+
+    prepareQuiz();
+  </script>
+
+</body>
+</html>
