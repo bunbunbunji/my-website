@@ -14,7 +14,7 @@ body {
   padding: 40px 20px;
   border-radius: 12px;
   text-align: center;
-  max-width: 400px;
+  max-width: 600px;
   width: 100%;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   margin: auto;
@@ -22,27 +22,13 @@ body {
 
 /* タイトル用 */
 .title {
-  display: flex;
-  flex-direction: column; /* 2行に縦並び */
-  align-items: center;    /* 中央揃え */
+  font-size: 22px;
+  line-height: 1.2;
+  margin-bottom: 16px;
   text-align: center;
-  margin-bottom: 32px;
 }
 
-.title-line1 {
-  font-size: 22px;
-  line-height: 1.2;
-  margin-bottom: 8px; /* 1行目と2行目の間隔 */
-}
-
-.title-line2 {
-  font-size: 22px;
-  line-height: 1.2;
-  word-break: keep-all; /* 日本語を途中で改行させない */
-  white-space: nowrap;  /* 改行させない */
-}
-
-/* ボタン共通スタイル */
+/* ボタン共通 */
 button {
   width: 100%;
   padding: 14px;
@@ -56,6 +42,41 @@ button {
   transition: background 0.2s;
 }
 
-button:hover {
+button:hover:not(:disabled) {
   background: #ff69b4;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* quiz.html 専用 */
+.members {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.member-btn {
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #000;
+  cursor: pointer;
+  flex: 1 0 auto;
+}
+
+.member-btn.on {
+  background: #ffb6c1;
+  border-color: #ff69b4;
+  color: #fff;
+}
+
+button.submit {
+  background: #ffb6c1;
+  color: #fff;
+  font-weight: bold;
 }
