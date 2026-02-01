@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>だれが歌ってる？</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="box">
+  <h2 class="title">だれが歌ってる？</h2>
+  <p id="lyrics">読み込み中…</p>
+  <div class="members" id="members"></div>
+  <button class="submit" id="submitBtn">回答する</button>
+  <button class="submit" id="nextBtn" style="display:none;">次の問題へ</button>
+  <p id="result"></p>
+</div>
+
+<script>
+const SUPABASE_URL = "https://atinpqtedmrfrtdlkpkd.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0aW5wcXRlZG1yZnJ0ZGxrcGtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwOTU0NjcsImV4cCI6MjA4NDY3MTQ2N30.Oor6oUuuIxa0pSxIRuwEw7ZzGYM4hOGfywHqv2FaBHg";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const quizState = JSON.parse(localStorage.getItem("quizState"));
+if (!quizState) location.href = "index.html";
+
+let quizzes = [];
+let currentIndex = 0;
+let currentQuiz = null;
+let members = [];
+let selectedMembers = new Set();
+
+// 初期ロード
+loadQuizzesAndMembers();
+
+async function loadQuizzesAndMembers() {
+  // 全問題取得
+  const { data: quizData } = await supabaseClient
+    .from("quizzes")
+    .select("*")
+    .eq("group_name", quizState.group)
+    .eq("difficulty", quizState.difficulty)
+    .order("id")
+    .limit(3);
+
+  if (!quizData?.length) { document.getElementById("lyrics").textContent = "問題を取得できません"; return; }
+  quizzes = quizData;
+
+  // メンバー取得
+  const { data: memberData } = await supabaseClient
+    .from("members")
+    .select("*")
+    .eq("group_name", quizState.group)
+    .order("sort_order");
+
+  if (!memberData?.length) { document.getElementById("lyrics").textContent = "メンバー情報を取得できません"; return; }
+  members = memberData;
+
+  // 最初の問題表示
+  showQuiz(currentIndex);
+}
+
+function showQuiz(index) {
+  currentQuiz = quizzes[index];
+  document.getElementById("lyrics").textContent = currentQuiz.lyrics_main;
+
+  // 選択状態リセット
+  selectedMembers.clear();
+  renderMembers();
+
+  // 結果表示リセット
+  const resultEl = document.getElementById("result");
+  resultEl.textContent = "";
+  resultEl.classList.remove("correct", "incorrect", "animate");
+
+  // 回答ボタンを必ず有効化
+  const submitBtn = document.getElementById("submitBtn");
+  submitBtn.disabled = false;        // ← ここがポイント
+  submitBtn.classList.remove("flash-red");
+
+  // 次の問題ボタンは非表示
+  document.getElementById("nextBtn").style.display = "none";
+}
+
+function renderMembers() {
+  const container = document.getElementById("members");
+  container.innerHTML = "";
+  members.forEach(m => {
+    const btn = document.createElement("button");
+    btn.textContent = m.name;
+    btn.className = "member-btn";
+    btn.onclick = () => toggleMember(btn, m.name);
+    container.appendChild(btn);
+  });
+
+  const allBtn = document.createElement("button");
+  allBtn.textContent = "全員";
+  allBtn.className = "member-btn";
+  allBtn.onclick = () => toggleAll(allBtn);
+  container.appendChild(allBtn);
+}
+
+function toggleMember(btn, name) {
+  if (selectedMembers.has(name)) { selectedMembers.delete(name); btn.classList.remove("on"); }
+  else { selectedMembers.add(name); btn.classList.add("on"); }
+}
+
+function toggleAll(allBtn) {
+  const memberButtons = document.querySelectorAll(".member-btn:not(:last-child)");
+  const allOn = [...memberButtons].every(b => b.classList.contains("on"));
+  memberButtons.forEach(btn => {
+    const name = btn.textContent;
+    if (allOn) { btn.classList.remove("on"); selectedMembers.delete(name); }
+    else { btn.classList.add("on"); selectedMembers.add(name); }
+  });
+  allBtn.classList.toggle("on", !allOn);
+}
+
+// 回答ボタン
+document.getElementById("submitBtn").onclick = () => {
+  const resultEl = document.getElementById("result");
+  const submitBtn = document.getElementById("submitBtn");
+
+  if (!currentQuiz) return;
+
+  if (selectedMembers.size === 0) {
+    resultEl.textContent = "誰も選択されていません！";
+    submitBtn.classList.add("flash-red");
+    submitBtn.addEventListener("animationend", () => submitBtn.classList.remove("flash-red"), { once: true });
+    return;
+  }
+
+  const correct = currentQuiz.correct_members.split(",").map(s => s.trim()).sort();
+  const answer = Array.from(selectedMembers).sort();
+  const isCorrect = correct.length === answer.length && correct.every((v,i)=>v===answer[i]);
+
+  resultEl.classList.remove("correct", "incorrect", "animate");
+  resultEl.textContent = isCorrect
+    ? `⭕ 正解！😄 （正解：${correct.join("・")}）`
+    : `❌ 不正解！😫 （正解：${correct.join("・")}）`;
+
+  resultEl.classList.add(isCorrect ? "correct" : "incorrect");
+  void resultEl.offsetWidth;
+  resultEl.classList.add("animate");
+
+  if (isCorrect) quizState.correctCount++;
+  localStorage.setItem("quizState", JSON.stringify(quizState));
+
+  // 回答後はボタンを無効化
+  submitBtn.disabled = true;
+
+  // 次の問題ボタンを表示
+  document.getElementById("nextBtn").style.display = "inline-block";
+};
+
+// 次の問題ボタン
+document.getElementById("nextBtn").onclick = () => {
+  currentIndex++;
+  if (currentIndex < quizzes.length) {
+    showQuiz(currentIndex);
+  } else {
+    alert(`全${quizzes.length}問終了！正解数：${quizState.correctCount}`);
+    location.href = "index.html";
+  }
+};
+</script>
+
+</body>
+</html>
