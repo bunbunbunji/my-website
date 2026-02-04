@@ -179,6 +179,14 @@ document.getElementById("submitBtn").onclick = () => {
   void resultEl.offsetWidth;
   resultEl.classList.add("animate");
 
+  // ★ 正解・不正解表示後に画面下までスクロール
+setTimeout(() => {
+  window.scrollTo({
+    top: document.body.scrollHeight,
+    behavior: "smooth"
+  });
+}, 100);
+
   if (isCorrect) quizState.correctCount++;
   localStorage.setItem("quizState", JSON.stringify(quizState));
 
