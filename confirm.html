@@ -39,6 +39,8 @@
     <p id="group"></p>
     <p id="difficulty"></p>
     <p id="status">問題を準備しています…</p>
+    <div id="description" style="display:none; margin-top:12px; font-size:14px; line-height:1.6;">
+    </div>
 
     <button id="startBtn" disabled>クイズを始める</button>
   </div>
@@ -97,6 +99,16 @@
 
       document.getElementById("status").textContent =
         `${state.quizIds.length}問のクイズを用意しました`;
+      
+        const description = document.getElementById("description");
+      description.innerHTML = `
+        ・このクイズは複数選択式です。<br>
+        ・ボタンをクリックすると、ボタンが選択された状態になります。<br>
+        ・「このメンバーだ」と思うメンバーを選んで「回答」ボタンをクリックしてください。<br>
+        ・「全員」ボタンをクリックすると、全員が選択または未選択の状態になります。
+      `;
+
+description.style.display = "block";
 
       const btn = document.getElementById("startBtn");
       btn.disabled = false;
