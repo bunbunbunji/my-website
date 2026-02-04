@@ -126,3 +126,42 @@ button.submit.flash-red {
   background-color: #f44336;
   color: white;
 }
+
+/* 歌詞の説明文（explanation） */
+#explanation {
+  margin-top: 10px;
+  font-size: 13px;          /* 小さめ文字 */
+  color: #666;              /* 薄いグレー */
+  line-height: 1.5;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  opacity: 0;
+  width: 220px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  padding: 8px 10px;
+  border-radius: 6px;
+
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+
+  transition: opacity 0.2s;
+  font-size: 13px;
+  z-index: 10;
+}
+
+.tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
