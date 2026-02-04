@@ -55,6 +55,31 @@
       // 次のページに遷移
       location.href = "confirm.html";
     }
+
+      let lastTappedButton = null;
+
+  document.querySelectorAll(".tooltip button").forEach(button => {
+    button.addEventListener("click", () => {
+      const tooltip = button.parentElement;
+      const level = button.dataset.level;
+
+      // スマホ判定
+      const isTouch = window.matchMedia("(hover: none)").matches;
+
+      if (isTouch) {
+        // 1回目タップ
+        if (lastTappedButton !== button) {
+          document.querySelectorAll(".tooltip").forEach(t => t.classList.remove("active"));
+          tooltip.classList.add("active");
+          lastTappedButton = button;
+          return;
+        }
+      }
+
+      // 2回目タップ or PCクリック
+      selectDifficulty(level);
+    });
+  });
   </script>
 
 </body>
