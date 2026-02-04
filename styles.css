@@ -32,7 +32,7 @@ body {
 button {
   width: 100%;
   padding: 14px;
-  margin: 8px 0;
+  margin: 4px 0;
   font-size: 16px;
   cursor: pointer;
   border-radius: 8px;
@@ -42,8 +42,10 @@ button {
   transition: background 0.2s;
 }
 
-button:hover:not(:disabled) {
-  background: #ff69b4;
+@media (hover: hover) and (pointer: fine) {
+  button:hover:not(:disabled) {
+    background: #ff69b4;
+  }
 }
 
 button:disabled {
