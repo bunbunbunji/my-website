@@ -280,3 +280,28 @@ body.scroll-page {
     gap: 6px;           /* ボタン同士の隙間も少しだけ詰める */
   }
 }
+
+/* クイズのヒント（前後の歌詞）用スタイル */
+.hint-lyrics {
+  font-size: 14px;
+  color: #888;
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 8px;
+  margin: 10px 0;
+  line-height: 1.4;
+}
+
+.hint-label {
+  font-size: 12px;
+  font-weight: bold;
+  color: #ffb6c1;
+}
+
+/* メインの歌詞を少し強調する */
+#lyrics {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 20px 0;
+  color: #333;
+}
