@@ -267,3 +267,16 @@ body.scroll-page {
     text-overflow: clip;   /* 文字を削ってでも一行を守る */
   }
 }
+
+/* === スマホ版メンバーボタンの高さ調整 === */
+@media (max-width: 480px) {
+  .member-btn {
+    padding: 6px 10px; /* 上下を8pxから6pxに、左右を12pxから10pxに少し縮小 */
+    font-size: 14px;    /* わずかに文字を小さくしてバランスをとる */
+    margin: 0;          /* 余計なマージンをリセット */
+  }
+
+  .members {
+    gap: 6px;           /* ボタン同士の隙間も少しだけ詰める */
+  }
+}
