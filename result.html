@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>検定結果 - KAWAII LAB検定</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .score-circle {
+      width: 150px;
+      height: 150px;
+      border: 8px solid #ffb6c1;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 20px auto;
+    }
+    .score-number {
+      font-size: 40px;
+      font-weight: bold;
+      color: #ff69b4;
+    }
+    .score-label {
+      font-size: 14px;
+      color: #666;
+    }
+    .message {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 30px;
+      color: #333;
+    }
+    .result-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .btn-secondary {
+      background: #fff;
+      color: #ffb6c1;
+      border: 2px solid #ffb6c1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="box">
+    <h2 class="title">検定結果</h2>
+    
+    <div class="score-circle">
+      <span class="score-label">正解数</span>
+      <span class="score-number" id="final-score">0</span>
+      <span class="score-label" id="total-questions">/ 10</span>
+    </div>
+
+    <p class="message" id="result-message"></p>
+
+    <div class="result-buttons">
+      <button onclick="retry()">同じ条件でもう一度</button>
+      <button class="btn-secondary" onclick="goHome()">グループ選択に戻る</button>
+    </div>
+  </div>
+
+  <script>
+    const state = JSON.parse(localStorage.getItem("quizState"));
+
+    if (!state) {
+      location.href = "index.html";
+    }
+
+    const score = state.correctCount || 0;
+    const total = state.quizIds ? state.quizIds.length : 10;
+
+    // スコア表示
+    document.getElementById("final-score").textContent = score;
+    document.getElementById("total-questions").textContent = `/ ${total}`;
+
+    // メッセージの分岐
+    const msgEl = document.getElementById("result-message");
+    const ratio = score / total;
+    if (ratio === 1) {
+      msgEl.textContent = "パーフェクト！🎉 あなたは真のオタクです！";
+    } else if (ratio >= 0.7) {
+      msgEl.textContent = "すごい！✨ かなりの聞き込み量ですね！";
+    } else if (ratio >= 0.4) {
+      msgEl.textContent = "あと一歩！もっと曲を聴いてみよう！";
+    } else {
+      msgEl.textContent = "伸びしろたっぷり！たくさん聴いて覚えよう！";
+    }
+
+    function retry() {
+      // スコアだけリセットして確認画面へ
+      state.currentIndex = 0;
+      state.correctCount = 0;
+      localStorage.setItem("quizState", JSON.stringify(state));
+      location.href = "confirm.html";
+    }
+
+    function goHome() {
+      location.href = "group.html";
+    }
+  </script>
+</body>
+</html>

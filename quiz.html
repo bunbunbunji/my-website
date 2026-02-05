@@ -206,12 +206,11 @@ document.getElementById("nextBtn").onclick = () => {
       behavior: "smooth"
     });
   } else {
-    alert(`全${quizzes.length}問終了！正解数：${quizState.correctCount}`);
-    location.href = "index.html";
+  // 終了時にresult.htmlへ飛ばす
+  location.href = "result.html";
   }
 };
 </script>
 
 </body>
 </html>
-

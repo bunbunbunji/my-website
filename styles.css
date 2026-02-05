@@ -212,3 +212,22 @@ button.submit.flash-red {
     color: #ff69b4 !important;
   }
 }
+
+/* === 画面スクロール固定用 === */
+body.locked {
+  /* 画面全体を固定してスクロールを禁止 */
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  height: 100dvh; /* アドレスバーを考慮した高さ */
+  overflow: hidden;
+  overscroll-behavior: none; /* iPhoneのボヨンとする動きを防止 */
+}
+
+/* 画面が小さすぎてボタンが入り切らない場合のみ、
+   白いBOXの中だけスクロールできるようにする安全策 */
+body.locked .box {
+  max-height: 90vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
