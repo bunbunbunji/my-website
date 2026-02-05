@@ -199,6 +199,12 @@ document.getElementById("nextBtn").onclick = () => {
   currentIndex++;
   if (currentIndex < quizzes.length) {
     showQuiz(currentIndex);
+
+    // ★ 画面を一番上にスクロール
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
   } else {
     alert(`全${quizzes.length}問終了！正解数：${quizState.correctCount}`);
     location.href = "index.html";
@@ -208,3 +214,4 @@ document.getElementById("nextBtn").onclick = () => {
 
 </body>
 </html>
+
