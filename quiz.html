@@ -7,210 +7,210 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="scroll-page">
 
-<div class="box">
-  <h2 class="title">だれが歌ってる？</h2>
-  <p id="lyrics">読み込み中…</p>
-  <div class="members" id="members"></div>
-  <button class="submit" id="submitBtn">回答する</button>
-  <button class="submit" id="nextBtn" style="display:none;">次の問題へ</button>
-  <p id="result"></p>
-  <div id="explanation"></div>
+  <div class="box">
+    <h2 class="title">だれが歌ってる？</h2>
+    <p id="lyrics">読み込み中…</p>
+    <div class="members" id="members"></div>
+    <button class="submit" id="submitBtn">回答する</button>
+    <button class="submit" id="nextBtn" style="display:none;">次の問題へ</button>
+    <p id="result"></p>
+    <div id="explanation"></div>
 
-</div>
+  </div>
 
-<script>
-const SUPABASE_URL = "https://atinpqtedmrfrtdlkpkd.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0aW5wcXRlZG1yZnJ0ZGxrcGtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwOTU0NjcsImV4cCI6MjA4NDY3MTQ2N30.Oor6oUuuIxa0pSxIRuwEw7ZzGYM4hOGfywHqv2FaBHg";
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  <script>
+  const SUPABASE_URL = "https://atinpqtedmrfrtdlkpkd.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0aW5wcXRlZG1yZnJ0ZGxrcGtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwOTU0NjcsImV4cCI6MjA4NDY3MTQ2N30.Oor6oUuuIxa0pSxIRuwEw7ZzGYM4hOGfywHqv2FaBHg";
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const quizState = JSON.parse(localStorage.getItem("quizState"));
-if (!quizState) location.href = "index.html";
+  const quizState = JSON.parse(localStorage.getItem("quizState"));
+  if (!quizState) location.href = "index.html";
 
-let quizzes = [];
-let currentIndex = 0;
-let currentQuiz = null;
-let members = [];
-let selectedMembers = new Set();
+  let quizzes = [];
+  let currentIndex = 0;
+  let currentQuiz = null;
+  let members = [];
+  let selectedMembers = new Set();
 
-// 初期ロード
-loadQuizzesAndMembers();
+  // 初期ロード
+  loadQuizzesAndMembers();
 
-async function loadQuizzesAndMembers() {
-  const { data: quizData, error: quizError } = await supabaseClient
-    .from("quizzes")
-    .select("*")
-    .eq("group_name", quizState.group)
-    .eq("difficulty", quizState.difficulty);
+  async function loadQuizzesAndMembers() {
+    const { data: quizData, error: quizError } = await supabaseClient
+      .from("quizzes")
+      .select("*")
+      .eq("group_name", quizState.group)
+      .eq("difficulty", quizState.difficulty);
 
-  if (quizError || !quizData || quizData.length === 0) {
-    document.getElementById("lyrics").textContent = "問題を取得できません";
-    return;
-  }
-
-  quizzes = quizData
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 10);
-
-  const { data: memberData, error: memberError } = await supabaseClient
-    .from("members")
-    .select("*")
-    .eq("group_name", quizState.group)
-    .order("sort_order");
-
-  if (memberError || !memberData || memberData.length === 0) {
-    document.getElementById("lyrics").textContent = "メンバー情報を取得できません";
-    return;
-  }
-
-  members = memberData;
-
-  currentIndex = 0;
-  showQuiz(currentIndex);
-}
-
-function showQuiz(index) {
-  currentQuiz = quizzes[index];
-  document.getElementById("lyrics").textContent = currentQuiz.lyrics_main;
-
-  selectedMembers.clear();
-  renderMembers();
-
-  const resultEl = document.getElementById("result");
-  resultEl.textContent = "";
-  resultEl.classList.remove("correct", "incorrect", "animate");
-
-  const explanationEl = document.getElementById("explanation");
-  explanationEl.textContent = "";
-
-  const submitBtn = document.getElementById("submitBtn");
-  submitBtn.disabled = false;
-  submitBtn.classList.remove("flash-red");
-
-  document.getElementById("nextBtn").style.display = "none";
-}
-
-function renderMembers() {
-  const container = document.getElementById("members");
-  container.innerHTML = "";
-  members.forEach(m => {
-    const btn = document.createElement("button");
-    btn.textContent = m.name;
-    btn.className = "member-btn";
-    btn.onclick = () => toggleMember(btn, m.name);
-    container.appendChild(btn);
-  });
-
-  const allBtn = document.createElement("button");
-  allBtn.textContent = "全員";
-  allBtn.className = "member-btn";
-  allBtn.onclick = () => toggleAll(allBtn);
-  container.appendChild(allBtn);
-}
-
-function toggleMember(btn, name) {
-  if (selectedMembers.has(name)) {
-    selectedMembers.delete(name);
-    btn.classList.remove("on");
-  } else {
-    selectedMembers.add(name);
-    btn.classList.add("on");
-  }
-}
-
-function toggleAll(allBtn) {
-  const memberButtons = document.querySelectorAll(".member-btn:not(:last-child)");
-  const allOn = [...memberButtons].every(b => b.classList.contains("on"));
-  memberButtons.forEach(btn => {
-    const name = btn.textContent;
-    if (allOn) {
-      btn.classList.remove("on");
-      selectedMembers.delete(name);
-    } else {
-      btn.classList.add("on");
-      selectedMembers.add(name);
+    if (quizError || !quizData || quizData.length === 0) {
+      document.getElementById("lyrics").textContent = "問題を取得できません";
+      return;
     }
-  });
-  allBtn.classList.toggle("on", !allOn);
-}
 
-// 回答ボタン
-document.getElementById("submitBtn").onclick = () => {
-  const resultEl = document.getElementById("result");
-  const explanationEl = document.getElementById("explanation");
-  const submitBtn = document.getElementById("submitBtn");
+    quizzes = quizData
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 10);
 
-  if (!currentQuiz) return;
+    const { data: memberData, error: memberError } = await supabaseClient
+      .from("members")
+      .select("*")
+      .eq("group_name", quizState.group)
+      .order("sort_order");
 
-  if (selectedMembers.size === 0) {
-    resultEl.textContent = "誰も選択されていません！";
-    submitBtn.classList.add("flash-red");
-    submitBtn.addEventListener(
-      "animationend",
-      () => submitBtn.classList.remove("flash-red"),
-      { once: true }
-    );
-    return;
+    if (memberError || !memberData || memberData.length === 0) {
+      document.getElementById("lyrics").textContent = "メンバー情報を取得できません";
+      return;
+    }
+
+    members = memberData;
+
+    currentIndex = 0;
+    showQuiz(currentIndex);
   }
 
-  const correct = currentQuiz.correct_members.split(",").map(s => s.trim()).sort();
-  const answer = Array.from(selectedMembers).sort();
-  const isCorrect =
-    correct.length === answer.length &&
-    correct.every((v, i) => v === answer[i]);
+  function showQuiz(index) {
+    currentQuiz = quizzes[index];
+    document.getElementById("lyrics").textContent = currentQuiz.lyrics_main;
 
-  /* ★ explanation 追加ここから */
-  const explanationText =
-    currentQuiz.song_title && currentQuiz.explanation
-    ? `この歌詞は「${currentQuiz.song_title}」の${currentQuiz.explanation}部分の歌詞でした！`
-    : "";
+    selectedMembers.clear();
+    renderMembers();
+
+    const resultEl = document.getElementById("result");
+    resultEl.textContent = "";
+    resultEl.classList.remove("correct", "incorrect", "animate");
+
+    const explanationEl = document.getElementById("explanation");
+    explanationEl.textContent = "";
+
+    const submitBtn = document.getElementById("submitBtn");
+    submitBtn.disabled = false;
+    submitBtn.classList.remove("flash-red");
+
+    document.getElementById("nextBtn").style.display = "none";
+  }
+
+  function renderMembers() {
+    const container = document.getElementById("members");
+    container.innerHTML = "";
+    members.forEach(m => {
+      const btn = document.createElement("button");
+      btn.textContent = m.name;
+      btn.className = "member-btn";
+      btn.onclick = () => toggleMember(btn, m.name);
+      container.appendChild(btn);
+    });
+
+    const allBtn = document.createElement("button");
+    allBtn.textContent = "全員";
+    allBtn.className = "member-btn";
+    allBtn.onclick = () => toggleAll(allBtn);
+    container.appendChild(allBtn);
+  }
+
+  function toggleMember(btn, name) {
+    if (selectedMembers.has(name)) {
+      selectedMembers.delete(name);
+      btn.classList.remove("on");
+    } else {
+      selectedMembers.add(name);
+      btn.classList.add("on");
+    }
+  }
+
+  function toggleAll(allBtn) {
+    const memberButtons = document.querySelectorAll(".member-btn:not(:last-child)");
+    const allOn = [...memberButtons].every(b => b.classList.contains("on"));
+    memberButtons.forEach(btn => {
+      const name = btn.textContent;
+      if (allOn) {
+        btn.classList.remove("on");
+        selectedMembers.delete(name);
+      } else {
+        btn.classList.add("on");
+        selectedMembers.add(name);
+      }
+    });
+    allBtn.classList.toggle("on", !allOn);
+  }
+
+  // 回答ボタン
+  document.getElementById("submitBtn").onclick = () => {
+    const resultEl = document.getElementById("result");
+    const explanationEl = document.getElementById("explanation");
+    const submitBtn = document.getElementById("submitBtn");
+
+    if (!currentQuiz) return;
+
+    if (selectedMembers.size === 0) {
+      resultEl.textContent = "誰も選択されていません！";
+      submitBtn.classList.add("flash-red");
+      submitBtn.addEventListener(
+        "animationend",
+        () => submitBtn.classList.remove("flash-red"),
+        { once: true }
+      );
+      return;
+    }
+
+    const correct = currentQuiz.correct_members.split(",").map(s => s.trim()).sort();
+    const answer = Array.from(selectedMembers).sort();
+    const isCorrect =
+      correct.length === answer.length &&
+      correct.every((v, i) => v === answer[i]);
+
+    /* ★ explanation 追加ここから */
+    const explanationText =
+      currentQuiz.song_title && currentQuiz.explanation
+      ? `この歌詞は「${currentQuiz.song_title}」の${currentQuiz.explanation}部分の歌詞でした！`
+      : "";
 
 
-  resultEl.classList.remove("correct", "incorrect", "animate");
+    resultEl.classList.remove("correct", "incorrect", "animate");
 
-  resultEl.textContent = isCorrect
-    ? `⭕ 正解！😄（正解：${correct.join("・")}）`
-    : `❌ 不正解！😫（正解：${correct.join("・")}）`;
+    resultEl.textContent = isCorrect
+      ? `⭕ 正解！😄（正解：${correct.join("・")}）`
+      : `❌ 不正解！😫（正解：${correct.join("・")}）`;
 
-  explanationEl.textContent = explanationText;
+    explanationEl.textContent = explanationText;
 
-  resultEl.classList.add(isCorrect ? "correct" : "incorrect");
-  void resultEl.offsetWidth;
-  resultEl.classList.add("animate");
+    resultEl.classList.add(isCorrect ? "correct" : "incorrect");
+    void resultEl.offsetWidth;
+    resultEl.classList.add("animate");
 
-  // ★ 正解・不正解表示後に画面下までスクロール
-setTimeout(() => {
-  window.scrollTo({
-    top: document.body.scrollHeight,
-    behavior: "smooth"
-  });
-}, 100);
-
-  if (isCorrect) quizState.correctCount++;
-  localStorage.setItem("quizState", JSON.stringify(quizState));
-
-  submitBtn.disabled = true;
-  document.getElementById("nextBtn").style.display = "inline-block";
-};
-
-// 次の問題ボタン
-document.getElementById("nextBtn").onclick = () => {
-  currentIndex++;
-  if (currentIndex < quizzes.length) {
-    showQuiz(currentIndex);
-
-    // ★ 画面を一番上にスクロール
+    // ★ 正解・不正解表示後に画面下までスクロール
+  setTimeout(() => {
     window.scrollTo({
-      top: 0,
+      top: document.body.scrollHeight,
       behavior: "smooth"
     });
-  } else {
-  // 終了時にresult.htmlへ飛ばす
-  location.href = "result.html";
-  }
-};
-</script>
+  }, 100);
+
+    if (isCorrect) quizState.correctCount++;
+    localStorage.setItem("quizState", JSON.stringify(quizState));
+
+    submitBtn.disabled = true;
+    document.getElementById("nextBtn").style.display = "inline-block";
+  };
+
+  // 次の問題ボタン
+  document.getElementById("nextBtn").onclick = () => {
+    currentIndex++;
+    if (currentIndex < quizzes.length) {
+      showQuiz(currentIndex);
+
+      // ★ 画面を一番上にスクロール
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+    } else {
+    // 終了時にresult.htmlへ飛ばす
+    location.href = "result.html";
+    }
+  };
+  </script>
 
 </body>
 </html>

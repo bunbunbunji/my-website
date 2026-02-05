@@ -231,3 +231,21 @@ body.locked .box {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
+
+/* === クイズ画面・結果画面の余白削除用 === */
+body.scroll-page {
+  height: auto;          /* 高さを固定せず、中身に合わせて伸ばす */
+  min-height: 100vh;     /* 背景が途切れないようにする */
+  align-items: flex-start; /* 上寄せにする（通常は真ん中寄せ） */
+  padding: 0;            /* 外側の余白をゼロに */
+}
+
+/* スマホ幅（600px以下）のときだけ、BOXの上の隙間もなくす */
+@media (max-width: 600px) {
+  body.scroll-page .box {
+    margin-top: 0;       /* 上の隙間をゼロに */
+    border-radius: 0;    /* 角丸もなくしてスマホアプリっぽく全画面に */
+    min-height: 100vh;   /* 画面いっぱいまで白背景にする */
+    box-shadow: none;    /* 影を消してスッキリさせる */
+  }
+}
