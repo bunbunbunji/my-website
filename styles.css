@@ -250,18 +250,20 @@ body.scroll-page {
   }
 }
 
-/* === 難易度ボタンのスマホ用調整 === */
 @media (max-width: 480px) {
-  /* ボタン同士の隙間を少し詰める */
+  /* 1. ボタン同士の隙間をさらに詰め、親要素のpaddingも削る */
   .button-row {
-    gap: 6px; 
+    gap: 4px; 
+    padding: 0;
   }
 
-  /* ボタン内の文字サイズと余白を調整 */
+  /* 2. ボタンの余白と文字サイズを限界まで調整 */
   .tooltip button {
-    font-size: 13px;       /* 文字を少し小さく */
-    padding: 14px 2px;     /* 横の余白を極力減らす */
-    white-space: nowrap;   /* 強制的に改行を禁止する */
-    width: 100%;           /* 幅を確保 */
+    /* 画面幅に合わせて文字を小さくする計算式 (3.2vw) */
+    font-size: clamp(10px, 3.2vw, 14px); 
+    padding: 14px 0;       /* 左右余白をゼロに */
+    white-space: nowrap;
+    overflow: hidden;      /* 万が一のハミ出しを隠す */
+    text-overflow: clip;   /* 文字を削ってでも一行を守る */
   }
 }
