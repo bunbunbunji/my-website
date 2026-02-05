@@ -19,6 +19,7 @@ body {
   width: 100%;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   margin: auto;
+  position: relative; /* 説明文の絶対配置の基準 */
 }
 
 /* タイトル用 */
@@ -139,32 +140,58 @@ button.submit.flash-red {
 }
 
 .tooltip {
-  position: relative;
-  display: inline-block;
-  margin-bottom: 12px;
+  text-align: center; /* 子要素を中央揃え */
+  margin-bottom: 16px;
 }
 
 .tooltip-text {
-  visibility: hidden;
-  opacity: 0;
-  width: 220px;
-  background-color: #333;
-  color: #fff;
-  text-align: center;
-  padding: 8px 10px;
-  border-radius: 6px;
-
-  position: absolute;
-  bottom: 120%;
-  left: 50%;
-  transform: translateX(-50%);
-
-  transition: opacity 0.2s;
-  font-size: 13px;
-  z-index: 10;
+  margin-top: 6px;
+  font-size: 14px;
+  color: #333;
 }
 
 .tooltip:hover .tooltip-text {
   visibility: visible;
   opacity: 1;
+}
+
+/* difficulty.html専用ボタン */
+.button-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.tooltip {
+  text-align: center;
+  flex: 1;
+}
+
+.tooltip button {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  background: #ffb6c1;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.tooltip-text {
+  margin-top: 6px;
+  font-size: 14px;
+  color: #333;
+  display: none;
+}
+
+
+#difficulty-desc {
+  text-align: center;
+  font-size: 14px;
+  color: #333;
+  margin-top: 12px;   /* ボタン群からの余白 */
+  min-height: 20px;   /* 説明文がないときの高さを確保 */
 }
