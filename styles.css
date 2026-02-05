@@ -195,3 +195,20 @@ button.submit.flash-red {
   margin-top: 12px;   /* ボタン群からの余白 */
   min-height: 20px;   /* 説明文がないときの高さを確保 */
 }
+
+/* 戻るボタン用のスタイル */
+.back-btn {
+  background: #fff !important;
+  color: #ffb6c1 !important;
+  border: 2px solid #ffb6c1 !important;
+  margin-top: 16px !important; /* 少し余白を広めにとる */
+  font-weight: bold;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .back-btn:hover {
+    background: #fff0f3 !important;
+    border-color: #ff69b4 !important;
+    color: #ff69b4 !important;
+  }
+}
