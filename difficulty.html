@@ -23,21 +23,23 @@
   <div class="box">
     <h2 class="title">難易度を選択</h2>
 
-    <div class="tooltip">
-      <button data-level="easy">やさしい</button>
-      <span class="tooltip-text">特徴的な歌詞を担当するメンバーが選出されます</span>
+    <div class="button-row">
+      <div class="tooltip">
+        <button data-level="easy">やさしい</button>
+      </div>
+      <div class="tooltip">
+        <button data-level="normal">ふつう</button>
+      </div>
+      <div class="tooltip">
+        <button data-level="hard">むずかしい</button>
+      </div>
     </div>
 
-    <div class="tooltip">
-      <button data-level="normal">ふつう</button>
-      <span class="tooltip-text">標準的な難易度です</span>
-    </div>
-
-    <div class="tooltip">
-      <button data-level="hard">むずかしい</button>
-      <span class="tooltip-text">歌割りが細かく、難易度が高いです</span>
-    </div>
+    <!-- 説明文表示用（ボタン群の下） -->
+    <div id="difficulty-desc"></div>
   </div>
+
+</div>
 
   <script>
     function selectDifficulty(level) {
@@ -55,31 +57,51 @@
       // 次のページに遷移
       location.href = "confirm.html";
     }
-
+      const desc = document.getElementById("difficulty-desc");
       let lastTappedButton = null;
 
-  document.querySelectorAll(".tooltip button").forEach(button => {
-    button.addEventListener("click", () => {
-      const tooltip = button.parentElement;
-      const level = button.dataset.level;
+const descriptions = {
+  easy: "初心者向け。問題数が少なめです",
+  normal: "標準的な難易度です",
+  hard: "歌割りが細かく、難易度が高いです"
+};
 
-      // スマホ判定
-      const isTouch = window.matchMedia("(hover: none)").matches;
+document.querySelectorAll(".tooltip button").forEach(button => {
+  const level = button.dataset.level;
 
-      if (isTouch) {
-        // 1回目タップ
-        if (lastTappedButton !== button) {
-          document.querySelectorAll(".tooltip").forEach(t => t.classList.remove("active"));
-          tooltip.classList.add("active");
-          lastTappedButton = button;
-          return;
-        }
+  // スマホ / PC共通クリック
+  button.addEventListener("click", () => {
+    const isTouch = window.matchMedia("(hover: none)").matches;
+
+    if (isTouch) {
+      if (lastTappedButton !== button) {
+        desc.textContent = descriptions[level];
+        lastTappedButton = button;
+        return; // 1回目タップで表示のみ
       }
+    }
 
-      // 2回目タップ or PCクリック
-      selectDifficulty(level);
-    });
+    // 2回目タップ or PCクリック → 次ページ
+    const state = JSON.parse(localStorage.getItem("quizState") || "{}");
+    state.difficulty = level;
+    localStorage.setItem("quizState", JSON.stringify(state));
+    location.href = "confirm.html";
   });
+
+  // PC: ホバーで表示
+  button.addEventListener("mouseenter", () => {
+    if (!window.matchMedia("(hover: none)").matches) {
+      desc.textContent = descriptions[level];
+    }
+  });
+
+  button.addEventListener("mouseleave", () => {
+    if (!window.matchMedia("(hover: none)").matches) {
+      desc.textContent = "";
+    }
+  });
+});
+
   </script>
 
 </body>
