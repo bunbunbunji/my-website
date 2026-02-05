@@ -11,7 +11,9 @@
 
   <div class="box">
     <h2 class="title">だれが歌ってる？</h2>
+    <div id="prev-lyrics" class="hint-lyrics" style="display:none;"></div>
     <p id="lyrics">読み込み中…</p>
+    <div id="next-lyrics" class="hint-lyrics" style="display:none;"></div>
     <div class="members" id="members"></div>
     <button class="submit" id="submitBtn">回答する</button>
     <button class="submit" id="nextBtn" style="display:none;">次の問題へ</button>
@@ -71,9 +73,41 @@
   }
 
   function showQuiz(index) {
-    currentQuiz = quizzes[index];
-    document.getElementById("lyrics").textContent = currentQuiz.lyrics_main;
+  currentQuiz = quizzes[index];
+  document.getElementById("lyrics").textContent = currentQuiz.lyrics_main;
 
+  const prevEl = document.getElementById("prev-lyrics");
+  const nextEl = document.getElementById("next-lyrics");
+
+  // ★ 難易度に応じたヒント表示の分岐
+  if (quizState.difficulty === "easy") {
+    // 【やさしい】前後2行ずつ表示
+    const prevText = [currentQuiz.lyrics_prev1, currentQuiz.lyrics_prev2].filter(t => t).join("<br>");
+    const nextText = [currentQuiz.lyrics_next1, currentQuiz.lyrics_next2].filter(t => t).join("<br>");
+    
+    updateHint(prevEl, "-直前の歌詞-", prevText);
+    updateHint(nextEl, "-直後の歌詞-", nextText);
+
+  } else if (quizState.difficulty === "normal") {
+    // 【ふつう】直前1行(prev2)と直後1行(next1)のみ表示
+    updateHint(prevEl, "-直前の歌詞-", currentQuiz.lyrics_prev2);
+    updateHint(nextEl, "-直後の歌詞-", currentQuiz.lyrics_next1);
+
+  } else {
+    // 【むずかしい】ヒントなし
+    prevEl.style.display = "none";
+    nextEl.style.display = "none";
+  }
+
+  // --- 補助関数 (コードをスッキリさせるため) ---
+  function updateHint(el, label, text) {
+    if (text && text.trim() !== "") {
+      el.innerHTML = `<span class="hint-label">${label}</span><br>${text}`;
+      el.style.display = "block";
+    } else {
+      el.style.display = "none";
+    }
+  }
     selectedMembers.clear();
     renderMembers();
 
