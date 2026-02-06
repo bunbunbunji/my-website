@@ -70,8 +70,9 @@ const descriptions = {
 document.querySelectorAll(".tooltip button").forEach(button => {
   const level = button.dataset.level;
 
-  // 1. 【マウス専用】ホバーで説明を表示/非表示
-  // pointerTypeがmouseの時だけ反応するようにします
+  // 1. 【マウス専用】ホバー処理
+  // iPhoneでは mouseenter がタップ時に一瞬走るのを防ぐため、
+  // pointerType が mouse の時だけ実行するように厳格化します。
   button.addEventListener("pointerenter", (e) => {
     if (e.pointerType === "mouse") {
       desc.textContent = descriptions[level];
@@ -84,24 +85,28 @@ document.querySelectorAll(".tooltip button").forEach(button => {
     }
   });
 
-  // 2. 【共通】クリック・タップ時の処理
-  button.addEventListener("click", (e) => {
-    // マウスでのクリックなら、説明なしで即遷移してOK（ホバーですでに読んでいるため）
-    if (e.pointerType === "mouse") {
-      goToNext(level);
-      return;
-    }
+  // 2. 【最重要：スマホ・タッチ用】
+  // clickイベントではなく touchend でスマホ操作を完全に横取りします
+  button.addEventListener("touchend", (e) => {
+    // 画面スクロール中の誤動作防止
+    if (e.cancelable) e.preventDefault(); 
 
-    // 指でのタップ（touch）やペンの場合
     if (lastTappedButton !== button) {
-      // まだ選択されていないボタンなら、説明を出して一旦止める
+      // 1回目：説明を表示
       desc.textContent = descriptions[level];
       lastTappedButton = button;
-      
-      // 他のボタンの「選択状態」をリセット（念のため）
-      e.stopPropagation(); 
     } else {
-      // すでに説明が出ているボタンをもう一度タップしたら遷移
+      // 2回目：同じボタンなら遷移
+      goToNext(level);
+    }
+  });
+
+  // 3. 【PC・マウス専用】クリック
+  button.addEventListener("click", (e) => {
+    // 指で触った場合は touchend 側で処理するため、
+    // ここではマウス操作（pointerType === 'mouse'）のみ即遷移させる
+    if (e.pointerType === "mouse" || e.pointerType === "") {
+      // マウスなら即座に決定
       goToNext(level);
     }
   });
@@ -116,22 +121,17 @@ function goToNext(level) {
 }
 
 // スマホでボタン以外の場所をタップしたら説明を消す
-document.addEventListener("click", (e) => {
+const resetState = (e) => {
   if (!e.target.closest(".tooltip")) {
     lastTappedButton = null;
     desc.textContent = "";
   }
-});
+};
 
-// スマホで別の場所を触ったらリセットする処理（おまけ）
-document.addEventListener("touchstart", (e) => {
-  if (!e.target.closest(".tooltip")) {
-    lastTappedButton = null;
-    desc.textContent = "";
-  }
-});
+document.addEventListener("click", resetState);
+document.addEventListener("touchend", resetState);
 
-  </script>
+</script>
 
 </body>
 </html>
