@@ -70,40 +70,57 @@ const descriptions = {
 document.querySelectorAll(".tooltip button").forEach(button => {
   const level = button.dataset.level;
 
-  // 【PC用】マウスが動いてボタンに入ったことを検知（タッチ判定を無視して実行）
-  button.addEventListener("mousemove", () => {
-    // 最後にタップされたボタンと違う、かつスマホモードでない時に説明を出す
-    if (lastTappedButton === null) { 
+  // 1. 【マウス専用】ホバーで説明を表示/非表示
+  // pointerTypeがmouseの時だけ反応するようにします
+  button.addEventListener("pointerenter", (e) => {
+    if (e.pointerType === "mouse") {
       desc.textContent = descriptions[level];
     }
   });
 
-  // 【PC用】マウスがボタンから出た時
-  button.addEventListener("mouseleave", () => {
-    desc.textContent = "";
+  button.addEventListener("pointerleave", (e) => {
+    if (e.pointerType === "mouse") {
+      desc.textContent = "";
+    }
   });
 
-  // 【共通】クリック時の動作
+  // 2. 【共通】クリック・タップ時の処理
   button.addEventListener("click", (e) => {
-    // マウスでのクリック（pointerTypeがmouse）か、
-    // あるいはタッチパネルでのタップかを判定
-    const isMouse = e.pointerType === "mouse" || !window.matchMedia("(hover: none)").matches;
-
-    if (!isMouse) {
-      // --- スマホ・タッチパネル操作の場合 ---
-      if (lastTappedButton !== button) {
-        desc.textContent = descriptions[level];
-        lastTappedButton = button;
-        return; // 1回目は説明表示のみ
-      }
+    // マウスでのクリックなら、説明なしで即遷移してOK（ホバーですでに読んでいるため）
+    if (e.pointerType === "mouse") {
+      goToNext(level);
+      return;
     }
 
-    // --- マウス操作、またはスマホ2回目タップの場合 ---
-    const state = JSON.parse(localStorage.getItem("quizState") || "{}");
-    state.difficulty = level;
-    localStorage.setItem("quizState", JSON.stringify(state));
-    location.href = "confirm.html";
+    // 指でのタップ（touch）やペンの場合
+    if (lastTappedButton !== button) {
+      // まだ選択されていないボタンなら、説明を出して一旦止める
+      desc.textContent = descriptions[level];
+      lastTappedButton = button;
+      
+      // 他のボタンの「選択状態」をリセット（念のため）
+      e.stopPropagation(); 
+    } else {
+      // すでに説明が出ているボタンをもう一度タップしたら遷移
+      goToNext(level);
+    }
   });
+});
+
+// 次の画面へ進む共通処理
+function goToNext(level) {
+  const state = JSON.parse(localStorage.getItem("quizState") || "{}");
+  state.difficulty = level;
+  localStorage.setItem("quizState", JSON.stringify(state));
+  location.href = "confirm.html";
+}
+
+// スマホでボタン以外の場所をタップしたら説明を消す
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".tooltip")) {
+    lastTappedButton = null;
+    desc.textContent = "";
+  }
 });
 
 // スマホで別の場所を触ったらリセットする処理（おまけ）
