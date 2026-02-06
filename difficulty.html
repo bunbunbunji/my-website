@@ -70,37 +70,48 @@ const descriptions = {
 document.querySelectorAll(".tooltip button").forEach(button => {
   const level = button.dataset.level;
 
-  // スマホ / PC共通クリック
-  button.addEventListener("click", () => {
-    const isTouch = window.matchMedia("(hover: none)").matches;
+  // 【PC用】マウスが動いてボタンに入ったことを検知（タッチ判定を無視して実行）
+  button.addEventListener("mousemove", () => {
+    // 最後にタップされたボタンと違う、かつスマホモードでない時に説明を出す
+    if (lastTappedButton === null) { 
+      desc.textContent = descriptions[level];
+    }
+  });
 
-    if (isTouch) {
+  // 【PC用】マウスがボタンから出た時
+  button.addEventListener("mouseleave", () => {
+    desc.textContent = "";
+  });
+
+  // 【共通】クリック時の動作
+  button.addEventListener("click", (e) => {
+    // マウスでのクリック（pointerTypeがmouse）か、
+    // あるいはタッチパネルでのタップかを判定
+    const isMouse = e.pointerType === "mouse" || !window.matchMedia("(hover: none)").matches;
+
+    if (!isMouse) {
+      // --- スマホ・タッチパネル操作の場合 ---
       if (lastTappedButton !== button) {
         desc.textContent = descriptions[level];
         lastTappedButton = button;
-        return; // 1回目タップで表示のみ
+        return; // 1回目は説明表示のみ
       }
     }
 
-    // 2回目タップ or PCクリック → 次ページ
+    // --- マウス操作、またはスマホ2回目タップの場合 ---
     const state = JSON.parse(localStorage.getItem("quizState") || "{}");
     state.difficulty = level;
     localStorage.setItem("quizState", JSON.stringify(state));
     location.href = "confirm.html";
   });
+});
 
-  // PC: ホバーで表示
-  button.addEventListener("mouseenter", () => {
-    if (!window.matchMedia("(hover: none)").matches) {
-      desc.textContent = descriptions[level];
-    }
-  });
-
-  button.addEventListener("mouseleave", () => {
-    if (!window.matchMedia("(hover: none)").matches) {
-      desc.textContent = "";
-    }
-  });
+// スマホで別の場所を触ったらリセットする処理（おまけ）
+document.addEventListener("touchstart", (e) => {
+  if (!e.target.closest(".tooltip")) {
+    lastTappedButton = null;
+    desc.textContent = "";
+  }
 });
 
   </script>
