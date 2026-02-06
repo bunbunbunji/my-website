@@ -25,9 +25,10 @@ body {
 }
 
 .title {
-  font-size: 22px;
+  font-size: 18px;      /* 22pxから18pxに小さく (#2) */
   line-height: 1.2;
-  margin-bottom: 16px;
+  margin-top: -10px;    /* 上のマージンをマイナス指定で狭く (#1) */
+  margin-bottom: 10px;  /* 下のマージンも少し詰めました */
   text-align: center;
 }
 
@@ -130,14 +131,15 @@ button.submit.flash-red {
 
 /* 歌詞・ヒント表示 */
 #lyrics {
-  font-size: 18px;
+  font-size: 22px;      /* 18pxから22pxに大きく (#3) */
   font-weight: bold;
-  margin: 20px 0;
+  margin: 10px 0;       /* 20pxから10pxに狭く (#4) */
   color: #333;
+  line-height: 1.4;     /* 歌詞が複数行になっても読みやすいように調整 */
 }
 
 .hint-lyrics {
-  font-size: 14px;
+  font-size: 12px;
   color: #888;
   background: #f9f9f9;
   padding: 10px;
