@@ -1,4 +1,6 @@
-/* 共通スタイル（全ページで流用可能） */
+/* ==========================================
+   共通スタイル
+   ========================================== */
 body {
   font-family: sans-serif;
   background: #f7f7f7;
@@ -7,7 +9,7 @@ body {
   align-items: center;
   height: 100vh;
   margin: 0;
-  overflow-x: hidden;   /* ← 追加：左右スクロール完全防止 */
+  overflow-x: hidden;
 }
 
 .box {
@@ -19,10 +21,9 @@ body {
   width: 100%;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   margin: auto;
-  position: relative; /* 説明文の絶対配置の基準 */
+  position: relative;
 }
 
-/* タイトル用 */
 .title {
   font-size: 22px;
   line-height: 1.2;
@@ -30,32 +31,41 @@ body {
   text-align: center;
 }
 
-/* ボタン共通 */
-button {
+/* --- ボタン基本設定 --- */
+button, 
+.tooltip button, 
+#nextBtn, 
+button.submit {
   width: 100%;
   padding: 14px;
   margin: 4px 0;
   font-size: 16px;
+  font-weight: bold;
   cursor: pointer;
-  border-radius: 8px;
+  border-radius: 25px;
   border: none;
-  background: #ffb6c1;
+  background: #ff85a2;
   color: #fff;
-  transition: background 0.2s;
+  transition: background 0.2s, opacity 0.2s, transform 0.1s; /* ここでアニメ設定 */
 }
 
+/* ホバー時（PC） */
 @media (hover: hover) and (pointer: fine) {
   button:hover:not(:disabled) {
-    background: #ff69b4;
+    background: #ff6b90;
   }
 }
 
+/* 無効化（disabled）時の色の薄さを維持 */
 button:disabled {
+  background: #ffb6c1 !important; /* 薄いピンクを強制維持 */
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-/* quiz.html 専用 */
+/* ==========================================
+   quiz.html 専用（回答・次へボタン）
+   ========================================== */
 .members {
   display: flex;
   flex-wrap: wrap;
@@ -71,19 +81,40 @@ button:disabled {
   color: #000;
   cursor: pointer;
   flex: 1 0 auto;
-  transition: all 0.2s;
+  transition: background-color 0.2s;
 }
 
 .member-btn.on {
-  background: #ffb6c1;
-  border-color: #ff69b4;
+  background: #ff85a2;
+  border-color: #ff6b90;
   color: #fff;
 }
 
+/* ★回答する・次の問題へボタン専用（立体的で凹む設定）★ */
 button.submit {
-  background: #ffb6c1;
-  color: #fff;
-  font-weight: bold;
+  display: block;
+  margin: 10px 0;
+  background-color: #ff85a2;
+  box-shadow: 0 4px 0 #e66a88; /* ボタンの下側に濃い色の「厚み」を出す */
+  position: relative;        /* 位置調整の基準 */
+  top: 0;                    /* 初期位置 */
+  transition: all 0.1s;      /* 動きをなめらかに */
+}
+
+/* 押した瞬間の挙動（立体感がつぶれて沈む） */
+button.submit:active:not(:disabled) {
+  top: 2px;                  /* ボタン自体を2px下にずらす */
+  box-shadow: 0 2px 0 #e66a88; /* 影を2pxに縮める（沈んだように見える） */
+  transform: scale(0.98);    /* わずかに小さくして「押し込み感」を強調 */
+}
+
+/* 無効時はフラットに戻し、沈まないようにする */
+button.submit:disabled {
+  background-color: #f0f0f0 !important;
+  color: #888;
+  box-shadow: 0 4px 0 #ccc; /* 無効時も厚みだけは残す（任意） */
+  top: 0 !important;
+  transform: none !important;
 }
 
 /* 回答ボタン「誰も選択されていない」時のアニメーション */
@@ -97,191 +128,14 @@ button.submit.flash-red {
   100% { background-color: #f44336; color: #fff; }
 }
 
-/* optional: メンバー選択ボタンの押下アニメーション */
-.member-btn {
-  transition: transform 0.1s, background-color 0.2s;
-}
-.member-btn:active {
-  transform: scale(0.95);
-}
-
-/* 結果表示アニメーション */
-@keyframes result-pop {
-  0% { opacity: 0; transform: scale(0.8); }
-  50% { opacity: 1.2; transform: scale(1.2); }
-  100% { opacity: 1; transform: scale(1); }
-}
-
-#result.animate {
-  animation: result-pop 0.5s ease-out;
-  padding: 8px 12px;
-  border-radius: 8px;
-  display: inline-block;
-  transition: background-color 0.3s, color 0.3s;
-}
-
-/* 正解/不正解用クラス */
-#result.correct {
-  background-color: #4caf50;
-  color: white;
-}
-
-#result.incorrect {
-  background-color: #f44336;
-  color: white;
-}
-
-/* 歌詞の説明文（explanation） */
-#explanation {
-  margin-top: 10px;
-  font-size: 13px;          /* 小さめ文字 */
-  color: #666;              /* 薄いグレー */
-  line-height: 1.5;
-}
-
-.tooltip {
-  text-align: center; /* 子要素を中央揃え */
-  margin-bottom: 16px;
-}
-
-.tooltip-text {
-  margin-top: 6px;
-  font-size: 14px;
-  color: #333;
-}
-
-.tooltip:hover .tooltip-text {
-  visibility: visible;
-  opacity: 1;
-}
-
-/* difficulty.html専用ボタン */
-.button-row {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 24px;
-}
-
-.tooltip {
-  text-align: center;
-  flex: 1;
-}
-
-.tooltip button {
-  width: 100%;
-  padding: 14px;
-  font-size: 16px;
-  border-radius: 8px;
-  border: none;
-  background: #ffb6c1;
-  color: #fff;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.tooltip-text {
-  margin-top: 6px;
-  font-size: 14px;
-  color: #333;
-  display: none;
-}
-
-
-#difficulty-desc {
-  text-align: center;
-  font-size: 14px;
-  color: #333;
-  margin-top: 12px;   /* ボタン群からの余白 */
-  min-height: 20px;   /* 説明文がないときの高さを確保 */
-}
-
-/* 戻るボタン用のスタイル */
-.back-btn {
-  background: #fff !important;
-  color: #ffb6c1 !important;
-  border: 2px solid #ffb6c1 !important;
-  margin-top: 16px !important; /* 少し余白を広めにとる */
+/* 歌詞・ヒント表示 */
+#lyrics {
+  font-size: 18px;
   font-weight: bold;
+  margin: 20px 0;
+  color: #333;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .back-btn:hover {
-    background: #fff0f3 !important;
-    border-color: #ff69b4 !important;
-    color: #ff69b4 !important;
-  }
-}
-
-/* === 画面スクロール固定用 === */
-body.locked {
-  /* 画面全体を固定してスクロールを禁止 */
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  height: 100dvh; /* アドレスバーを考慮した高さ */
-  overflow: hidden;
-  overscroll-behavior: none; /* iPhoneのボヨンとする動きを防止 */
-}
-
-/* 画面が小さすぎてボタンが入り切らない場合のみ、
-   白いBOXの中だけスクロールできるようにする安全策 */
-body.locked .box {
-  max-height: 90vh;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* === クイズ画面・結果画面の余白削除用 === */
-body.scroll-page {
-  height: auto;          /* 高さを固定せず、中身に合わせて伸ばす */
-  min-height: 100vh;     /* 背景が途切れないようにする */
-  align-items: flex-start; /* 上寄せにする（通常は真ん中寄せ） */
-  padding: 0;            /* 外側の余白をゼロに */
-}
-
-/* スマホ幅（600px以下）のときだけ、BOXの上の隙間もなくす */
-@media (max-width: 600px) {
-  body.scroll-page .box {
-    margin-top: 0;       /* 上の隙間をゼロに */
-    border-radius: 0;    /* 角丸もなくしてスマホアプリっぽく全画面に */
-    min-height: 100vh;   /* 画面いっぱいまで白背景にする */
-    box-shadow: none;    /* 影を消してスッキリさせる */
-  }
-}
-
-@media (max-width: 480px) {
-  /* 1. ボタン同士の隙間をさらに詰め、親要素のpaddingも削る */
-  .button-row {
-    gap: 4px; 
-    padding: 0;
-  }
-
-  /* 2. ボタンの余白と文字サイズを限界まで調整 */
-  .tooltip button {
-    /* 画面幅に合わせて文字を小さくする計算式 (3.2vw) */
-    font-size: clamp(10px, 3.2vw, 14px); 
-    padding: 14px 0;       /* 左右余白をゼロに */
-    white-space: nowrap;
-    overflow: hidden;      /* 万が一のハミ出しを隠す */
-    text-overflow: clip;   /* 文字を削ってでも一行を守る */
-  }
-}
-
-/* === スマホ版メンバーボタンの高さ調整 === */
-@media (max-width: 480px) {
-  .member-btn {
-    padding: 6px 10px; /* 上下を8pxから6pxに、左右を12pxから10pxに少し縮小 */
-    font-size: 14px;    /* わずかに文字を小さくしてバランスをとる */
-    margin: 0;          /* 余計なマージンをリセット */
-  }
-
-  .members {
-    gap: 6px;           /* ボタン同士の隙間も少しだけ詰める */
-  }
-}
-
-/* クイズのヒント（前後の歌詞）用スタイル */
 .hint-lyrics {
   font-size: 14px;
   color: #888;
@@ -298,10 +152,95 @@ body.scroll-page {
   color: #ffb6c1;
 }
 
-/* メインの歌詞を少し強調する */
-#lyrics {
-  font-size: 18px;
-  font-weight: bold;
-  margin: 20px 0;
+/* ==========================================
+   difficulty.html 専用
+   ========================================== */
+.button-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.tooltip {
+  text-align: center;
+  flex: 1;
+}
+
+#difficulty-desc {
+  text-align: center;
+  font-size: 14px;
   color: #333;
+  margin-top: 12px;
+  min-height: 20px;
+}
+
+/* ==========================================
+   その他（特殊ボタン・状態）
+   ========================================== */
+.back-btn {
+  background: #fff !important;
+  color: #ff85a2 !important;
+  border: 2px solid #ff85a2 !important;
+  margin-top: 16px !important;
+}
+
+#result.animate {
+  animation: result-pop 0.5s ease-out;
+  padding: 8px 12px;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+@keyframes result-pop {
+  0% { opacity: 0; transform: scale(0.8); }
+  50% { opacity: 1.2; transform: scale(1.2); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+#result.correct { background-color: #4caf50; color: white; }
+#result.incorrect { background-color: #f44336; color: white; }
+
+/* ==========================================
+   レスポンシブ (スマホ対応)
+   ========================================== */
+@media (max-width: 600px) {
+  body.scroll-page .box {
+    margin-top: 0;
+    border-radius: 0;
+    min-height: 100vh;
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .button-row { gap: 4px; padding: 0; }
+  .tooltip button {
+    font-size: clamp(10px, 3.2vw, 14px);
+    padding: 14px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+  }
+  .member-btn { padding: 6px 10px; font-size: 14px; margin: 0; }
+  .members { gap: 6px; }
+}
+
+/* 全面固定用 */
+body.locked {
+  position: fixed;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+body.locked .box {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+body.scroll-page {
+  height: auto;
+  min-height: 100vh;
+  align-items: flex-start;
 }
