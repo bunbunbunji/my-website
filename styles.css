@@ -172,9 +172,14 @@ button.submit.flash-red {
 #difficulty-desc {
   text-align: center;
   font-size: 14px;
-  color: #333;
-  margin-top: 12px;
-  min-height: 20px;
+  color: #666;
+  margin: 20px 0;
+  min-height: 60px; /* 説明が2行になるので、少し高さを広げました */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.6;
+  white-space: pre-wrap; /* これを追加：JavaScriptの \n で改行されるようになります */
 }
 
 /* ==========================================
@@ -245,4 +250,79 @@ body.scroll-page {
   height: auto;
   min-height: 100vh;
   align-items: flex-start;
+}
+
+/* --- 基本設定 --- */
+.title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.title-main {
+  font-size: 1.2rem;
+  color: #ff69b2; /* KAWAII LABっぽいピンク */
+  font-weight: bold;
+}
+
+.title-sub {
+  font-size: 1.6rem;
+  line-height: 1.3;
+}
+
+/* スマホ以外では改行しない */
+.mobile-only {
+  display: none;
+}
+
+/* --- スマホ向け調整 (画面幅 480px以下) --- */
+@media (max-width: 480px) {
+  .mobile-only {
+    display: inline;
+  }
+
+  .title-main {
+    font-size: 1rem;
+  }
+
+  .title-sub {
+    font-size: 1.4rem; /* スマホで圧迫感が出ないサイズ */
+    padding: 0 10px;
+  }
+
+  .description {
+  text-align: center; /* 子要素を中央に寄せる */
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 15px;
+  padding: 20px;
+  margin: 20px 0;
+}
+.rules {
+  display: inline-block; /* 中身の幅に合わせつつ、親のcenterで中央へ */
+  text-align: left;
+}
+
+.rule-item {
+  display: grid;
+  /* ✨の幅(24px) - 文字(1fr) - ✨の幅(24px) */
+  grid-template-columns: 24px 1fr 24px;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 1rem;
+  color: #555;
+  font-weight: bold;
+}
+/* スマホで文字がはみ出さないように調整 */
+@media (max-width: 480px) {
+  .rule-item {
+    font-size: 0.9rem;
+    gap: 4px;
+  }
+}
+
+.rule-item span {
+  text-align: center;
+}
 }

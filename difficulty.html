@@ -5,7 +5,6 @@
   <title>難易度選択</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- 共通スタイル -->
   <link rel="stylesheet" href="styles.css">
 
   <style>
@@ -13,8 +12,25 @@
     .title {
       font-size: 22px;
       line-height: 1.2;
+      margin-top: -10px;
       margin-bottom: 24px;
       text-align: center;
+    }
+    
+    /* 説明文エリアのスタイル */
+    #difficulty-desc {
+      text-align: center;
+      font-size: 14px;
+      color: #666;
+      margin: 20px 0;
+      /* 2行になってもガタつかないよう高さを少し確保 */
+      min-height: 60px; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.6;
+      /* 重要：JavaScriptの \n で改行させる設定 */
+      white-space: pre-wrap; 
     }
   </style>
 </head>
@@ -35,103 +51,81 @@
       </div>
     </div>
 
-    <!-- 説明文表示用（ボタン群の下） -->
     <div id="difficulty-desc"></div>
+
     <button class="back-btn" onclick="location.href='group.html'">グループ選択に戻る</button>
   </div>
 
-</div>
-
   <script>
-    function selectDifficulty(level) {
-      const state = JSON.parse(localStorage.getItem("quizState"));
+    const desc = document.getElementById("difficulty-desc");
+    let lastTappedButton = null;
 
-      if (!state || !state.group) {
-        // 不正遷移対策
-        location.href = "group.html";
-        return;
-      }
+    // 最新の説明文（\n で改行）
+    const descriptions = {
+      easy: "その曲で特に特徴的な歌詞が選出されます。\nまたヒントとして、問題の前後2フレーズの歌詞が表示されます。",
+      normal: "一般的なソロパート、または全員で歌っている歌詞が選出されます。\nまたヒントとして、問題の前後1フレーズの歌詞が表示されます。",
+      hard: "二人以上で歌っている歌詞が選出されます。\nノーヒントです。"
+    };
 
+    document.querySelectorAll(".tooltip button").forEach(button => {
+      const level = button.dataset.level;
+
+      // 1. 【マウス専用】ホバー処理
+      button.addEventListener("pointerenter", (e) => {
+        if (e.pointerType === "mouse") {
+          desc.textContent = descriptions[level];
+        }
+      });
+
+      button.addEventListener("pointerleave", (e) => {
+        if (e.pointerType === "mouse") {
+          desc.textContent = "";
+        }
+      });
+
+      // 2. 【最重要：スマホ・タッチ用】
+      button.addEventListener("touchend", (e) => {
+        if (e.cancelable) e.preventDefault(); 
+
+        if (lastTappedButton !== button) {
+          // 1回目：説明を表示
+          desc.textContent = descriptions[level];
+          lastTappedButton = button;
+        } else {
+          // 2回目：同じボタンなら遷移
+          goToNext(level);
+        }
+      });
+
+      // 3. 【PC・マウス専用】クリック
+      button.addEventListener("click", (e) => {
+        if (e.pointerType === "mouse" || e.pointerType === "") {
+          goToNext(level);
+        }
+      });
+    });
+
+    // 次の画面へ進む共通処理
+    function goToNext(level) {
+      const state = JSON.parse(localStorage.getItem("quizState") || "{}");
+      // ここで保存される level (easy/normal/hard) が 
+      // quiz.html での supabase カラム名指定に使われます
       state.difficulty = level;
       localStorage.setItem("quizState", JSON.stringify(state));
-
-      // 次のページに遷移
       location.href = "confirm.html";
     }
-      const desc = document.getElementById("difficulty-desc");
-      let lastTappedButton = null;
 
-const descriptions = {
-  easy: "初心者向け。問題数が少なめです",
-  normal: "標準的な難易度です",
-  hard: "歌割りが細かく、難易度が高いです"
-};
+    // 画面の他を触ったらリセット
+    const resetState = (e) => {
+      if (!e.target.closest(".tooltip")) {
+        lastTappedButton = null;
+        desc.textContent = "";
+      }
+    };
 
-document.querySelectorAll(".tooltip button").forEach(button => {
-  const level = button.dataset.level;
-
-  // 1. 【マウス専用】ホバー処理
-  // iPhoneでは mouseenter がタップ時に一瞬走るのを防ぐため、
-  // pointerType が mouse の時だけ実行するように厳格化します。
-  button.addEventListener("pointerenter", (e) => {
-    if (e.pointerType === "mouse") {
-      desc.textContent = descriptions[level];
-    }
-  });
-
-  button.addEventListener("pointerleave", (e) => {
-    if (e.pointerType === "mouse") {
-      desc.textContent = "";
-    }
-  });
-
-  // 2. 【最重要：スマホ・タッチ用】
-  // clickイベントではなく touchend でスマホ操作を完全に横取りします
-  button.addEventListener("touchend", (e) => {
-    // 画面スクロール中の誤動作防止
-    if (e.cancelable) e.preventDefault(); 
-
-    if (lastTappedButton !== button) {
-      // 1回目：説明を表示
-      desc.textContent = descriptions[level];
-      lastTappedButton = button;
-    } else {
-      // 2回目：同じボタンなら遷移
-      goToNext(level);
-    }
-  });
-
-  // 3. 【PC・マウス専用】クリック
-  button.addEventListener("click", (e) => {
-    // 指で触った場合は touchend 側で処理するため、
-    // ここではマウス操作（pointerType === 'mouse'）のみ即遷移させる
-    if (e.pointerType === "mouse" || e.pointerType === "") {
-      // マウスなら即座に決定
-      goToNext(level);
-    }
-  });
-});
-
-// 次の画面へ進む共通処理
-function goToNext(level) {
-  const state = JSON.parse(localStorage.getItem("quizState") || "{}");
-  state.difficulty = level;
-  localStorage.setItem("quizState", JSON.stringify(state));
-  location.href = "confirm.html";
-}
-
-// スマホでボタン以外の場所をタップしたら説明を消す
-const resetState = (e) => {
-  if (!e.target.closest(".tooltip")) {
-    lastTappedButton = null;
-    desc.textContent = "";
-  }
-};
-
-document.addEventListener("click", resetState);
-document.addEventListener("touchend", resetState);
-
-</script>
+    document.addEventListener("click", resetState);
+    document.addEventListener("touchend", resetState);
+  </script>
 
 </body>
 </html>
