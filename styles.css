@@ -1,8 +1,8 @@
 /* ==========================================
-   共通スタイル
+   1. 基本レイアウト
    ========================================== */
 body {
-  font-family: sans-serif;
+  font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif;
   background: #f7f7f7;
   display: flex;
   justify-content: center;
@@ -24,216 +24,7 @@ body {
   position: relative;
 }
 
-.title {
-  font-size: 18px;      /* 22pxから18pxに小さく (#2) */
-  line-height: 1.2;
-  margin-top: -10px;    /* 上のマージンをマイナス指定で狭く (#1) */
-  margin-bottom: 10px;  /* 下のマージンも少し詰めました */
-  text-align: center;
-}
-
-/* --- ボタン基本設定 --- */
-button, 
-.tooltip button, 
-#nextBtn, 
-button.submit {
-  width: 100%;
-  padding: 14px;
-  margin: 4px 0;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  border-radius: 25px;
-  border: none;
-  background: #ff85a2;
-  color: #fff;
-  transition: background 0.2s, opacity 0.2s, transform 0.1s; /* ここでアニメ設定 */
-}
-
-/* ホバー時（PC） */
-@media (hover: hover) and (pointer: fine) {
-  button:hover:not(:disabled) {
-    background: #ff6b90;
-  }
-}
-
-/* 無効化（disabled）時の色の薄さを維持 */
-button:disabled {
-  background: #ffb6c1 !important; /* 薄いピンクを強制維持 */
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* ==========================================
-   quiz.html 専用（回答・次へボタン）
-   ========================================== */
-.members {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 16px 0;
-}
-
-.member-btn {
-  padding: 8px 12px;
-  border-radius: 20px;
-  border: 1px solid #ccc;
-  background: #fff;
-  color: #000;
-  cursor: pointer;
-  flex: 1 0 auto;
-  transition: background-color 0.2s;
-}
-
-.member-btn.on {
-  background: #ff85a2;
-  border-color: #ff6b90;
-  color: #fff;
-}
-
-/* ★回答する・次の問題へボタン専用（立体的で凹む設定）★ */
-button.submit {
-  display: block;
-  margin: 10px 0;
-  background-color: #ff85a2;
-  box-shadow: 0 4px 0 #e66a88; /* ボタンの下側に濃い色の「厚み」を出す */
-  position: relative;        /* 位置調整の基準 */
-  top: 0;                    /* 初期位置 */
-  transition: all 0.1s;      /* 動きをなめらかに */
-}
-
-/* 押した瞬間の挙動（立体感がつぶれて沈む） */
-button.submit:active:not(:disabled) {
-  top: 2px;                  /* ボタン自体を2px下にずらす */
-  box-shadow: 0 2px 0 #e66a88; /* 影を2pxに縮める（沈んだように見える） */
-  transform: scale(0.98);    /* わずかに小さくして「押し込み感」を強調 */
-}
-
-/* 無効時はフラットに戻し、沈まないようにする */
-button.submit:disabled {
-  background-color: #f0f0f0 !important;
-  color: #888;
-  box-shadow: 0 4px 0 #ccc; /* 無効時も厚みだけは残す（任意） */
-  top: 0 !important;
-  transform: none !important;
-}
-
-/* 回答ボタン「誰も選択されていない」時のアニメーション */
-button.submit.flash-red {
-  animation: flash-red 0.5s ease-in-out 2;
-}
-
-@keyframes flash-red {
-  0% { background-color: #f44336; color: #fff; }
-  50% { background-color: #fff; color: #f44336; }
-  100% { background-color: #f44336; color: #fff; }
-}
-
-/* 歌詞・ヒント表示 */
-#lyrics {
-  font-size: 22px;      /* 18pxから22pxに大きく (#3) */
-  font-weight: bold;
-  margin: 10px 0;       /* 20pxから10pxに狭く (#4) */
-  color: #333;
-  line-height: 1.4;     /* 歌詞が複数行になっても読みやすいように調整 */
-}
-
-.hint-lyrics {
-  font-size: 12px;
-  color: #888;
-  background: #f9f9f9;
-  padding: 10px;
-  border-radius: 8px;
-  margin: 10px 0;
-  line-height: 1.4;
-}
-
-.hint-label {
-  font-size: 12px;
-  font-weight: bold;
-  color: #ffb6c1;
-}
-
-/* ==========================================
-   difficulty.html 専用
-   ========================================== */
-.button-row {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 24px;
-}
-
-.tooltip {
-  text-align: center;
-  flex: 1;
-}
-
-#difficulty-desc {
-  text-align: center;
-  font-size: 14px;
-  color: #666;
-  margin: 20px 0;
-  min-height: 60px; /* 説明が2行になるので、少し高さを広げました */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1.6;
-  white-space: pre-wrap; /* これを追加：JavaScriptの \n で改行されるようになります */
-}
-
-/* ==========================================
-   その他（特殊ボタン・状態）
-   ========================================== */
-.back-btn {
-  background: #fff !important;
-  color: #ff85a2 !important;
-  border: 2px solid #ff85a2 !important;
-  margin-top: 16px !important;
-}
-
-#result.animate {
-  animation: result-pop 0.5s ease-out;
-  padding: 8px 12px;
-  border-radius: 8px;
-  display: inline-block;
-}
-
-@keyframes result-pop {
-  0% { opacity: 0; transform: scale(0.8); }
-  50% { opacity: 1.2; transform: scale(1.2); }
-  100% { opacity: 1; transform: scale(1); }
-}
-
-#result.correct { background-color: #4caf50; color: white; }
-#result.incorrect { background-color: #f44336; color: white; }
-
-/* ==========================================
-   レスポンシブ (スマホ対応)
-   ========================================== */
-@media (max-width: 600px) {
-  body.scroll-page .box {
-    margin-top: 0;
-    border-radius: 0;
-    min-height: 100vh;
-    box-shadow: none;
-  }
-}
-
-@media (max-width: 480px) {
-  .button-row { gap: 4px; padding: 0; }
-  .tooltip button {
-    font-size: clamp(10px, 3.2vw, 14px);
-    padding: 14px 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: clip;
-  }
-  .member-btn { padding: 6px 10px; font-size: 14px; margin: 0; }
-  .members { gap: 6px; }
-}
-
-/* 全面固定用 */
+/* 全面固定用（indexなど） */
 body.locked {
   position: fixed;
   width: 100%;
@@ -246,83 +37,291 @@ body.locked .box {
   overflow-y: auto;
 }
 
+/* スクロール用（quizなど） */
 body.scroll-page {
   height: auto;
   min-height: 100vh;
   align-items: flex-start;
 }
 
-/* --- 基本設定 --- */
+/* ==========================================
+   2. ヘッダー・タイトル (ポップ設定)
+   ========================================== */
 .title {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 0px;
+  margin-top: -10px;
+  margin-bottom: 0px; /* 5pxから0pxに変更して下の隙間をカット */
 }
 
-.title-main {
-  font-size: 1.2rem;
-  color: #ff69b2; /* KAWAII LABっぽいピンク */
-  font-weight: bold;
+.site-logo {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  margin-bottom: -5px; /* ロゴの下の余白をマイナスにしてさらに接近！ */
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
 }
 
 .title-sub {
-  font-size: 1.6rem;
-  line-height: 1.3;
+  display: block;
+  /* ここで丸文字フォントを指定 */
+  font-family: "Mochiy Pop One", sans-serif;
+  font-size: 2.0rem;
+  font-weight: 400; /* このフォントは400でも十分太いです */
+  line-height: 1.4;
+  margin-top: 0px;    /* 10pxから0pxに！ */
+  transform: rotate(-2deg);
 }
 
-/* スマホ以外では改行しない */
-.mobile-only {
-  display: none;
+.title-sub span {
+  display: inline-block;
+  animation: bounce 2s ease-in-out infinite;
+  /* 縁取りを3pxに少し太くして、影を少しずらすとぷっくりします */
+  text-shadow: 
+    3px 3px 0 #fff, -3px -3px 0 #fff,
+    3px -3px 0 #fff, -3px 3px 0 #fff,
+    5px 5px 0 rgba(0,0,0,0.1);
 }
 
-/* --- スマホ向け調整 (画面幅 480px以下) --- */
-@media (max-width: 480px) {
-  .mobile-only {
-    display: inline;
-  }
+/* 文字の色分けループ */
+.title-sub span:nth-child(4n+1) { color: #ff69b2; }
+.title-sub span:nth-child(4n+2) { color: #4ecdc4; }
+.title-sub span:nth-child(4n+3) { color: #ffbe0b; }
+.title-sub span:nth-child(4n+4) { color: #ff006e; }
 
-  .title-main {
-    font-size: 1rem;
-  }
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
 
-  .title-sub {
-    font-size: 1.4rem; /* スマホで圧迫感が出ないサイズ */
-    padding: 0 10px;
-  }
+/* ==========================================
+   3. ボタン共通設定 (ポップ・立体的)
+   ========================================== */
+button, .submit, #nextBtn {
+  width: 100%;
+  background-color: #ff69b2;
+  border: 4px solid #fff;
+  outline: 3px solid #ff69b2;
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: 900;
+  padding: 12px 20px;
+  margin: 10px 0;
+  border-radius: 15px;
+  box-shadow: 4px 4px 0px #d81b60;
+  cursor: pointer;
+  transition: all 0.1s;
+  position: relative;
+  top: 0;
+}
 
-  .description {
-  text-align: center; /* 子要素を中央に寄せる */
+/* --- 検定開始ボタン専用（パステル・グラデーション） --- */
+.start-btn {
+  /* ロゴのポップさに負けない多幸感カラー */
+  background: linear-gradient(45deg, #ff9a9e, #fad0c4, #ffecd2, #a1c4fd, #c2e9fb);
+  background-size: 300% 300%;
+  animation: gradientMove 5s ease infinite; /* 常に色が流れる */
+  
+  /* 既存のボタン設定を上書き */
+  border: 4px solid #fff;
+  outline: 3px solid #ffecd2; /* 縁取りを少し柔らかい色に */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  color: #fff;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.2); /* 文字をくっきり */
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: 5px !important; /* 0pxにしてもOKです */
+  margin-bottom: 10px;
+}
+
+/* 浮き上がるようなホバー効果 */
+.start-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* 背景を動かすアニメーション */
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+button:active:not(:disabled) {
+  top: 2px;
+  box-shadow: 2px 2px 0px #d81b60;
+  transform: scale(0.98);
+}
+
+button:disabled {
+  background-color: #f0f0f0 !important;
+  outline-color: #ccc !important;
+  color: #888 !important;
+  box-shadow: 2px 2px 0px #ccc;
+  cursor: not-allowed;
+  top: 0;
+}
+
+/* 特殊ボタン */
+.back-btn {
+  background: #fff !important;
+  color: #ff69b2 !important;
+  outline-color: #ff69b2 !important;
+}
+
+/* ==========================================
+   4. インデックス・概要
+   ========================================== */
+.description {
   background: rgba(255, 255, 255, 0.6);
   border-radius: 15px;
-  padding: 20px;
-  margin: 20px 0;
+  padding: 10px 20px; /* 上下のパディングを15pxから10pxに少し縮小 */
+  margin-top: 0px;    /* 5pxから0pxに変更 */
+  margin-bottom: 0px;
 }
+
+.desc-text {
+  margin-top: 0;      /* 説明文の上の余白をゼロに */
+  margin-bottom: 10px;
+}
+
 .rules {
-  display: inline-block; /* 中身の幅に合わせつつ、親のcenterで中央へ */
-  text-align: left;
+  display: flex;            /* inline-blockから変更 */
+  flex-direction: column;   /* 縦に並べる */
+  align-items: center;      /* 子要素を中央に寄せる */
+  margin: 5px 0;
 }
 
 .rule-item {
-  display: grid;
-  /* ✨の幅(24px) - 文字(1fr) - ✨の幅(24px) */
-  grid-template-columns: 24px 1fr 24px;
+  display: flex;            /* gridからflexに変更すると中央で扱いやすいです */
   align-items: center;
+  justify-content: center;  /* 中身を中央揃えに */
   gap: 8px;
   margin-bottom: 8px;
   font-size: 1rem;
   color: #555;
   font-weight: bold;
+  text-align: center;       /* テキスト自体も中央揃え */
 }
-/* スマホで文字がはみ出さないように調整 */
-@media (max-width: 480px) {
-  .rule-item {
-    font-size: 0.9rem;
-    gap: 4px;
+
+.rule-item:last-child {
+  margin-bottom: 0px; 
+}
+
+.disclaimer {
+  margin-top: 20px;
+  font-size: 0.75rem;
+  color: #888;
+  line-height: 1.5;
+}
+
+/* ==========================================
+   5. クイズ画面要素
+   ========================================== */
+#lyrics {
+  font-size: 22px;
+  font-weight: bold;
+  margin: 15px 0;
+  color: #333;
+  line-height: 1.4;
+}
+
+.hint-lyrics {
+  font-size: 12px;
+  color: #888;
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 8px;
+  margin: 10px 0;
+  text-align: left;
+}
+
+.hint-label {
+  font-weight: bold;
+  color: #ffb6c1;
+}
+
+/* メンバー選択ボタン */
+.members {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.member-btn {
+  /* ここは共通ボタン設定を上書き */
+  width: auto;
+  flex: 1 0 auto;
+  font-size: 14px;
+  padding: 8px 12px;
+  background: #fff;
+  color: #333;
+  border: 2px solid #ccc;
+  outline: none;
+  box-shadow: none;
+  border-radius: 20px;
+}
+
+.member-btn.on {
+  background: #ff69b2;
+  border-color: #ff69b2;
+  color: #fff;
+}
+
+/* 判定表示 */
+#result.animate {
+  animation: result-pop 0.5s ease-out;
+  padding: 8px 15px;
+  border-radius: 8px;
+  display: inline-block;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+@keyframes result-pop {
+  0% { opacity: 0; transform: scale(0.8); }
+  50% { opacity: 1.2; transform: scale(1.1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+#result.correct { background-color: #4caf50; color: white; }
+#result.incorrect { background-color: #f44336; color: white; }
+
+/* ==========================================
+   6. 難易度・スマホ調整
+   ========================================== */
+#difficulty-desc {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  font-size: 14px;
+  color: #666;
+}
+
+@media (max-width: 600px) {
+  body.scroll-page .box {
+    margin-top: 0;
+    border-radius: 0;
+    min-height: 100vh;
+    box-shadow: none;
   }
 }
 
-.rule-item span {
-  text-align: center;
-}
+@media (max-width: 480px) {
+  .site-logo { max-width: 240px; }
+  .title-sub { font-size: 1.3rem; transform: rotate(-1deg); }
+  .mobile-only { display: inline; }
+  
+  .rule-item { font-size: 0.85rem; gap: 4px; }
+  
+  .button-row { gap: 6px; }
+  button, .submit { font-size: 1.1rem; padding: 10px; }
+  
+  #lyrics { font-size: 18px; }
+  .member-btn { font-size: 12px; padding: 6px 10px; }
 }

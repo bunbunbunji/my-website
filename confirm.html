@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <title>出題内容の確認</title>
+  <link rel="icon" href="icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="icon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
 
   <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -99,14 +102,12 @@
       localStorage.setItem("quizState", JSON.stringify(state));
 
       document.getElementById("status").textContent =
-        `${state.quizIds.length}問のクイズを用意しました`;
+        `${state.quizIds.length}問のクイズを用意しました！`;
       
         const description = document.getElementById("description");
       description.innerHTML = `
         ・このクイズは複数選択式です。<br>
-        ・ボタンをクリックすると、ボタンが選択された状態になります。<br>
-        ・「このメンバーだ」と思うメンバーを選んで「回答」ボタンをクリックしてください。<br>
-        ・「全員」ボタンをクリックすると、全員が選択または未選択の状態になります。
+        ・「全員」ボタンで一括選択・解除ができます。<br>
       `;
 
 description.style.display = "block";
