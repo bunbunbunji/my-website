@@ -80,17 +80,24 @@
 
     // ===== クイズ取得 =====
     async function prepareQuiz() {
-      const { data, error } = await supabaseClient
-        .from("quizzes")
-        .select("id")
-        .eq("group_name", state.group)
-        .eq("difficulty", state.difficulty);
+          const { data, error } = await supabaseClient
+            .from("quizzes")
+            .select("id")
+            .eq("group_name", state.group)
+            // 修正箇所：true を 1 (数値) に変更
+            .eq(state.difficulty, 1); 
 
-      if (error || !data || data.length === 0) {
-        document.getElementById("status").textContent =
-          "問題が見つかりませんでした";
-        return;
-      }
+          if (error) {
+            console.error("Supabaseエラー:", error);
+            document.getElementById("status").textContent = "エラーが発生しました";
+            return;
+          }
+
+        if (!data || data.length === 0) {
+          document.getElementById("status").textContent =
+            "問題が見つかりませんでした";
+          return;
+        }
 
       // シャッフル
       const shuffled = data
