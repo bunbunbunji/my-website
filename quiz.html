@@ -145,6 +145,7 @@
     function renderMembers() {
       const container = document.getElementById("members");
       container.innerHTML = "";
+      
       members.forEach(m => {
         const btn = document.createElement("button");
         btn.textContent = m.name;
@@ -163,13 +164,22 @@
 
       const allBtn = document.createElement("button");
       allBtn.textContent = "全員";
-      allBtn.className = "member-btn";
+      // classに "all-btn" を追加してCSSと紐付けます
+      allBtn.className = "member-btn all-btn";
+
       allBtn.onclick = () => {
+        // :not(.all-btn) にすることで「全員」ボタン自身を除外して判定
         const memberButtons = document.querySelectorAll(".member-btn:not(:last-child)");
         const allOn = [...memberButtons].every(b => b.classList.contains("on"));
+
         memberButtons.forEach(b => {
-          if (allOn) { b.classList.remove("on"); selectedMembers.delete(b.textContent); }
-          else { b.classList.add("on"); selectedMembers.add(b.textContent); }
+          if (allOn) { 
+            b.classList.remove("on"); 
+            selectedMembers.delete(b.textContent); 
+          } else { 
+            b.classList.add("on"); 
+            selectedMembers.add(b.textContent); 
+          }
         });
         allBtn.classList.toggle("on", !allOn);
       };
