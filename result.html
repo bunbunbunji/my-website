@@ -115,20 +115,25 @@
         });
       }, 500);
     }
-    document.getElementById("share-btn").onclick = () => {
+document.getElementById("share-btn").onclick = () => {
       const rankName = document.getElementById("rank").textContent;
       const score = document.getElementById("correct-count").textContent;
       
-      // シェアするテキストを作成（改行は %0A）
-      const text = `歌割り検定の結果は…%0A【${rankName}】でした！(正解：${score}/10問)%0A%0A#歌割り検定 #${state.group}%0A`;
+      // グループ名と難易度を整形
+      const groupName = state.group; 
+      // 難易度を日本語に変換（もしstate.difficultyが"easy"等なら）
+      const difficultyMap = { "easy": "やさしい", "normal": "ふつう", "hard": "むずかしい" };
+      const diffName = difficultyMap[state.difficulty] || state.difficulty;
+
+      const siteUrl = "https://bunbunbunji.github.io/my-website/index.html";
+
+      // テキストの中にグループと難易度を組み込む
+      const text = encodeURIComponent(
+        `歌割り検定の結果は…\n【${rankName}】でした！(正解：${score}/10問)\nグループ：${groupName}\n難易度：${diffName}\n${siteUrl}\n\n#KAWAIILAB歌割り検定`
+      );
+
+      const shareUrl = `https://twitter.com/intent/tweet?text=${text}`;
       
-      // 現在のURL（またはトップページのURL）を取得
-      const url = encodeURIComponent(window.location.origin + window.location.pathname.replace('result.html', 'index.html'));
-      
-      // Xのシェア用URLを生成
-      const shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
-      
-      // 別ウィンドウで開く
       window.open(shareUrl, '_blank', 'width=600,height=400');
     };
 

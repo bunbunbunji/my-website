@@ -3,7 +3,13 @@
    ========================================== */
 body {
   font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif;
-  background: #f7f7f7;
+  
+  /* ここを修正：パステルピンクに変更 */
+  background: #fff0f5; /* LavenderBlush: 非常に淡いピンク */
+  
+  /* もし、もう少し「色味」が欲しい場合はこちら： #ffe4e1 (MistyRose) */
+  /* background: #ffe4e1; */
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -51,27 +57,25 @@ body.scroll-page {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0px;
-  margin-top: -10px;
-  margin-bottom: 0px; /* 5pxから0pxに変更して下の隙間をカット */
+  gap: 5px;            /* ロゴと文字の間の適度な隙間 */
+  margin-top: 0px;     /* 標準位置へ */
+  margin-bottom: 10px; /* 説明文との間隔 */
 }
-
 .site-logo {
   width: 100%;
-  max-width: 300px;
+  max-width: 450px; 
   height: auto;
-  margin-bottom: -5px; /* ロゴの下の余白をマイナスにしてさらに接近！ */
+  margin-bottom: 0px;  /* マイナス指定を解除 */
   filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
 }
 
 .title-sub {
   display: block;
-  /* ここで丸文字フォントを指定 */
   font-family: "Mochiy Pop One", sans-serif;
   font-size: 2.0rem;
-  font-weight: 400; /* このフォントは400でも十分太いです */
-  line-height: 1.4;
-  margin-top: 0px;    /* 10pxから0pxに！ */
+  font-weight: 400;
+  line-height: 1.3;
+  margin-top: 0px;
   transform: rotate(-2deg);
 }
 
@@ -171,12 +175,13 @@ button:disabled {
 /* ==========================================
    4. インデックス・概要
    ========================================== */
+/* 説明文の余白も標準化 */
 .description {
   background: rgba(255, 255, 255, 0.6);
   border-radius: 15px;
-  padding: 10px 20px; /* 上下のパディングを15pxから10pxに少し縮小 */
-  margin-top: 0px;    /* 5pxから0pxに変更 */
-  margin-bottom: 0px;
+  padding: 10px 20px;
+  margin-top: 10px;
+  margin-bottom: 5px;
 }
 
 .desc-text {
@@ -357,8 +362,13 @@ button:disabled {
 }
 
 @media (max-width: 480px) {
-  .site-logo { max-width: 240px; }
-  .title-sub { font-size: 1.3rem; transform: rotate(-1deg); }
+  .site-logo { 
+    max-width: 320px; 
+  }
+  .title-sub { 
+    font-size: 1.3rem; 
+    transform: rotate(-1deg); 
+  }
   .mobile-only { display: inline; }
   
   .rule-item { font-size: 0.85rem; gap: 4px; }
