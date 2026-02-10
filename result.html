@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>検定結果 - KAWAII LAB検定</title>
+  <title>検定結果</title>
   <link rel="icon" href="icon.png" type="image/png">
   <link rel="apple-touch-icon" href="icon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,58 +11,55 @@
     .score-circle {
       width: 150px;
       height: 150px;
-      border: 8px solid #ffb6c1;
       border-radius: 50%;
+      background: #fff;
+      border: 5px solid #ff69b2;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       margin: 20px auto;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
-    .score-number {
-      font-size: 40px;
-      font-weight: bold;
-      color: #ff69b4;
+    .score-num {
+      font-size: 48px;
+      font-weight: 900;
+      color: #ff69b2;
+      line-height: 1;
     }
-    .score-label {
-      font-size: 14px;
-      color: #666;
-    }
-    .message {
+    .score-total {
       font-size: 18px;
+      color: #888;
+    }
+    .rank-text {
+      font-size: 20px;
       font-weight: bold;
-      margin-bottom: 30px;
+      margin: 10px 0;
       color: #333;
     }
-    .result-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .btn-secondary {
-      background: #fff;
-      color: #ffb6c1;
-      border: 2px solid #ffb6c1;
+    .comment {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 24px;
     }
   </style>
 </head>
-<body class="scroll-page">
+<body class="locked">
 
   <div class="box">
     <h2 class="title">検定結果</h2>
-    
+
     <div class="score-circle">
-      <span class="score-label">正解数</span>
-      <span class="score-number" id="final-score">0</span>
-      <span class="score-label" id="total-questions">/ 10</span>
+      <div class="score-num" id="correct-count">0</div>
+      <div class="score-total" id="total-count">/ 0問</div>
     </div>
 
-    <p class="message" id="result-message"></p>
+    <p id="rank" class="rank-text">判定中...</p>
+    <p id="comment" class="comment"></p>
 
-    <div class="result-buttons">
-      <button onclick="retry()">同じ条件でもう一度</button>
-      <button class="btn-secondary" onclick="goHome()">グループ選択に戻る</button>
-    </div>
+    <button onclick="location.href='group.html'">もう一度挑戦する</button>
+    <button class="back-btn" onclick="location.href='index.html'">トップに戻る</button>
   </div>
 
   <script>
@@ -72,37 +69,34 @@
       location.href = "index.html";
     }
 
-    const score = state.correctCount || 0;
-    const total = state.quizIds ? state.quizIds.length : 10;
+    const correct = state.correctCount || 0;
+    const total = state.quizIds.length || 0;
+    const rate = (correct / total) * 100;
 
-    // スコア表示
-    document.getElementById("final-score").textContent = score;
-    document.getElementById("total-questions").textContent = `/ ${total}`;
+    document.getElementById("correct-count").textContent = correct;
+    document.getElementById("total-count").textContent = `/ ${total}問`;
 
-    // メッセージの分岐
-    const msgEl = document.getElementById("result-message");
-    const ratio = score / total;
-    if (ratio === 1) {
-      msgEl.textContent = "パーフェクト！🎉 あなたは真のオタクです！";
-    } else if (ratio >= 0.7) {
-      msgEl.textContent = "すごい！✨ かなりの聞き込み量ですね！";
-    } else if (ratio >= 0.4) {
-      msgEl.textContent = "あと一歩！もっと曲を聴いてみよう！";
+    // ランクとコメントの判定
+    let rank = "";
+    let comment = "";
+
+    if (rate === 100) {
+      rank = "🌟 神推し級 🌟";
+      comment = "完璧です！あなたは正真正銘のファンですね。この結果を自慢しちゃいましょう！";
+    } else if (rate >= 80) {
+      rank = "🥇 物知り級";
+      comment = "すごい！かなりの正解率です。あと少しで全問正解でしたね！";
+    } else if (rate >= 50) {
+      rank = "🥈 ファン級";
+      comment = "ナイス！よく知っていますね。次は全問正解を目指して頑張りましょう！";
     } else {
-      msgEl.textContent = "伸びしろたっぷり！たくさん聴いて覚えよう！";
+      rank = "🥉 ビギナー級";
+      comment = "まずは曲をたくさん聴いて、メンバーの歌声を覚えていきましょう！";
     }
 
-    function retry() {
-      // スコアだけリセットして確認画面へ
-      state.currentIndex = 0;
-      state.correctCount = 0;
-      localStorage.setItem("quizState", JSON.stringify(state));
-      location.href = "confirm.html";
-    }
-
-    function goHome() {
-      location.href = "group.html";
-    }
+    document.getElementById("rank").textContent = rank;
+    document.getElementById("comment").textContent = comment;
   </script>
+
 </body>
 </html>
