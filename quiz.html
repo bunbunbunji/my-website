@@ -16,7 +16,7 @@
       <div class="progress-container">
       <div id="progress-bar" class="progress-bar"></div>
       </div>
-    <h2 class="title">だれが歌ってる？</h2>
+    <h2 class="title quiz-title">だれが歌ってる？</h2>
     <div id="prev-lyrics" class="hint-lyrics" style="display:none;"></div>
     <p id="lyrics">読み込み中…</p>
     <div id="next-lyrics" class="hint-lyrics" style="display:none;"></div>
@@ -105,7 +105,7 @@
       // ★進捗バーの更新
       const progressPercent = ((index + 1) / quizzes.length) * 100;
       document.getElementById("progress-bar").style.width = progressPercent + "%";
-      
+
       document.getElementById("lyrics").textContent = currentQuiz.lyrics_main;
 
       const prevEl = document.getElementById("prev-lyrics");

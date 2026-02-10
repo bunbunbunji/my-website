@@ -394,3 +394,84 @@ button:disabled {
   margin-bottom: 15px;
 }
 
+/* ==========================================
+   7. 結果画面専用
+   ========================================== */
+.result-box {
+  padding: 50px 20px;
+}
+
+.result-label {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 5px;
+}
+
+.rank-display {
+  font-family: "Mochiy Pop One", sans-serif;
+  font-size: 1.8rem;
+  color: #ff69b2;
+  margin-bottom: 30px;
+  text-shadow: 2px 2px 0 #fff, 4px 4px 0 rgba(0,0,0,0.05);
+}
+
+.score-container {
+  margin: 30px 0;
+}
+
+.score-circle {
+  width: 140px;
+  height: 140px;
+  margin: 0 auto;
+  border: 8px solid #ff69b2;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #fff;
+  box-shadow: 0 10px 20px rgba(255, 105, 178, 0.2);
+}
+
+.score-num {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #ff69b2;
+  line-height: 1;
+}
+
+.score-unit {
+  font-size: 0.9rem;
+  color: #888;
+  margin-top: 5px;
+}
+
+.message-area {
+  margin: 30px 0;
+  min-height: 60px;
+}
+
+.comment-text {
+  font-size: 15px;
+  color: #555;
+  line-height: 1.6;
+}
+
+.result-buttons {
+  margin-top: 40px;
+}
+
+/* X（Twitter）シェアボタン */
+.share-btn {
+  background-color: #000 !important; /* Xのブランドカラー */
+  color: #fff !important;
+  outline-color: #000 !important;
+  box-shadow: 3px 3px 0px #333 !important;
+  margin-bottom: 20px !important;
+  font-size: 1rem !important;
+}
+
+.share-btn:active {
+  box-shadow: 1px 1px 0px #333 !important;
+  top: 2px;
+}
