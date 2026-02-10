@@ -180,7 +180,7 @@ button:disabled {
 .description {
   background: rgba(255, 255, 255, 0.6);
   border-radius: 15px;
-  padding: 0px 20px;
+  padding: 5px 20px;
   margin-top: 10px;
   margin-bottom: 5px;
 }
@@ -202,7 +202,7 @@ button:disabled {
   align-items: center;
   justify-content: center;  /* 中身を中央揃えに */
   gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 2px;
   font-size: 1rem;
   color: #555;
   font-weight: bold;
@@ -222,6 +222,7 @@ button:disabled {
 /* ==========================================
    5. クイズ画面要素
    ========================================== */
+
 #lyrics {
   font-size: 20px; /* 22pxから20pxに微調整 */
   font-weight: bold;
@@ -234,7 +235,7 @@ button:disabled {
   font-size: 12px;
   color: #888;
   background: #f9f9f9;
-  padding: 10px;
+  padding: 0px 0px 3px 0px;
   border-radius: 8px;
   margin: 10px 0;
   text-align: center;
