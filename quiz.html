@@ -32,7 +32,7 @@
 
   /* #1 クイズタイトルのサイズを小さく */
   .quiz-title {
-    font-size: 1.1rem !important; /* 共通設定を上書き */
+    font-size: 1.1rem !important;
     color: #888;
     margin-top: 5px;
     margin-bottom: 15px;
@@ -42,27 +42,27 @@
   /* #2 メイン歌詞のサイズを大きく */
   #lyrics { 
     font-size: 1.4rem; 
-    font-weight: normal; /* bold から normal に変更して少し細く */
+    font-weight: normal; 
     color: #333;
     margin: 20px 0; 
-    line-height: 1.6; /* 行間を少し広げてスッキリさせる */
+    line-height: 1.6;
     padding: 0 10px;
-    letter-spacing: 0.03em; /* 文字の間隔をわずかに広げて読みやすく */
+    letter-spacing: 0.03em;
     word-break: break-all;
   }
 
   /* ヒント歌詞の装飾 */
   .hint-lyrics { 
-    font-size: 0.75rem; /* わずかにサイズダウン */
+    font-size: 0.75rem;
     font-weight: normal; 
-    color: #aaa; /* さらに薄いグレーにして「細さ」を演出 */
+    color: #aaa;
     background: #fdfdfd; 
     border: 1px dashed #eee;
     padding: 8px; 
     border-radius: 8px; 
     margin: 8px 0; 
     line-height: 1.4;
-    letter-spacing: 0.05em; /* 字間を広げて余白を作る */
+    letter-spacing: 0.05em;
   }
   .hint-label { font-weight: bold; color: #ffb6c1; font-size: 0.75rem; }
 
@@ -82,19 +82,55 @@
     max-width: 150px;
     display: block;
     margin: 0 auto !important;
-    font-size: 0.85rem; /* 0.9からわずかにダウン */
-    font-weight: normal !important; /* 600(セミボールド)から完全にnormalへ */
-    padding: 8px 0;
+    font-size: 0.85rem;
+    font-weight: normal !important;
+    padding: 10px 0;
     background-color: #ffffff !important;
-    color: #888 !important; /* 少し薄めのグレーにして軽さを出す */
+    color: #888 !important;
     border: 1px solid #e0e0e0 !important;
     outline: none !important;
     border-radius: 20px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    box-shadow: 0 2px 0px #eee !important;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: transform 0.1s, box-shadow 0.1s, background-color 0.1s;
+    position: relative;
     top: 0 !important;
-    letter-spacing: 0.02em; /* わずかに字間を広げる */
+    /* スマホでタップした時の青いハイライトを消す */
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* --- 🖱️ PC版（マウス操作）のみ浮き上がる設定 --- */
+  @media (hover: hover) {
+    .member-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 0px #eee !important;
+      background-color: #fffafc !important;
+    }
+    .member-btn.on:hover:not(:disabled) {
+      box-shadow: 0 4px 0px #d81b60 !important;
+    }
+  }
+
+  /* --- 📱 スマホ版（タッチ操作）ではhoverを無効化 --- */
+  @media (hover: none) {
+    .member-btn:hover {
+      /* hoverしても通常時と同じ状態を維持する */
+      transform: none !important;
+      background-color: #ffffff !important;
+      box-shadow: 0 2px 0px #eee !important;
+    }
+    /* 選択中ボタンのhover維持も防ぐ */
+    .member-btn.on:hover {
+      background-color: #ff69b2 !important;
+      box-shadow: 0 2px 0px #d81b60 !important;
+    }
+  }
+
+  /* タップ・クリック時の沈み込み（全共通：押した瞬間だけ反応） */
+  .member-btn:active:not(:disabled) {
+    transform: translateY(2px) !important;
+    box-shadow: 0 0px 0px #eee !important;
+    transition: 0s; /* 押した瞬間の反応を最速に */
   }
 
   /* 選択時の状態 */
@@ -102,17 +138,17 @@
     background-color: #ff69b2 !important; 
     color: #fff !important; 
     border-color: #ff69b2 !important; 
-    font-weight: normal !important; /* ON時も太くしない */
+    box-shadow: 0 2px 0px #d81b60 !important;
   }
 
-  /* 全員ボタン（一番最後のボタン） */
+  /* 全員ボタン */
   .member-btn.all-btn { 
     background-color: #f8f8f8 !important; 
     border-style: dashed !important;
-    color: #777 !important; /* ONになっても文字色を白に変えず、グレーに固定 */
+    color: #777 !important;
   }
 
-  /* 回答・次の問題へボタン（styles.cssの基本ボタンを継承しつつ微調整） */
+  /* 回答・次の問題へボタン */
   .submit {
     margin-top: 20px;
     width: 70% !important;
@@ -130,7 +166,6 @@
     font-size: 0.95rem;
     display: block;
     text-align: center;
-    /* 文字に白い縁取りをつけて、背景色に負けないようにする */
     text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
   }
   @keyframes result-pop { 
@@ -138,14 +173,14 @@
     100% { opacity: 1; transform: scale(1); } 
   }
   .correct { 
-    background: #e8f5e9 !important; /* 薄い緑 */
-    color: #2e7d32 !important;    /* 濃い緑の文字 */
+    background: #e8f5e9 !important; 
+    color: #2e7d32 !important; 
     border: 2px solid #4caf50;
   }
   .incorrect { 
-    background: #ffebee !important; /* 薄い赤（ピンク系） */
-    color: #d32f2f !important;    /* 濃い赤の文字 */
-    border: 2px solid #f44336;     /* 枠線でしっかり強調 */
+    background: #ffebee !important; 
+    color: #d32f2f !important; 
+    border: 2px solid #f44336; 
   }
 
   /* 解説テキスト */
@@ -157,27 +192,31 @@
     padding: 0 10px;
   }
 
+  /* --- スマホ版の余白調整 --- */
   @media (max-width: 480px) {
-  body {
-    /* 画面中央寄せを解除して上から配置する */
-    align-items: flex-start !important;
-    height: auto !important; /* 高さを固定せずコンテンツに合わせる */
-    padding-top: 10px !important; /* 1番上の余白を最小限に */
-  }
+    body {
+      align-items: flex-start !important;
+      height: auto !important; 
+      padding-top: 10px !important; 
+    }
 
-  .box {
-    /* 箱自体の上のマージンを詰める */
-    margin-top: 5px !important;
-    padding: 15px 10px !important; /* 中の余白も少し削ってコンパクトに */
-    width: 95% !important; /* 横幅を広げて縦長感を抑える */
-  }
+    .box {
+      margin-top: 5px !important;
+      padding: 15px 10px !important;
+      width: 95% !important;
+    }
 
-  /* タイトル（問題番号など）がある場合、その隙間も調整 */
-  .title {
-    margin-bottom: 10px !important;
-    font-size: 1.2rem !important; /* 少し小さくして上に詰める */
+    .title {
+      margin-bottom: 10px !important;
+      font-size: 1.2rem !important;
+    }
   }
-}
+  .warning { 
+  background: #fff3e0 !important; /* 警告らしい薄オレンジ */
+  color: #ef6c00 !important;    /* 濃いオレンジ */
+  border: 2px solid #ffb74d !important;
+  text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
+  }
 </style>
 
 <body class="scroll-page">
@@ -185,7 +224,7 @@
   <div class="box">
     <p id="quiz-counter" style="text-align: center; font-size: 14px; color: #888; margin-bottom: 5px;"></p>
       <div class="progress-container">
-      <div id="progress-bar" class="progress-bar"></div>
+        <div id="progress-bar" class="progress-bar"></div>
       </div>
     <h2 class="title quiz-title">だれが歌ってる？</h2>
     <div id="prev-lyrics" class="hint-lyrics" style="display:none;"></div>
@@ -365,26 +404,37 @@
     }
 
     document.getElementById("submitBtn").onclick = () => {
-      if (selectedMembers.size === 0) return;
+      // --- 修正箇所：未選択時の処理 ---
+      if (selectedMembers.size === 0) {
+        const res = document.getElementById("result");
+        res.textContent = "⚠️ メンバーを選択してください！";
+        res.className = "animate warning"; // warning クラスでオレンジ色にする
+        res.style.display = "block";
+        
+        // ユーザーが気づきやすいように少し画面を揺らすなどの演出をしてもいいですね
+        return; 
+      }
+      // ----------------------------
+
       const correct = currentQuiz.correct_members.split(",").map(s => s.trim()).sort();
       const answer = Array.from(selectedMembers).sort();
       const isCorrect = correct.length === answer.length && correct.every((v, i) => v === answer[i]);
 
       const res = document.getElementById("result");
+      // 正解・不正解の表示（ここは既存のまま）
       res.textContent = isCorrect ? `⭕ 正解！😄（正解：${correct.join("・")}）` : `❌ 不正解！😫（正解：${correct.join("・")}）`;
       res.className = isCorrect ? "correct animate" : "incorrect animate";
 
       document.getElementById("explanation").textContent = (currentQuiz.song_title && currentQuiz.explanation) ? `この歌詞は「${currentQuiz.song_title}」の${currentQuiz.explanation}部分でした！` : "";
       
       if (isCorrect) quizState.correctCount++;
-            localStorage.setItem("quizState", JSON.stringify(quizState));
+      localStorage.setItem("quizState", JSON.stringify(quizState));
 
-            // 修正：回答ボタンを「無効化」ではなく「非表示」にする
-            document.getElementById("submitBtn").style.display = "none";
-            // 次の問題へを表示
-            document.getElementById("nextBtn").style.display = "block"; 
-            
-            setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }), 100);
+      // 回答ボタンを非表示、次へボタンを表示
+      document.getElementById("submitBtn").style.display = "none";
+      document.getElementById("nextBtn").style.display = "block"; 
+      
+      setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }), 100);
     };
 
     document.getElementById("nextBtn").onclick = () => {
