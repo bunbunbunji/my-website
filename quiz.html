@@ -156,6 +156,28 @@
     margin: 10px 0;
     padding: 0 10px;
   }
+
+  @media (max-width: 480px) {
+  body {
+    /* 画面中央寄せを解除して上から配置する */
+    align-items: flex-start !important;
+    height: auto !important; /* 高さを固定せずコンテンツに合わせる */
+    padding-top: 10px !important; /* 1番上の余白を最小限に */
+  }
+
+  .box {
+    /* 箱自体の上のマージンを詰める */
+    margin-top: 5px !important;
+    padding: 15px 10px !important; /* 中の余白も少し削ってコンパクトに */
+    width: 95% !important; /* 横幅を広げて縦長感を抑える */
+  }
+
+  /* タイトル（問題番号など）がある場合、その隙間も調整 */
+  .title {
+    margin-bottom: 10px !important;
+    font-size: 1.2rem !important; /* 少し小さくして上に詰める */
+  }
+}
 </style>
 
 <body class="scroll-page">
