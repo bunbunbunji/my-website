@@ -7,8 +7,157 @@
   <title>だれが歌ってる？</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
+
+<style>
+  /* 全体レイアウト調整 */
+  .progress-container { 
+    width: 100%; 
+    height: 6px; 
+    background: #eee; 
+    border-radius: 4px; 
+    margin-bottom: 10px; 
+    overflow: hidden; 
+  }
+  .progress-bar { 
+    height: 100%; 
+    background: linear-gradient(90deg, #ffb6c1, #ff69b2); 
+    width: 0%; 
+    transition: width 0.4s; 
+  }
+
+  /* #1 クイズタイトルのサイズを小さく */
+  .quiz-title {
+    font-size: 1.1rem !important; /* 共通設定を上書き */
+    color: #888;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    text-shadow: none;
+  }
+
+  /* #2 メイン歌詞のサイズを大きく */
+  #lyrics { 
+    font-size: 1.4rem; 
+    font-weight: normal; /* bold から normal に変更して少し細く */
+    color: #333;
+    margin: 20px 0; 
+    line-height: 1.6; /* 行間を少し広げてスッキリさせる */
+    padding: 0 10px;
+    letter-spacing: 0.03em; /* 文字の間隔をわずかに広げて読みやすく */
+    word-break: break-all;
+  }
+
+  /* ヒント歌詞の装飾 */
+  .hint-lyrics { 
+    font-size: 0.75rem; /* わずかにサイズダウン */
+    font-weight: normal; 
+    color: #aaa; /* さらに薄いグレーにして「細さ」を演出 */
+    background: #fdfdfd; 
+    border: 1px dashed #eee;
+    padding: 8px; 
+    border-radius: 8px; 
+    margin: 8px 0; 
+    line-height: 1.4;
+    letter-spacing: 0.05em; /* 字間を広げて余白を作る */
+  }
+  .hint-label { font-weight: bold; color: #ffb6c1; font-size: 0.75rem; }
+
+  /* メンバーボタンのグリッド配置 */
+  .members { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 10px; 
+    width: 100%; 
+    max-width: 320px; 
+    margin: 20px auto; 
+  }
+
+  /* #3 各メンバーボタンの新しいStyle指定 */
+  .member-btn {
+    width: 100% !important;
+    max-width: 150px;
+    display: block;
+    margin: 0 auto !important;
+    font-size: 0.85rem; /* 0.9からわずかにダウン */
+    font-weight: normal !important; /* 600(セミボールド)から完全にnormalへ */
+    padding: 8px 0;
+    background-color: #ffffff !important;
+    color: #888 !important; /* 少し薄めのグレーにして軽さを出す */
+    border: 1px solid #e0e0e0 !important;
+    outline: none !important;
+    border-radius: 20px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    top: 0 !important;
+    letter-spacing: 0.02em; /* わずかに字間を広げる */
+  }
+
+  /* 選択時の状態 */
+  .member-btn.on { 
+    background-color: #ff69b2 !important; 
+    color: #fff !important; 
+    border-color: #ff69b2 !important; 
+    font-weight: normal !important; /* ON時も太くしない */
+  }
+
+  /* 全員ボタン（一番最後のボタン） */
+  .member-btn.all-btn { 
+    background-color: #f8f8f8 !important; 
+    border-style: dashed !important;
+    color: #777 !important; /* ONになっても文字色を白に変えず、グレーに固定 */
+  }
+
+  /* 回答・次の問題へボタン（styles.cssの基本ボタンを継承しつつ微調整） */
+  .submit {
+    margin-top: 20px;
+    width: 70% !important;
+  }
+
+  /* 正解・不正解表示 */
+  #result.animate { 
+    animation: result-pop 0.5s ease-out; 
+    padding: 12px; 
+    border-radius: 12px; 
+    font-weight: bold; 
+    margin: 15px auto;
+    width: 80%;
+    max-width: 300px;
+    font-size: 0.95rem;
+    display: block;
+    text-align: center;
+    /* 文字に白い縁取りをつけて、背景色に負けないようにする */
+    text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
+  }
+  @keyframes result-pop { 
+    0% { opacity: 0; transform: scale(0.8); } 
+    100% { opacity: 1; transform: scale(1); } 
+  }
+  .correct { 
+    background: #e8f5e9 !important; /* 薄い緑 */
+    color: #2e7d32 !important;    /* 濃い緑の文字 */
+    border: 2px solid #4caf50;
+  }
+  .incorrect { 
+    background: #ffebee !important; /* 薄い赤（ピンク系） */
+    color: #d32f2f !important;    /* 濃い赤の文字 */
+    border: 2px solid #f44336;     /* 枠線でしっかり強調 */
+  }
+
+  /* 解説テキスト */
+  #explanation {
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.6;
+    margin: 10px 0;
+    padding: 0 10px;
+  }
+</style>
+
 <body class="scroll-page">
 
   <div class="box">

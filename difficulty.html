@@ -5,130 +5,190 @@
   <title>難易度選択</title>
   <link rel="icon" href="icon.png" type="image/png">
   <link rel="apple-touch-icon" href="icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
 
   <link rel="stylesheet" href="styles.css">
 
-  <style>
-    /* ページ固有の微調整 */
-    .title {
-      font-size: 22px;
-      line-height: 1.2;
-      margin-top: -10px;
-      margin-bottom: 24px;
-      text-align: center;
-    }
-    
-    /* 説明文エリアのスタイル */
-    #difficulty-desc {
-      text-align: center;
-      font-size: 14px;
-      color: #666;
-      margin: 20px 0;
-      /* 2行になってもガタつかないよう高さを少し確保 */
-      min-height: 60px; 
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 1.6;
-      /* 重要：JavaScriptの \n で改行させる設定 */
-      white-space: pre-wrap; 
-    }
-  </style>
 </head>
-<body class="locked">
+
+<style>
+  /* タイトルの間隔調整 */
+  .title {
+    margin-bottom: 30px;
+  }
+
+  /* 難易度ボタンを中央に配置するための親要素 */
+  .button-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    width: 100%;
+  }
+
+  /* 難易度ボタン+iアイコンのセット */
+  .difficulty-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    width: 100%;
+    margin-bottom: 15px; 
+    padding-left: 28px; 
+  }
+
+  /* 難易度ボタン自体のサイズ固定 */
+  .difficulty-item > button {
+    width: 70% !important;
+    max-width: 220px !important;
+    margin: 0 !important;
+  }
+
+  /* --- 3段階・難易度別カラー設定 --- */
+
+  /* 🟢 1: やさしい（パステルグリーン） */
+  .difficulty-item:nth-of-type(1) > button { 
+    background-color: #81c784 !important; 
+    outline-color: #81c784 !important; 
+    color: #ffffff !important;
+    box-shadow: 3px 3px 0px #4caf50; 
+  }
+
+  /* 🟡 2: ふつう（サンフラワーイエロー） */
+  .difficulty-item:nth-of-type(2) > button { 
+    background-color: #ffd54f !important; 
+    outline-color: #ffd54f !important; 
+    color: #795548 !important; /* 文字を濃い茶色にして視認性アップ */
+    box-shadow: 3px 3px 0px #ffb300; 
+  }
+
+  /* 🔴 3: むずかしい（パステルレッド） */
+  .difficulty-item:nth-of-type(3) > button { 
+    background-color: #ef5350 !important; 
+    outline-color: #ef5350 !important; 
+    color: #ffffff !important;
+    box-shadow: 3px 3px 0px #d32f2f; 
+  }
+
+  /* iアイコンの位置固定 */
+  .info-icon {
+    width: 18px;
+    height: 18px;
+    margin-left: 10px; 
+    cursor: pointer;
+    filter: sepia(1) saturate(5) hue-rotate(280deg);
+    flex-shrink: 0;
+  }
+
+  /* 戻るボタン */
+  .back-btn {
+    margin-top: 40px !important; 
+  }
+
+  /* ポップアップの設定 */
+  .info-pop {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -40%); opacity: 0; visibility: hidden;
+    background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    border: 3px solid #ff69b2; border-radius: 15px; padding: 20px; width: 280px; max-width: 85vw;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 2000; white-space: pre-wrap; pointer-events: none;
+    transition: all 0.3s ease;
+  }
+  .info-pop.show { opacity: 1; visibility: visible; transform: translate(-50%, -50%); pointer-events: auto; }
+</style>
+
+<body class="locked difficulty-page">
 
   <div class="box">
     <h2 class="title">難易度を選択</h2>
 
     <div class="button-row">
-      <div class="tooltip">
+      <div class="difficulty-item">
         <button data-level="easy">やさしい</button>
+        <img src="info.png" class="info-icon" data-level="easy">
+        <div class="info-pop"></div>
       </div>
-      <div class="tooltip">
+      
+      <div class="difficulty-item">
         <button data-level="normal">ふつう</button>
+        <img src="info.png" class="info-icon" data-level="normal">
+        <div class="info-pop"></div>
       </div>
-      <div class="tooltip">
-        <button data-level="hard">むずかしい</button>
-      </div>
-    </div>
 
-    <div id="difficulty-desc"></div>
+      <div class="difficulty-item">
+        <button data-level="hard">むずかしい</button>
+        <img src="info.png" class="info-icon" data-level="hard">
+        <div class="info-pop"></div>
+      </div>
+</div>
 
     <button class="back-btn" onclick="location.href='group.html'">グループ選択に戻る</button>
   </div>
 
-  <script>
-    const desc = document.getElementById("difficulty-desc");
-    let lastTappedButton = null;
+    <script>
+      // 各難易度の説明文データ
+      const descriptions = {
+        easy: "・特徴的な歌詞を歌っている1人が選出されます。\n・設問の前後2フレーズの歌詞が表示されます。",
+        normal: "・1人または全員で歌っている歌詞が選出されます。\n・設問の前後1フレーズの歌詞が表示されます。",
+        hard: "・2人以上で歌っている歌詞が選出されます。\n・ノーヒントです。"
+      };
 
-    // 最新の説明文（\n で改行）
-    const descriptions = {
-      easy: "・特徴的な歌詞を歌っている1人が選出されます。\n・設問の前後2フレーズの歌詞が表示されます。",
-      normal: "・1人または全員で歌っている歌詞が選出されます。\n・設問の前後1フレーズの歌詞が表示されます。",
-      hard: "・2人以上で歌っている歌詞が選出されます。\n・ノーヒントです。"
-    };
+      // infoアイコン（画像）に対するクリックイベントの設定
+      document.querySelectorAll(".info-icon").forEach(icon => {
+        const level = icon.dataset.level;
+        const pop = icon.parentElement.querySelector(".info-pop");
+        
+        // 説明文をセット
+        pop.textContent = descriptions[level];
 
-    document.querySelectorAll(".tooltip button").forEach(button => {
-      const level = button.dataset.level;
-
-      // 1. 【マウス専用】ホバー処理
-      button.addEventListener("pointerenter", (e) => {
-        if (e.pointerType === "mouse") {
-          desc.textContent = descriptions[level];
-        }
+        icon.addEventListener("click", (e) => {
+          // 親要素へのイベント伝播を止める（documentのクリックイベントと干渉させないため）
+          e.stopPropagation();
+          
+          const isShowing = pop.classList.contains("show");
+          
+          // 他に開いているポップアップがあればすべて閉じる
+          document.querySelectorAll(".info-pop").forEach(p => {
+            p.classList.remove("show");
+          });
+          
+          // クリックしたアイコンに対応するポップアップの状態を切り替え
+          // クラスを付け外しするだけでCSSのtransitionアニメーションが発動します
+          if (!isShowing) {
+            pop.classList.add("show");
+          }
+        });
       });
 
-      button.addEventListener("pointerleave", (e) => {
-        if (e.pointerType === "mouse") {
-          desc.textContent = "";
-        }
+      // ポップアップ以外の場所（画面のどこか）をクリックしたら閉じる処理
+      document.addEventListener("click", () => {
+        document.querySelectorAll(".info-pop").forEach(p => {
+          p.classList.remove("show");
+        });
       });
 
-      // 2. 【最重要：スマホ・タッチ用】
-      button.addEventListener("touchend", (e) => {
-        if (e.cancelable) e.preventDefault(); 
-
-        if (lastTappedButton !== button) {
-          // 1回目：説明を表示
-          desc.textContent = descriptions[level];
-          lastTappedButton = button;
-        } else {
-          // 2回目：同じボタンなら遷移
-          goToNext(level);
-        }
+      // 難易度選択ボタン（メインボタン）のクリック処理
+      document.querySelectorAll("button[data-level]").forEach(button => {
+        button.addEventListener("click", () => {
+          goToNext(button.dataset.level);
+        });
       });
 
-      // 3. 【PC・マウス専用】クリック
-      button.addEventListener("click", (e) => {
-        if (e.pointerType === "mouse" || e.pointerType === "") {
-          goToNext(level);
-        }
-      });
-    });
-
-    // 次の画面へ進む共通処理
-    function goToNext(level) {
-      const state = JSON.parse(localStorage.getItem("quizState") || "{}");
-      // ここで保存される level (easy/normal/hard) が 
-      // quiz.html での supabase カラム名指定に使われます
-      state.difficulty = level;
-      localStorage.setItem("quizState", JSON.stringify(state));
-      location.href = "confirm.html";
-    }
-
-    // 画面の他を触ったらリセット
-    const resetState = (e) => {
-      if (!e.target.closest(".tooltip")) {
-        lastTappedButton = null;
-        desc.textContent = "";
+      /**
+       * 次の確認画面へ進む処理
+       * @param {string} level - 選択された難易度 (easy / normal / hard)
+       */
+      function goToNext(level) {
+        const state = JSON.parse(localStorage.getItem("quizState") || "{}");
+        // 選択された難易度を保存
+        state.difficulty = level;
+        localStorage.setItem("quizState", JSON.stringify(state));
+        // 確認画面へ遷移
+        location.href = "confirm.html";
       }
-    };
-
-    document.addEventListener("click", resetState);
-    document.addEventListener("touchend", resetState);
-  </script>
+    </script>
 
 </body>
 </html>

@@ -5,31 +5,83 @@
   <title>グループ選択</title>
   <link rel="icon" href="icon.png" type="image/png">
   <link rel="apple-touch-icon" href="icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- 共通スタイル読み込み -->
   <link rel="stylesheet" href="styles.css">
 
-  <style>
-    /* ページ固有の微調整 */
-    .title {
-      font-size: 22px;
-      line-height: 1.2;
-      margin-bottom: 24px;
-      text-align: center;
-    }
-  </style>
+<style>
+  /* 箱の中にドット模様を追加 */
+  .box {
+    background-image: radial-gradient(#fff0f5 10%, transparent 10%);
+    background-size: 20px 20px;
+    border: 4px solid #fff;
+  }
+
+  button {
+    white-space: nowrap;
+    font-size: clamp(10px, 3.8vw, 16px) !important;
+    letter-spacing: 0.02em;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+  }
+
+  /* --- グループ別・個性派カラー設定 --- */
+
+  /* 🍎 1: FRUITS ZIPPER（大人なベリーピンク） */
+  button:nth-of-type(1) { 
+    background-color: #ff8a65 !important; 
+    outline-color: #ff8a65 !important; 
+    color: #ffffff !important;
+    box-shadow: 3px 3px 0px #e64a19; 
+  }
+
+  /* 🍬 2: CANDY TUNE（かっこいいターコイズ） */
+  button:nth-of-type(2) { 
+    background-color: #00838f !important; 
+    outline-color: #00838f !important; 
+    color: #ffffff !important;
+    box-shadow: 3px 3px 0px #006064; 
+  }
+  /* 💐 3: SWEET STEADY（おとなしくてかわいいラベンダー） */
+  button:nth-of-type(3) { 
+    background-color: #e1bee7 !important; 
+    outline-color: #e1bee7 !important; 
+    color: #6a1b9a !important; 
+    box-shadow: 3px 3px 0px #ba68c8; 
+  }
+
+  /* 🛣️ 4: CUTIE STREET（キャピキャピしたショッキングピンク） */
+  button:nth-of-type(4) { 
+    background-color: #ff007f !important; 
+    outline-color: #ff007f !important; 
+    color: #ffffff !important;
+    box-shadow: 3px 3px 0px #c2185b; 
+  }
+
+  /* 🌟 5: MORE STAR（若々しいサンシャインイエロー） */
+  button:nth-of-type(5) { 
+    background-color: #7e57c2 !important; 
+    outline-color: #7e57c2 !important; 
+    color: #ffffff !important;
+    box-shadow: 3px 3px 0px #5e35b1; 
+  }
+</style>
+
 </head>
 <body class="locked">
 
   <div class="box">
     <h2 class="title">グループを選択</h2>
 
-    <button onclick="selectGroup('FRUITS ZIPPER')">FRUITS ZIPPER</button>
-    <button onclick="selectGroup('CANDY TUNE')">CANDY TUNE</button>
-    <button onclick="selectGroup('SWEET STEADY')">SWEET STEADY</button>
-    <button onclick="selectGroup('CUTIE STREET')">CUTIE STREET</button>
-    <button onclick="selectGroup('MORE STAR')">MORE STAR</button>
+    <button onclick="selectGroup('FRUITS ZIPPER')">🍎FRUITS ZIPPER🍎</button>
+    <button onclick="selectGroup('CANDY TUNE')">🍬CANDY TUNE🍬</button>
+    <button onclick="selectGroup('SWEET STEADY')">💐SWEET STEADY💐</button>
+    <button onclick="selectGroup('CUTIE STREET')">🛣️CUTIE STREET🛣️</button>
+    <button onclick="selectGroup('MORE STAR')">🌟MORE STAR🌟</button>
   </div>
 
   <script>

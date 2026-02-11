@@ -1,488 +1,133 @@
 /* ==========================================
-   1. 基本レイアウト
+   1. 基本レイアウト & 共通背景
    ========================================== */
 body {
-  font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif;
-  
-  /* ここを修正：パステルピンクに変更 */
-  background: #fff0f5; /* LavenderBlush: 非常に淡いピンク */
-  
-  /* もし、もう少し「色味」が欲しい場合はこちら： #ffe4e1 (MistyRose) */
-  /* background: #ffe4e1; */
-
+  font-family: "Mochiy Pop One", sans-serif;
+  background: #fff0f5; 
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   margin: 0;
   overflow-x: hidden;
+  color: #555;
 }
 
 .box {
   background: white;
-  padding: 20px 20px;
-  border-radius: 12px;
+  padding: 25px 20px;
+  border-radius: 20px; /* 少し角を丸く */
   text-align: center;
   max-width: 550px;
-  width: 100%;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  width: 90%; /* 左右に少し余白を作る */
+  box-shadow: 0 10px 30px rgba(255, 105, 180, 0.15); /* ピンクがかった柔らかい影 */
   margin: auto;
   position: relative;
+  border: 4px solid #fff; /* 箱自体にも白フチをつけてクッキリさせる */
 }
 
-/* 全面固定用（indexなど） */
-body.locked {
-  position: fixed;
-  width: 100%;
-  height: 100dvh;
-  overflow: hidden;
-}
-
-body.locked .box {
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-/* スクロール用（quizなど） */
-body.scroll-page {
-  height: auto;
-  min-height: 100vh;
-  align-items: flex-start;
-}
+body.locked { position: fixed; width: 100%; height: 100dvh; overflow: hidden; }
+body.locked .box { max-height: 90vh; overflow-y: auto; }
+body.scroll-page { height: auto; min-height: 100vh; align-items: flex-start; padding-top: 20px; }
 
 /* ==========================================
-   2. ヘッダー・タイトル (ポップ設定)
+   2. タイトル & ロゴ共通設定
    ========================================== */
 .title {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;            /* ロゴと文字の間の適度な隙間 */
-  margin-top: 0px;     /* 標準位置へ */
-  margin-bottom: 10px; /* 説明文との間隔 */
+  gap: 8px;
+  margin-bottom: 25px;
+  font-size: 1.5rem;
+  color: #ff69b2;
+  text-shadow: 2px 2px 0 #fff;
+  letter-spacing: 0.05em;
 }
 .site-logo {
   width: 100%;
-  max-width: 330px; 
+  max-width: 300px; 
   height: auto;
-  margin-top: 0px;
-  margin-bottom: 0px;  /* マイナス指定を解除 */
   filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
 }
-
 .title-sub {
   display: block;
   font-family: "Mochiy Pop One", sans-serif;
-  font-size: 2.0rem;
-  font-weight: 400;
+  font-size: 1.8rem;
   line-height: 1.3;
-  margin-top: 0px;
-  transform: rotate(-2deg);
+  transform: rotate(-1deg);
 }
-
 .title-sub span {
   display: inline-block;
   animation: bounce 2s ease-in-out infinite;
-  /* 縁取りを3pxに少し太くして、影を少しずらすとぷっくりします */
-  text-shadow: 
-    3px 3px 0 #fff, -3px -3px 0 #fff,
-    3px -3px 0 #fff, -3px 3px 0 #fff,
-    5px 5px 0 rgba(0,0,0,0.1);
+  text-shadow: 2px 2px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 3px 3px 0 rgba(0,0,0,0.1);
 }
-
-/* 文字の色分けループ */
+/* タイトルの色分け */
 .title-sub span:nth-child(4n+1) { color: #ff69b2; }
 .title-sub span:nth-child(4n+2) { color: #4ecdc4; }
 .title-sub span:nth-child(4n+3) { color: #ffbe0b; }
 .title-sub span:nth-child(4n+4) { color: #ff006e; }
 
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
-}
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 
 /* ==========================================
-   3. ボタン共通設定 (ポップ・立体的)
+   3. ボタン共通（立体的・ポップ）
    ========================================== */
-button, .submit, #nextBtn {
-  /* 幅の制限を追加 */
-  width: 85%;           /* 100%から85%に。少し左右に余白を。 */
-  max-width: 280px;     /* 横長になりすぎないように制限 */
-  display: block;       /* 中央寄せのためにブロック要素化 */
-  margin: 10px auto;    /* 左右を auto にして中央に配置 */
-
-  font-size: 1.1rem;    /* 1.3remから少し小さく */
-  font-weight: 900;
-  padding: 10px 16px;   /* 12px 20pxから少しスリムに */
-  
+button, .submit, .member-btn {
+  font-family: "Mochiy Pop One", sans-serif;
+  width: 85%;
+  max-width: 280px;
+  display: block;
+  margin: 12px auto;
+  font-size: 1.0rem;
+  font-weight: normal;
+  padding: 14px 16px;
   background-color: #ff69b2;
-  border: 3px solid #fff; /* 枠線も少し細く */
-  outline: 2px solid #ff69b2;
+  border: 3px solid #fff;
+  /* 修正：outlineが個別の色指定を邪魔していたので、少し調整 */
+  outline: 2px solid transparent; 
   color: #fff;
-  border-radius: 12px;
-  box-shadow: 3px 3px 0px #d81b60; /* 影も少し控えめに */
+  border-radius: 50px; /* ボタンは思い切り丸い方が可愛い */
+  box-shadow: 0 4px 0px #d81b60; /* 影を真下に少し厚く */
   cursor: pointer;
-  transition: all 0.1s;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
   top: 0;
+  text-decoration: none;
 }
 
-/* --- 検定開始ボタン専用（パステル・グラデーション） --- */
-.start-btn {
-  width: 70%;           /* 開始ボタンはさらに少し絞って「特別感」を */
-  max-width: 220px;
-  margin: 0px auto;
-  font-size: 1.2rem;    /* 開始ボタンだけは少し大きく */
-  /* グラデーション等の設定は維持 */
-  background: linear-gradient(45deg, #ff9a9e, #fad0c4, #ffecd2, #a1c4fd, #c2e9fb);
-  background-size: 300% 300%;
-  animation: gradientMove 5s ease infinite;
-}
-/* 浮き上がるようなホバー効果 */
-.start-btn:hover {
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-}
-
-/* 背景を動かすアニメーション */
-@keyframes gradientMove {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+/* ホバーで少し浮く演出を追加 */
+button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0px #d81b60;
 }
 
 button:active:not(:disabled) {
-  top: 2px;
-  box-shadow: 2px 2px 0px #d81b60;
-  transform: scale(0.98);
+  top: 3px;
+  box-shadow: 0 1px 0px #d81b60;
+  transform: translateY(0) scale(0.98);
 }
 
-button:disabled {
-  background-color: #f0f0f0 !important;
-  outline-color: #ccc !important;
-  color: #888 !important;
-  box-shadow: 2px 2px 0px #ccc;
-  cursor: not-allowed;
-  top: 0;
-}
+button:disabled { background-color: #f0f0f0 !important; color: #888 !important; box-shadow: 0 2px 0px #ccc !important; cursor: not-allowed; border-color: #ddd !important; }
 
-/* 特殊ボタン */
-.back-btn {
-  background: #fff !important;
-  color: #ff69b2 !important;
-  outline-color: #ff69b2 !important;
+/* 戻るボタンの基本共通設定 */
+.back-btn { 
+  background: #fff !important; 
+  color: #ff69b2 !important; 
+  border: 3px solid #ff69b2 !important; 
+  box-shadow: 0 4px 0px #ffc1e3 !important; 
+  width: 70% !important; 
+  max-width: 220px !important; 
 }
+.back-btn:active { box-shadow: 0 1px 0px #ffc1e3 !important; }
 
 /* ==========================================
-   4. インデックス・概要
+   4. レスポンシブ (共通)
    ========================================== */
-/* 説明文の余白も標準化 */
-.description {
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 15px;
-  padding: 5px 20px;
-  margin-top: 10px;
-  margin-bottom: 5px;
-}
-
-.desc-text {
-  margin-top: 0;      /* 説明文の上の余白をゼロに */
-  margin-bottom: 10px;
-}
-
-.rules {
-  display: flex;            /* inline-blockから変更 */
-  flex-direction: column;   /* 縦に並べる */
-  align-items: center;      /* 子要素を中央に寄せる */
-  margin: 5px 0;
-}
-
-.rule-item {
-  display: flex;            /* gridからflexに変更すると中央で扱いやすいです */
-  align-items: center;
-  justify-content: center;  /* 中身を中央揃えに */
-  gap: 8px;
-  margin-bottom: 2px;
-  font-size: 1rem;
-  color: #555;
-  font-weight: bold;
-  text-align: center;       /* テキスト自体も中央揃え */
-}
-
-.rule-item:last-child {
-  margin-bottom: 0px; 
-}
-
-.disclaimer {
-  font-size: 0.75rem;
-  color: #888;
-  line-height: 1.5;
-}
-
-/* ==========================================
-   5. クイズ画面要素
-   ========================================== */
-
-#lyrics {
-  font-size: 20px; /* 22pxから20pxに微調整 */
-  font-weight: bold;
-  margin: 15px 0;
-  color: #333;
-  line-height: 1.4;
-}
-
-.hint-lyrics {
-  font-size: 12px;
-  color: #888;
-  background: #f9f9f9;
-  padding: 0px 0px 3px 0px;
-  border-radius: 8px;
-  margin: 10px 0;
-  text-align: center;
-}
-
-.hint-label {
-  font-weight: bold;
-  color: #ffb6c1;
-}
-
-/* メンバー選択ボタン */
-.members {
-  display: grid !important;
-  grid-template-columns: 1fr 1fr; 
-  gap: 0px 10px; /* 上下を少しだけ(2px→6px)広げて誤操作防止 */
-  margin: 15px auto;
-  width: 90%;
-  max-width: 340px;
-  justify-items: center;
-}
-
-/* 各メンバーボタン */
-.member-btn {
-  width: 100%;
-  max-width: 150px;
-  display: block;
-  font-size: 0.9rem;
-  font-weight: 600;
-  padding: 8px 0; /* 少し押しやすく高さを戻す */
-  background-color: #ffffff;
-  color: #777;
-  border: 1px solid #e0e0e0; 
-  border-radius: 20px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-/* 「全員」ボタン専用のクラス（HTML側で class="all-btn" を付与） */
-.member-btn.all-btn {
-  grid-column: auto !important; /* 2列ぶち抜きを解除 */
-  max-width: 150px;           /* 他のメンバーと同じサイズに */
-  background-color: #f0f0f0;  /* 少しグレーにして「人名ではない」ことを強調 */
-  color: #666;
-  border: 1px dashed #bbb;    /* 点線で「ツール感」を出す */
-  font-weight: bold;
-}
-/* メンバー選択ボタン（quiz.html）は「2列」を維持するため上書き */
-.members.member-btn {
-  width: 100%;          /* gridの中では100%にする */
-  max-width: none;      /* gridに任せる */
-  margin: 0;            /* autoではなく0に */
-}
-
-/* 押した瞬間の動き（初期のボタン共通設定を適用） */
-.member-btn:active {
-  transform: translateY(0);
-  box-shadow: none;
-}
-
-/* 選択された時の色 */
-.member-btn.on {
-  background-color: #ff69b2;
-  border-color: #ff69b2;
-  color: #fff;
-  box-shadow: 0 3px 8px rgba(255, 105, 178, 0.25);
-}
-
-.submit {
-  margin-top: 30px !important; /* メンバー選択が終わった後の距離を離す */
-}
-
-/* 判定表示 */
-#result {
-  display: block;        /* 横並びを防ぐ */
-  margin: 15px auto;    /* 上下に余白を作り中央寄せ */
-  min-height: 1.5em;    /* 結果が表示されるまで場所を確保 */
-}
-
-#result.animate {
-  animation: result-pop 0.5s ease-out;
-  padding: 12px 20px;
-  border-radius: 12px;
-  display: inline-block; /* 背景色を文字幅に合わせる */
-  font-weight: bold;
-}
-
-#explanation {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 5px;  /* 次の問題へボタンとの隙間 */
-  line-height: 1.5;
-}
-
-@keyframes result-pop {
-  0% { opacity: 0; transform: scale(0.8); }
-  50% { opacity: 1.2; transform: scale(1.1); }
-  100% { opacity: 1; transform: scale(1); }
-}
-
-#result.correct { background-color: #4caf50; color: white; }
-#result.incorrect { background-color: #f44336; color: white; }
-
-/* ==========================================
-   6. 難易度・スマホ調整
-   ========================================== */
-#difficulty-desc {
-  min-height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  font-size: 14px;
-  color: #666;
-}
-
-@media (max-width: 600px) {
-  body.scroll-page .box {
-    margin-top: 0;
-    border-radius: 0;
-    min-height: 100vh;
-    box-shadow: none;
-  }
-}
-
+.mobile-only { display: none; }
 @media (max-width: 480px) {
-  .site-logo { 
-    max-width: 320px; 
-  }
-  .title-sub { 
-    font-size: 1.3rem; 
-    transform: rotate(-1deg); 
-  }
   .mobile-only { display: inline; }
-  
-  .rule-item { font-size: 0.85rem; gap: 4px; }
-  
-  .button-row { gap: 6px; }
-  button, .submit { font-size: 1.1rem; padding: 10px; }
-  
-  #lyrics { font-size: 18px; }
-  .member-btn { font-size: 12px; padding: 6px 10px; }
-}
-
-/* 進捗バーの外枠 */
-.progress-container {
-  width: 100%;
-  height: 6px; /* 8pxから6pxへ、よりスマートに */
-  background-color: #eee;
-  border-radius: 4px;
-  margin: 10px 0 20px 0; /* 上下の余白をバランスよく */
-  overflow: hidden;
-}
-
-/* 進捗バーの中身（動く部分） */
-.progress-bar {
-  width: 0%; /* 最初は0% */
-  height: 100%;
-  background: linear-gradient(90deg, #ffb6c1, #ff69b2); /* 綺麗なグラデーション */
-  transition: width 0.4s ease; /* 伸びるアニメーションを滑らかに */
-}
-
-.box .title {
-  font-size: 1.2rem; /* 元のサイズから少しダウン */
-  margin-top: 5px;
-  margin-bottom: 15px;
-}
-
-/* ==========================================
-   7. 結果画面専用
-   ========================================== */
-.result-box {
-  padding: 50px 20px;
-}
-
-.result-label {
-  font-size: 14px;
-  color: #888;
-  margin-bottom: 5px;
-}
-
-.rank-display {
-  font-family: "Mochiy Pop One", sans-serif;
-  font-size: 1.8rem;
-  color: #ff69b2;
-  margin-bottom: 30px;
-  text-shadow: 2px 2px 0 #fff, 4px 4px 0 rgba(0,0,0,0.05);
-}
-
-.score-container {
-  margin: 30px 0;
-}
-
-.score-circle {
-  width: 140px;
-  height: 140px;
-  margin: 0 auto;
-  border: 8px solid #ff69b2;
-  border-radius: 50%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: #fff;
-  box-shadow: 0 10px 20px rgba(255, 105, 178, 0.2);
-}
-
-.score-num {
-  font-size: 3rem;
-  font-weight: 900;
-  color: #ff69b2;
-  line-height: 1;
-}
-
-.score-unit {
-  font-size: 0.9rem;
-  color: #888;
-  margin-top: 5px;
-}
-
-.message-area {
-  margin: 30px 0;
-  min-height: 60px;
-}
-
-.comment-text {
-  font-size: 15px;
-  color: #555;
-  line-height: 1.6;
-}
-
-.result-buttons {
-  margin-top: 40px;
-}
-
-/* X（Twitter）シェアボタン */
-.share-btn {
-  background-color: #000 !important; /* Xのブランドカラー */
-  color: #fff !important;
-  outline-color: #000 !important;
-  box-shadow: 3px 3px 0px #333 !important;
-  margin-bottom: 20px !important;
-  font-size: 1rem !important;
-}
-
-.share-btn:active {
-  box-shadow: 1px 1px 0px #333 !important;
-  top: 2px;
+  .title-sub { font-size: 1.4rem; }
+  .box { width: 92%; padding: 20px 15px; }
+  button, .submit, .back-btn { width: 85% !important; } /* スマホでも幅を保つ */
 }

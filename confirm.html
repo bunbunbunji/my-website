@@ -5,6 +5,9 @@
   <title>出題内容の確認</title>
   <link rel="icon" href="icon.png" type="image/png">
   <link rel="apple-touch-icon" href="icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 
@@ -14,38 +17,156 @@
   <!-- 共通スタイル -->
   <link rel="stylesheet" href="styles.css">
 
-  <style>
-    /* ページ固有微調整 */
-    .title {
-      font-size: 22px;
-      line-height: 1.2;
-      margin-bottom: 24px;
-      text-align: center;
-    }
+<style>
+  /* 全体のレイアウト調整 */
+  .confirm-container {
+    text-align: center;
+    padding: 10px 20px;
+  }
 
-    #status {
-      margin: 16px 0;
-      font-weight: bold;
-    }
+  /* --- #1: info-card をスリムに調整 --- */
+  .info-card {
+    background: #ffffff !important;
+    background-image: radial-gradient(#fff0f5 15%, transparent 15%) !important;
+    background-size: 15px 15px !important;
+    border: 3px solid #ffb7d5 !important;
+    border-radius: 30px !important;
+    padding: 15px 20px !important; /* 上下パディングを 30px → 15px に縮小 */
+    margin: 15px auto !important;   /* 外側の余白も少し詰めました */
+    box-shadow: 0 10px 25px rgba(255, 105, 180, 0.15) !important;
+    max-width: 300px;
+    position: relative;
+  }
 
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  </style>
+  .confirm-item {
+    margin: 8px 0; /* 項目間の隙間を少し詰めました */
+  }
+
+  .confirm-label {
+    font-size: 0.75rem;
+    color: #ff8ab4;
+    display: block;
+    margin-bottom: 2px;
+    font-weight: bold;
+  }
+
+  /* 選択値の文字サイズも、カードに合わせて微調整 */
+  .confirm-value {
+    display: block;
+    font-size: 1.5rem !important; /* 1.8rem → 1.5rem に調整 */
+    font-weight: 900 !important;
+    margin-bottom: 5px; /* 下の余白を詰めました */
+    
+    background: linear-gradient(90deg, #ff1493, #ff8a65, #ff1493) !important;
+    background-size: 200% auto !important;
+    background-clip: text !important;
+    -webkit-background-clip: text !important;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+    animation: textShine 4s linear infinite;
+  }
+
+  @keyframes textShine {
+    to { background-position: 200% center; }
+  }
+
+  /* --- 🚀 クイズを始めるボタン --- */
+  .start-btn {
+    all: unset;
+    display: inline-block !important;
+    box-sizing: border-box !important;
+    cursor: pointer !important;
+    width: 90% !important;
+    max-width: 280px !important;
+    height: 60px !important; /* 高さを少し抑えてスッキリさせました */
+    line-height: 60px !important;
+    background: linear-gradient(45deg, #ff007f, #ff69b2, #ff8a65) !important;
+    background-size: 200% 200% !important;
+    color: #ffffff !important;
+    font-size: 1.2rem !important;
+    font-weight: bold !important;
+    font-family: "Mochiy Pop One", sans-serif !important;
+    border-radius: 100px !important;
+    border: 4px solid #fff !important;
+    box-shadow: 0 8px 0px #c2185b, 0 12px 20px rgba(255, 20, 147, 0.3) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    transition: all 0.3s ease !important;
+    animation: gradientShift 3s ease infinite, pulse 2s infinite;
+  }
+
+  /* --- #2: ボタンの間隔を離す --- */
+  .back-btn {
+    margin-top: 25px !important; /* クイズを始めるボタンとの距離を確保 */
+  }
+
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+    100% { transform: scale(1); }
+  }
+
+  .start-btn::after {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: -150%;
+    width: 80%;
+    height: 300%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: rotate(30deg);
+    animation: megaShine 3.5s infinite;
+  }
+
+  @keyframes megaShine {
+    0% { left: -150%; }
+    25% { left: 150%; }
+    100% { left: 150%; }
+  }
+
+  .start-btn:hover {
+    transform: translateY(-3px) scale(1.05) !important;
+    filter: brightness(1.1);
+    box-shadow: 0 10px 0px #c2185b, 0 15px 25px rgba(255, 20, 147, 0.4) !important;
+  }
+
+  .start-btn:active {
+    transform: translateY(2px) !important;
+    box-shadow: 0 4px 0px #c2185b !important;
+  }
+</style>
+
 </head>
 <body class="locked">
 
   <div class="box">
     <h2 class="title">出題内容の確認</h2>
 
-    <p id="group"></p>
-    <p id="difficulty"></p>
-    <p id="status">問題を準備しています…</p>
-    <div id="description" style="display:none; margin-top:12px; font-size:14px; line-height:1.6;">
+    <div class="info-card">
+      <div class="confirm-item">
+        <span class="confirm-label">グループ</span>
+        <span id="group" class="confirm-value">取得中…</span>
+      </div>
+      
+      <div class="confirm-item">
+        <span class="confirm-label">難易度</span>
+        <span id="difficulty" class="confirm-value">取得中…</span>
+      </div>
+      
+      <p id="status" style="font-weight: bold; color: #ff69b2; margin-top: 10px;">問題を準備しています…</p>
     </div>
 
-    <button id="startBtn" disabled>クイズを始める</button>
+    <div id="description" style="display:none; margin-bottom:20px; font-size:14px; line-height:1.6; color: #888;">
+    </div>
+
+    <button id="startBtn" class="start-btn" disabled>クイズを始める</button>
+    
     <button class="back-btn" onclick="location.href='difficulty.html'">難易度選択に戻る</button>
   </div>
 
@@ -53,10 +174,7 @@
     // ===== Supabase 設定 =====
     const supabaseUrl = "https://atinpqtedmrfrtdlkpkd.supabase.co";
     const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0aW5wcXRlZG1yZnJ0ZGxrcGtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwOTU0NjcsImV4cCI6MjA4NDY3MTQ2N30.Oor6oUuuIxa0pSxIRuwEw7ZzGYM4hOGfywHqv2FaBHg";
-    const supabaseClient = window.supabase.createClient(
-      supabaseUrl,
-      supabaseKey
-    );
+    const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
     // ===== 状態取得 =====
     const state = JSON.parse(localStorage.getItem("quizState"));
@@ -65,59 +183,47 @@
       location.href = "group.html";
     }
 
-    // 表示
-    document.getElementById("group").textContent =
-      "グループ： " + state.group;
+    // クラス名に影響を与えず中身だけ書き換える
+    document.getElementById("group").textContent = state.group;
 
     const difficultyLabel = {
       easy: "やさしい",
       normal: "ふつう",
       hard: "むずかしい"
     };
-
-    document.getElementById("difficulty").textContent =
-      "難易度： " + difficultyLabel[state.difficulty];
+    document.getElementById("difficulty").textContent = difficultyLabel[state.difficulty];
 
     // ===== クイズ取得 =====
     async function prepareQuiz() {
-          const { data, error } = await supabaseClient
-            .from("quizzes")
-            .select("id")
-            .eq("group_name", state.group)
-            // 修正箇所：true を 1 (数値) に変更
-            .eq(state.difficulty, 1); 
+      const { data, error } = await supabaseClient
+        .from("quizzes")
+        .select("id")
+        .eq("group_name", state.group)
+        .eq(state.difficulty, 1); 
 
-          if (error) {
-            console.error("Supabaseエラー:", error);
-            document.getElementById("status").textContent = "エラーが発生しました";
-            return;
-          }
+      if (error) {
+        console.error("Supabaseエラー:", error);
+        document.getElementById("status").textContent = "エラーが発生しました";
+        return;
+      }
 
-        if (!data || data.length === 0) {
-          document.getElementById("status").textContent =
-            "問題が見つかりませんでした";
-          return;
-        }
+      if (!data || data.length === 0) {
+        document.getElementById("status").textContent = "問題が見つかりませんでした";
+        return;
+      }
 
-      // シャッフル
-      const shuffled = data
-        .map(q => q.id)
-        .sort(() => Math.random() - 0.5);
-
-      // 最大10問まで
+      const shuffled = data.map(q => q.id).sort(() => Math.random() - 0.5);
       state.quizIds = shuffled.slice(0, 10);
       localStorage.setItem("quizState", JSON.stringify(state));
 
-      document.getElementById("status").textContent =
-        `${state.quizIds.length}問のクイズを用意しました！`;
+      document.getElementById("status").textContent = `${state.quizIds.length}問のクイズを用意しました！`;
       
-        const description = document.getElementById("description");
+      const description = document.getElementById("description");
       description.innerHTML = `
         ・このクイズは複数選択式です。<br>
-        ・「全員」ボタンで一括選択・解除ができます。<br>
+        ・「全員」ボタンで一括選択・解除ができます。
       `;
-
-description.style.display = "block";
+      description.style.display = "block";
 
       const btn = document.getElementById("startBtn");
       btn.disabled = false;
