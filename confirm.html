@@ -197,39 +197,45 @@
     async function prepareQuiz() {
       const { data, error } = await supabaseClient
         .from("quizzes")
-        .select("id")
+        .select(`id, ${state.difficulty}`) // 難易度列（easy等）とその値を取得
         .eq("group_name", state.group)
-        .eq(state.difficulty, 1); 
+        .gt(state.difficulty, 0); // 値が 0 より大きい（出題対象）ものを取得
 
-      if (error) {
-        console.error("Supabaseエラー:", error);
-        document.getElementById("status").textContent = "エラーが発生しました";
-        return;
-      }
-
-      if (!data || data.length === 0) {
+      if (error || !data || data.length === 0) {
         document.getElementById("status").textContent = "問題が見つかりませんでした";
         return;
       }
 
-      const shuffled = data.map(q => q.id).sort(() => Math.random() - 0.5);
-      state.quizIds = shuffled.slice(0, 10);
+      // --- 🚀 重み付き抽選ロジック ---
+      const selectedIds = [];
+      const tempPool = [...data]; // 取得したデータのコピー
+      const maxQuestions = 10;
+
+      for (let i = 0; i < maxQuestions && tempPool.length > 0; i++) {
+        // 全体の重みの合計を計算
+        const totalWeight = tempPool.reduce((sum, q) => sum + q[state.difficulty], 0);
+        let random = Math.random() * totalWeight;
+        
+        // 重みに基づいて当選を決定
+        for (let j = 0; j < tempPool.length; j++) {
+          random -= tempPool[j][state.difficulty];
+          if (random <= 0) {
+            selectedIds.push(tempPool[j].id);
+            tempPool.splice(j, 1); // 同じ問題が選ばれないようにプールから削除
+            break;
+          }
+        }
+      }
+
+      state.quizIds = selectedIds;
       localStorage.setItem("quizState", JSON.stringify(state));
+      // --- ここまで ---
 
       document.getElementById("status").textContent = `${state.quizIds.length}問のクイズを用意しました！`;
-      
-      const description = document.getElementById("description");
-      description.innerHTML = `
-        ・このクイズは複数選択式です。<br>
-        ・「全員」ボタンで一括選択・解除ができます。
-      `;
-      description.style.display = "block";
-
+      document.getElementById("description").style.display = "block";
       const btn = document.getElementById("startBtn");
       btn.disabled = false;
-      btn.onclick = () => {
-        location.href = "quiz.html";
-      };
+      btn.onclick = () => { location.href = "quiz.html"; };
     }
 
     prepareQuiz();
