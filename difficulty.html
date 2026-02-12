@@ -96,14 +96,32 @@
 
   /* ポップアップの設定 */
   .info-pop {
-    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -40%); opacity: 0; visibility: hidden;
-    background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-    border: 3px solid #ff69b2; border-radius: 15px; padding: 20px; width: auto; max-width: 85vw; min-width: 260px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 2000; white-space: pre; pointer-events: none;
+    position: fixed; 
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -40%); 
+    opacity: 0; 
+    visibility: hidden;
+    background: rgba(255, 255, 255, 0.98); /* 背景を少し濃くして読みやすく */
+    backdrop-filter: blur(4px); 
+    -webkit-backdrop-filter: blur(4px);
+    border: 3px solid #ff69b2; 
+    border-radius: 15px; 
+    padding: 15px 20px; /* 上下の余白を少し詰め、左右を確保 */
+    width: auto; 
+    min-width: 250px; 
+    max-width: 90vw; /* 画面からはみ出さない最大幅 */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+    z-index: 2000; 
+    
+    /* --- 左揃えと改行の設定 --- */
+    text-align: left;    /* 左揃えにする */
+    white-space: pre;    /* \n 以外で改行させない */
+    font-size: 0.8rem;   /* 少し小さくして1行がはみ出ないように調整 */
+    line-height: 1.6;    /* 行間を広げて読みやすく */
+    
+    pointer-events: none;
     transition: all 0.3s ease;
-    font-size: 0.75rem;
-    line-height: 1.5; 
-    overflow-x: auto;
   }
   .info-pop.show { opacity: 1; visibility: visible; transform: translate(-50%, -50%); pointer-events: auto; }
 </style>
