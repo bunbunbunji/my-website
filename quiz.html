@@ -266,27 +266,41 @@
 
     // 3. データ読み込み関数
     async function loadQuizzesAndMembers() {
-      // 難易度指定のカラムが1であるものを取得
+      // 🚀 修正：選択された難易度のカラムが 0 より大きい（出題対象）データを取得
       const { data: quizData, error: quizError } = await supabaseClient
         .from("quizzes")
         .select("*")
         .eq("group_name", quizState.group)
-        .eq(quizState.difficulty, 1);
+        .gt(quizState.difficulty, 0); 
 
       if (quizError || !quizData || quizData.length === 0) {
         document.getElementById("lyrics").textContent = "問題を取得できませんでした";
         return;
       }
 
-      // 確率調整フィルタ
-      const filteredQuizzes = quizData.filter(quiz => {
-        const rate = (quiz.Question_rate !== null && quiz.Question_rate !== undefined) ? quiz.Question_rate : 1.0; 
-        return Math.random() < rate;
-      });
+      // 🚀 修正：重み付き抽選ロジック (難易度カラムの値を重みとして10問選出)
+      const selectedQuizzes = [];
+      const tempPool = [...quizData];
+      const maxQuestions = 10;
+      const diffKey = quizState.difficulty; // "easy", "normal", "hard", "expert"
 
-      // シャッフルして10問
-      quizzes = filteredQuizzes.sort(() => Math.random() - 0.5).slice(0, 10);
-      console.log("【デバッグ】選出されたクイズID一覧:", quizzes.map(q => q.id));
+      for (let i = 0; i < maxQuestions && tempPool.length > 0; i++) {
+        // 現在のプール内の重みの合計を計算
+        const totalWeight = tempPool.reduce((sum, q) => sum + (q[diffKey] || 0), 0);
+        let random = Math.random() * totalWeight;
+
+        for (let j = 0; j < tempPool.length; j++) {
+          random -= tempPool[j][diffKey];
+          if (random <= 0) {
+            selectedQuizzes.push(tempPool[j]);
+            tempPool.splice(j, 1); // 選ばれた問題を重複しないよう削除
+            break;
+          }
+        }
+      }
+
+      quizzes = selectedQuizzes;
+      console.log("【デバッグ】重み付き抽選結果:", quizzes.map(q => ({id: q.id, weight: q[diffKey]})));
 
       if (quizzes.length === 0) {
         document.getElementById("lyrics").textContent = "条件に合う問題が見つかりませんでした";
@@ -309,10 +323,8 @@
     function showQuiz(index) {
       currentIndex = index;
       currentQuiz = quizzes[index];
-      // --- ここを追加：カウンターの表示更新 ---
-      // indexは0から始まるので +1 して表示します
+      
       document.getElementById("quiz-counter").textContent = `${index + 1} / ${quizzes.length} 問目`;
-      // ★進捗バーの更新
       const progressPercent = ((index + 1) / quizzes.length) * 100;
       document.getElementById("progress-bar").style.width = progressPercent + "%";
 
@@ -321,6 +333,7 @@
       const prevEl = document.getElementById("prev-lyrics");
       const nextEl = document.getElementById("next-lyrics");
 
+      // 🚀 修正：「げきむず (expert)」と「むずかしい (hard)」はヒント非表示
       if (quizState.difficulty === "easy") {
         const prevText = [currentQuiz.lyrics_prev1, currentQuiz.lyrics_prev2].filter(t => t).join("<br>");
         const nextText = [currentQuiz.lyrics_next1, currentQuiz.lyrics_next2].filter(t => t).join("<br>");
@@ -330,6 +343,7 @@
         updateHint(prevEl, "-直前の歌詞-", currentQuiz.lyrics_prev2);
         updateHint(nextEl, "-直後の歌詞-", currentQuiz.lyrics_next1);
       } else {
+        // hard, expert の場合はヒントを隠す
         prevEl.style.display = "none";
         nextEl.style.display = "none";
       }
@@ -338,13 +352,13 @@
       renderMembers();
       const resultEl = document.getElementById("result");
       resultEl.textContent = "";
-      resultEl.className = ""; // これで "correct" や "incorrect" クラスをすべて消去します
+      resultEl.className = ""; 
       
       const explanationEl = document.getElementById("explanation");
       explanationEl.textContent = "";
 
       const submitBtn = document.getElementById("submitBtn");
-      submitBtn.style.display = "block"; // 復活させる
+      submitBtn.style.display = "block"; 
       submitBtn.disabled = false;
       
       document.getElementById("nextBtn").style.display = "none";
@@ -381,12 +395,10 @@
 
       const allBtn = document.createElement("button");
       allBtn.textContent = "全員";
-      // classに "all-btn" を追加してCSSと紐付けます
       allBtn.className = "member-btn all-btn";
 
       allBtn.onclick = () => {
-        // :not(.all-btn) にすることで「全員」ボタン自身を除外して判定
-        const memberButtons = document.querySelectorAll(".member-btn:not(:last-child)");
+        const memberButtons = document.querySelectorAll(".member-btn:not(.all-btn)");
         const allOn = [...memberButtons].every(b => b.classList.contains("on"));
 
         memberButtons.forEach(b => {
@@ -404,24 +416,19 @@
     }
 
     document.getElementById("submitBtn").onclick = () => {
-      // --- 修正箇所：未選択時の処理 ---
       if (selectedMembers.size === 0) {
         const res = document.getElementById("result");
         res.textContent = "⚠️ メンバーを選択してください！";
-        res.className = "animate warning"; // warning クラスでオレンジ色にする
+        res.className = "animate warning";
         res.style.display = "block";
-        
-        // ユーザーが気づきやすいように少し画面を揺らすなどの演出をしてもいいですね
         return; 
       }
-      // ----------------------------
 
       const correct = currentQuiz.correct_members.split(",").map(s => s.trim()).sort();
       const answer = Array.from(selectedMembers).sort();
       const isCorrect = correct.length === answer.length && correct.every((v, i) => v === answer[i]);
 
       const res = document.getElementById("result");
-      // 正解・不正解の表示（ここは既存のまま）
       res.textContent = isCorrect ? `⭕ 正解！😄（正解：${correct.join("・")}）` : `❌ 不正解！😫（正解：${correct.join("・")}）`;
       res.className = isCorrect ? "correct animate" : "incorrect animate";
 
@@ -430,7 +437,6 @@
       if (isCorrect) quizState.correctCount++;
       localStorage.setItem("quizState", JSON.stringify(quizState));
 
-      // 回答ボタンを非表示、次へボタンを表示
       document.getElementById("submitBtn").style.display = "none";
       document.getElementById("nextBtn").style.display = "block"; 
       
@@ -446,7 +452,6 @@
       }
     };
 
-    // 最後に実行
     loadQuizzesAndMembers();
   </script>
 </body>

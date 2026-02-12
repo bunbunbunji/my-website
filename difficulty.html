@@ -10,15 +10,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-
   <link rel="stylesheet" href="styles.css">
-
 </head>
 
 <style>
   /* タイトルの間隔調整 */
   .title {
-    margin-bottom: 30px;
+    margin-bottom: 25px;
   }
 
   /* 難易度ボタンを中央に配置するための親要素 */
@@ -36,7 +34,7 @@
     align-items: center;
     justify-content: center; 
     width: 100%;
-    margin-bottom: 15px; 
+    margin-bottom: 12px; 
     padding-left: 28px; 
   }
 
@@ -47,7 +45,7 @@
     margin: 0 !important;
   }
 
-  /* --- 3段階・難易度別カラー設定 --- */
+  /* --- 4段階・難易度別カラー設定 --- */
 
   /* 🟢 1: やさしい（パステルグリーン） */
   .difficulty-item:nth-of-type(1) > button { 
@@ -61,7 +59,7 @@
   .difficulty-item:nth-of-type(2) > button { 
     background-color: #ffd54f !important; 
     outline-color: #ffd54f !important; 
-    color: #795548 !important; /* 文字を濃い茶色にして視認性アップ */
+    color: #795548 !important; 
     box-shadow: 3px 3px 0px #ffb300; 
   }
 
@@ -71,6 +69,14 @@
     outline-color: #ef5350 !important; 
     color: #ffffff !important;
     box-shadow: 3px 3px 0px #d32f2f; 
+  }
+
+  /* 🟣 4: げきむず（バイオレット）追加 */
+  .difficulty-item:nth-of-type(4) > button { 
+    background-color: #ba68c8 !important; 
+    outline-color: #ba68c8 !important; 
+    color: #ffffff !important;
+    box-shadow: 3px 3px 0px #9c27b0; 
   }
 
   /* iアイコンの位置固定 */
@@ -85,16 +91,19 @@
 
   /* 戻るボタン */
   .back-btn {
-    margin-top: 40px !important; 
+    margin-top: 30px !important; 
   }
 
   /* ポップアップの設定 */
   .info-pop {
     position: fixed; top: 50%; left: 50%; transform: translate(-50%, -40%); opacity: 0; visibility: hidden;
     background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-    border: 3px solid #ff69b2; border-radius: 15px; padding: 20px; width: 280px; max-width: 85vw;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 2000; white-space: pre-wrap; pointer-events: none;
+    border: 3px solid #ff69b2; border-radius: 15px; padding: 20px; width: auto; max-width: 85vw; min-width: 260px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 2000; white-space: pre; pointer-events: none;
     transition: all 0.3s ease;
+    font-size: 0.75rem;
+    line-height: 1.5; 
+    overflow-x: auto;
   }
   .info-pop.show { opacity: 1; visibility: visible; transform: translate(-50%, -50%); pointer-events: auto; }
 </style>
@@ -122,73 +131,67 @@
         <img src="info.png" class="info-icon" data-level="hard">
         <div class="info-pop"></div>
       </div>
-</div>
+
+      <div class="difficulty-item">
+        <button data-level="expert">げきむず</button>
+        <img src="info.png" class="info-icon" data-level="expert">
+        <div class="info-pop"></div>
+      </div>
+    </div>
 
     <button class="back-btn" onclick="location.href='group.html'">グループ選択に戻る</button>
   </div>
 
-    <script>
-      // 各難易度の説明文データ
-      const descriptions = {
-        easy: "・特徴的な歌詞を歌っている1人が選出されます。\n・設問の前後2フレーズの歌詞が表示されます。",
-        normal: "・1人または全員で歌っている歌詞が選出されます。\n・設問の前後1フレーズの歌詞が表示されます。",
-        hard: "・2人以上で歌っている歌詞が選出されます。\n・ノーヒントです。"
-      };
+  <script>
+    // 各難易度の説明文データ
+    const descriptions = {
+      easy: "・その曲で特に特徴的な部分を歌っている1人が選出されます\n・歌割りやMVが公開されていない曲も選出されます\n・設問の前後2フレーズの歌詞が表示されます",
+      normal: "・一般的な歌詞を歌っている1人が選出されます\n・歌割りやMVが公開されている曲のみ選出されます\n・設問の前後1フレーズの歌詞が表示されます",
+      hard: "・1人または全員で歌っている歌詞が選出されます\n・歌割りやMVが公開されていない曲も選出されます\n・ノーヒントです。",
+      expert: "・2人以上または全員で歌っている歌詞が選出されます。\n・ノーヒントです。"
+    };
 
-      // infoアイコン（画像）に対するクリックイベントの設定
-      document.querySelectorAll(".info-icon").forEach(icon => {
-        const level = icon.dataset.level;
-        const pop = icon.parentElement.querySelector(".info-pop");
+    // infoアイコン（画像）に対するクリックイベントの設定
+    document.querySelectorAll(".info-icon").forEach(icon => {
+      const level = icon.dataset.level;
+      const pop = icon.parentElement.querySelector(".info-pop");
+      
+      // 説明文をセット
+      pop.textContent = descriptions[level];
+
+      icon.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isShowing = pop.classList.contains("show");
         
-        // 説明文をセット
-        pop.textContent = descriptions[level];
-
-        icon.addEventListener("click", (e) => {
-          // 親要素へのイベント伝播を止める（documentのクリックイベントと干渉させないため）
-          e.stopPropagation();
-          
-          const isShowing = pop.classList.contains("show");
-          
-          // 他に開いているポップアップがあればすべて閉じる
-          document.querySelectorAll(".info-pop").forEach(p => {
-            p.classList.remove("show");
-          });
-          
-          // クリックしたアイコンに対応するポップアップの状態を切り替え
-          // クラスを付け外しするだけでCSSのtransitionアニメーションが発動します
-          if (!isShowing) {
-            pop.classList.add("show");
-          }
-        });
-      });
-
-      // ポップアップ以外の場所（画面のどこか）をクリックしたら閉じる処理
-      document.addEventListener("click", () => {
         document.querySelectorAll(".info-pop").forEach(p => {
           p.classList.remove("show");
         });
+        
+        if (!isShowing) {
+          pop.classList.add("show");
+        }
       });
+    });
 
-      // 難易度選択ボタン（メインボタン）のクリック処理
-      document.querySelectorAll("button[data-level]").forEach(button => {
-        button.addEventListener("click", () => {
-          goToNext(button.dataset.level);
-        });
+    document.addEventListener("click", () => {
+      document.querySelectorAll(".info-pop").forEach(p => {
+        p.classList.remove("show");
       });
+    });
 
-      /**
-       * 次の確認画面へ進む処理
-       * @param {string} level - 選択された難易度 (easy / normal / hard)
-       */
-      function goToNext(level) {
-        const state = JSON.parse(localStorage.getItem("quizState") || "{}");
-        // 選択された難易度を保存
-        state.difficulty = level;
-        localStorage.setItem("quizState", JSON.stringify(state));
-        // 確認画面へ遷移
-        location.href = "confirm.html";
-      }
-    </script>
+    document.querySelectorAll("button[data-level]").forEach(button => {
+      button.addEventListener("click", () => {
+        goToNext(button.dataset.level);
+      });
+    });
+
+    function goToNext(level) {
+      const state = JSON.parse(localStorage.getItem("quizState") || "{}");
+      state.difficulty = level;
+      localStorage.setItem("quizState", JSON.stringify(state));
+      location.href = "confirm.html";
+    }
+  </script>
 
 </body>
 </html>
