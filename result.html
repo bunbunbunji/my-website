@@ -76,9 +76,16 @@
     // 1. データの読み込み
     const state = JSON.parse(localStorage.getItem("quizState"));
 
-    if (!state) {
+    // データがない、または既に「終了済み(isFinished)」の場合は追い返す
+    if (!state || state.isFinished) {
       location.href = "index.html";
+      // 処理を中断（これ以降のカウントアップ等を動かさない）
+      throw new Error("Invalid access"); 
     }
+    // isCompleteをfalseにし、かつ isFinishedをtrueに更新
+    state.isComplete = false; 
+    state.isFinished = true;
+    localStorage.setItem("quizState", JSON.stringify(state));
 
     // --- 共通設定 ---
     const difficultyMap = { 

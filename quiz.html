@@ -488,6 +488,10 @@
         showQuiz(currentIndex + 1);
         window.scrollTo({ top: 0, behavior: "smooth" });
       } else {
+        const state = JSON.parse(localStorage.getItem("quizState") || "{}");
+        state.isComplete = true; // 10問解き終わったフラグを立てる
+        localStorage.setItem("quizState", JSON.stringify(state));
+        
         location.href = "result.html";
       }
     };
