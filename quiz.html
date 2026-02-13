@@ -49,6 +49,8 @@
     padding: 0 10px;
     letter-spacing: 0.03em;
     word-break: break-all;
+    /* ✨ これを追加：改行コードを反映させ、端で自動折り返しもする */
+    white-space: pre-wrap;
   }
 
   /* ヒント歌詞の装飾 */
@@ -63,6 +65,7 @@
     margin: 8px 0; 
     line-height: 1.4;
     letter-spacing: 0.05em;
+    white-space: pre-wrap;
   }
   .hint-label { font-weight: bold; color: #ffb6c1; font-size: 0.75rem; }
 
@@ -217,6 +220,43 @@
   border: 2px solid #ffb74d !important;
   text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
   }
+
+  body {
+  -webkit-user-select: none; /* Safari, Chrome, iOSなど */
+  -moz-user-select: none;    /* Firefox */
+  -ms-user-select: none;     /* IE / Edge */
+  user-select: none;         /* 標準の仕様 */
+  }
+
+/* 歌詞が表示される部分など、特定の場所だけに適用したい場合（推奨） */
+.lyrics-container {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* --- 🖱️ PC版：ボタンON（選択中）の時のホバー挙動を修正 --- */
+  @media (hover: hover) {
+    /* 選択中（.on）のボタンにマウスが乗った時 */
+    .member-btn.on:hover:not(:disabled) {
+      /* 背景色を選択中の色のまま固定（白くならないようにする） */
+      background-color: #ff69b2 !important; 
+      /* 文字色を白のまま固定 */
+      color: #ffffff !important;
+      /* 浮き上がり効果は維持しつつ、少しだけ明るくして反応を出す（任意） */
+      filter: brightness(1.05);
+      /* 影の色も選択中の色に合わせる */
+      box-shadow: 0 4px 0px #d81b60 !important;
+    }
+  }
+
+  /* --- 📱 スマホ版：タッチ時の色の変化を固定 --- */
+  @media (hover: none) {
+    .member-btn.on:active {
+      background-color: #ff69b2 !important;
+      color: #ffffff !important;
+    }
+  }
+
 </style>
 
 <body class="scroll-page">

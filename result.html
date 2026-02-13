@@ -17,6 +17,22 @@
   .score-circle { width: 120px; height: 120px; border: 6px solid #ff69b2; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 20px auto; background: #fff; box-shadow: 0 5px 15px rgba(255,105,178,0.2); }
   .score-num { font-size: 2.5rem; font-weight: 900; color: #ff69b2; }
   .share-btn { background: #000 !important; color: #fff !important; outline-color: #000 !important; box-shadow: 3px 3px 0px #333 !important; }
+  .info-badges {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+  }
+  .badge {
+    background: #fdfdfd;
+    border: 1px solid #ffb6c1;
+    color: #ff69b2;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
 </style>
 
 <body class="locked">
@@ -30,6 +46,11 @@
         <span id="correct-count" class="score-num">0</span>
         <span class="score-unit">/ 10 問</span>
       </div>
+    </div>
+
+    <div class="info-badges">
+      <span id="display-group" class="badge">---</span>
+      <span id="display-diff" class="badge">---</span>
     </div>
 
     <div class="message-area">
@@ -52,18 +73,30 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <script>
-    // データの読み込み
+    // 1. データの読み込み
     const state = JSON.parse(localStorage.getItem("quizState"));
 
     if (!state) {
       location.href = "index.html";
     }
 
+    // --- 共通設定 ---
+    const difficultyMap = { 
+      "easy": "やさしい", 
+      "normal": "ふつう", 
+      "hard": "むずかしい",
+      "expert": "げきむず" 
+    };
+
     const correct = state.correctCount || 0;
-    const total = 10; // 10問固定の場合
+    const total = 10;
     const rate = (correct / total) * 100;
 
-    // カウントアップアニメーション（少しリッチに）
+    // 2. グループ名と難易度の表示反映
+    document.getElementById("display-group").textContent = state.group || "---";
+    document.getElementById("display-diff").textContent = difficultyMap[state.difficulty] || state.difficulty;
+
+    // 3. カウントアップアニメーション
     let displayNum = 0;
     const countEl = document.getElementById("correct-count");
     const timer = setInterval(() => {
@@ -75,14 +108,13 @@
       }
     }, 100);
 
-    // ランク判定ロジック
+    // 4. ランク判定ロジック
     let rank = "";
     let comment = "";
 
     if (rate === 100) {
       rank = "🌟神推し級🌟";
       comment = "完璧です！全問正解！<br>あなたは間違いなく、このグループの歌割りを完全に理解していますね。";
-      // ★全問正解時のみ紙吹雪を飛ばす
       launchConfetti();
     } else if (rate >= 80) {
       rank = "🥇物知り級";
@@ -98,16 +130,15 @@
     document.getElementById("rank").textContent = rank;
     document.getElementById("comment").innerHTML = comment;
 
+    // 5. 紙吹雪エフェクト
     function launchConfetti() {
-      // 1. 真ん中からドカン！
       confetti({
         particleCount: 150,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#ff69b2', '#ffb6c1', '#ffffff', '#4ecdc4'] // サイトの色に合わせた配色
+        colors: ['#ff69b2', '#ffb6c1', '#ffffff', '#4ecdc4']
       });
 
-      // 2. 少し遅れて左右から追い打ち！
       setTimeout(() => {
         confetti({
           particleCount: 50,
@@ -125,28 +156,22 @@
         });
       }, 500);
     }
-document.getElementById("share-btn").onclick = () => {
+
+    // 6. X（Twitter）シェア機能
+    document.getElementById("share-btn").onclick = () => {
       const rankName = document.getElementById("rank").textContent;
       const score = document.getElementById("correct-count").textContent;
-      
-      // グループ名と難易度を整形
       const groupName = state.group; 
-      // 難易度を日本語に変換（もしstate.difficultyが"easy"等なら）
-      const difficultyMap = { "easy": "やさしい", "normal": "ふつう", "hard": "むずかしい" };
       const diffName = difficultyMap[state.difficulty] || state.difficulty;
-
       const siteUrl = "https://bunbunbunji.github.io/my-website/index.html";
 
-      // テキストの中にグループと難易度を組み込む
       const text = encodeURIComponent(
         `歌割り検定の結果は…\n【${rankName}】でした！(正解：${score}/10問)\nグループ：${groupName}\n難易度：${diffName}\n${siteUrl}\n\n#KAWAIILAB歌割り検定`
       );
 
       const shareUrl = `https://twitter.com/intent/tweet?text=${text}`;
-      
       window.open(shareUrl, '_blank', 'width=600,height=400');
     };
-
   </script>
 
 
