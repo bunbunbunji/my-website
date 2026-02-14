@@ -9,124 +9,63 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <link rel="stylesheet" href="styles.css">
 </head>
 
 <style>
   /* タイトルの間隔調整 */
-  .title {
-    margin-bottom: 25px;
-  }
+  .title { margin-bottom: 25px; }
 
-  /* 難易度ボタンを中央に配置するための親要素 */
   .button-row {
-    display: flex;
-    flex-direction: column;
-    align-items: center; 
-    width: 100%;
+    display: flex; flex-direction: column; align-items: center; width: 100%;
   }
 
-  /* 難易度ボタン+iアイコンのセット */
   .difficulty-item {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center; 
-    width: 100%;
-    margin-bottom: 12px; 
-    padding-left: 28px; 
+    position: relative; display: flex; align-items: center; justify-content: center; 
+    width: 100%; margin-bottom: 12px; padding-left: 28px; 
   }
 
-  /* 難易度ボタン自体のサイズ固定 */
   .difficulty-item > button {
-    width: 70% !important;
-    max-width: 220px !important;
-    margin: 0 !important;
+    width: 70% !important; max-width: 220px !important; margin: 0 !important;
   }
 
-  /* --- 4段階・難易度別カラー設定 --- */
+  /* --- 難易度別カラー --- */
+  .difficulty-item:nth-of-type(1) > button { background-color: #81c784 !important; outline-color: #81c784 !important; color: #ffffff !important; box-shadow: 3px 3px 0px #4caf50; }
+  .difficulty-item:nth-of-type(2) > button { background-color: #ffd54f !important; outline-color: #ffd54f !important; color: #795548 !important; box-shadow: 3px 3px 0px #ffb300; }
+  .difficulty-item:nth-of-type(3) > button { background-color: #ef5350 !important; outline-color: #ef5350 !important; color: #ffffff !important; box-shadow: 3px 3px 0px #d32f2f; }
+  .difficulty-item:nth-of-type(4) > button { background-color: #ba68c8 !important; outline-color: #ba68c8 !important; color: #ffffff !important; box-shadow: 3px 3px 0px #9c27b0; }
 
-  /* 🟢 1: やさしい（パステルグリーン） */
-  .difficulty-item:nth-of-type(1) > button { 
-    background-color: #81c784 !important; 
-    outline-color: #81c784 !important; 
-    color: #ffffff !important;
-    box-shadow: 3px 3px 0px #4caf50; 
-  }
-
-  /* 🟡 2: ふつう（サンフラワーイエロー） */
-  .difficulty-item:nth-of-type(2) > button { 
-    background-color: #ffd54f !important; 
-    outline-color: #ffd54f !important; 
-    color: #795548 !important; 
-    box-shadow: 3px 3px 0px #ffb300; 
-  }
-
-  /* 🔴 3: むずかしい（パステルレッド） */
-  .difficulty-item:nth-of-type(3) > button { 
-    background-color: #ef5350 !important; 
-    outline-color: #ef5350 !important; 
-    color: #ffffff !important;
-    box-shadow: 3px 3px 0px #d32f2f; 
-  }
-
-  /* 🟣 4: げきむず（バイオレット）追加 */
-  .difficulty-item:nth-of-type(4) > button { 
-    background-color: #ba68c8 !important; 
-    outline-color: #ba68c8 !important; 
-    color: #ffffff !important;
-    box-shadow: 3px 3px 0px #9c27b0; 
-  }
-
-  /* iアイコンの位置固定 */
   .info-icon {
-    width: 18px;
-    height: 18px;
-    margin-left: 10px; 
-    cursor: pointer;
-    filter: sepia(1) saturate(5) hue-rotate(280deg);
-    flex-shrink: 0;
+    width: 18px; height: 18px; margin-left: 10px; cursor: pointer;
+    filter: sepia(1) saturate(5) hue-rotate(280deg); flex-shrink: 0;
   }
 
-  /* 戻るボタン */
-  .back-btn {
-    margin-top: 30px !important; 
-  }
+  .back-btn { margin-top: 30px !important; }
 
-  /* ポップアップの設定 */
+  /* 🌑 背景を暗くするオーバーレイ */
+  #modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.4); /* 暗さの度合い */
+    opacity: 0; visibility: hidden;
+    transition: all 0.3s ease; z-index: 1500; /* ポップアップ(2000)より下に配置 */
+  }
+  #modal-overlay.show { opacity: 1; visibility: visible; }
+
+  /* 📄 ポップアップの設定 */
   .info-pop {
-    position: fixed; 
-    top: 50%; 
-    left: 50%; 
-    transform: translate(-50%, -40%); 
-    opacity: 0; 
-    visibility: hidden;
-    background: rgba(255, 255, 255, 0.98); /* 背景を少し濃くして読みやすく */
-    backdrop-filter: blur(4px); 
-    -webkit-backdrop-filter: blur(4px);
-    border: 3px solid #ff69b2; 
-    border-radius: 15px; 
-    padding: 15px 20px; /* 上下の余白を少し詰め、左右を確保 */
-    width: auto; 
-    min-width: 250px; 
-    max-width: 90vw; /* 画面からはみ出さない最大幅 */
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
-    z-index: 2000; 
-    
-    /* --- 左揃えと改行の設定 --- */
-    text-align: left;    /* 左揃えにする */
-    white-space: pre;    /* \n 以外で改行させない */
-    font-size: 0.8rem;   /* 少し小さくして1行がはみ出ないように調整 */
-    line-height: 1.6;    /* 行間を広げて読みやすく */
-    
-    pointer-events: none;
-    transition: all 0.3s ease;
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -40%); opacity: 0; visibility: hidden;
+    background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    border: 3px solid #ff69b2; border-radius: 15px; padding: 15px 20px; width: auto; 
+    min-width: 250px; max-width: 90vw; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 2000; 
+    text-align: left; white-space: pre; font-size: 0.8rem; line-height: 1.6;
+    pointer-events: none; transition: all 0.3s ease;
   }
   .info-pop.show { opacity: 1; visibility: visible; transform: translate(-50%, -50%); pointer-events: auto; }
 </style>
 
 <body class="locked difficulty-page">
+
+  <div id="modal-overlay"></div>
 
   <div class="box">
     <h2 class="title">難易度を選択</h2>
@@ -161,44 +100,44 @@
   </div>
 
   <script>
-    // 各難易度の説明文データ
     const descriptions = {
-      easy: "・その曲で特に特徴的な部分を歌っている1人が選出されます\n・歌割りやMVが公開されていない曲も選出されます\n・設問の前後2フレーズの歌詞が表示されます",
-      normal: "・一般的な歌詞を歌っている1人が選出されます\n・歌割りやMVが公開されている曲のみ選出されます\n・設問の前後1フレーズの歌詞が表示されます",
-      hard: "・1人または全員で歌っている歌詞が選出されます\n・歌割りやMVが公開されていない曲も選出されます\n・ノーヒントです。",
-      expert: "・2人以上または全員で歌っている歌詞が選出されます。\n・ノーヒントです。"
+      easy: "・特に特徴的な部分を歌っている1人が選出されます\n・歌割りやMV、Choreography動画・DancePractice動画が\n　公開されていない曲も選出されます\n・設問の前後2フレーズの歌詞が表示されます",
+      normal: "・一般的な歌詞を歌っている1人が選出されます\n・歌割りやMV、Choreography動画・DancePractice動画が\n　公開されている曲のみ選出されます\n・設問の前後1フレーズの歌詞が表示されます",
+      hard: "・1人または全員で歌っている歌詞が選出されます\n・配信されているすべての曲から選出されます\n・ノーヒントです。",
+      expert: "・2人以上または全員で歌っている歌詞が選出されます。\n・配信されているすべての曲から選出されます\n・ノーヒントです。"
     };
 
-    // infoアイコン（画像）に対するクリックイベントの設定
+    const overlay = document.getElementById("modal-overlay");
+
+    // infoアイコンに対するクリックイベント
     document.querySelectorAll(".info-icon").forEach(icon => {
       const level = icon.dataset.level;
       const pop = icon.parentElement.querySelector(".info-pop");
-      
-      // 説明文をセット
       pop.textContent = descriptions[level];
 
       icon.addEventListener("click", (e) => {
         e.stopPropagation();
-        const isShowing = pop.classList.contains("show");
         
-        document.querySelectorAll(".info-pop").forEach(p => {
-          p.classList.remove("show");
-        });
+        // すべてのポップアップを一旦閉じる
+        document.querySelectorAll(".info-pop").forEach(p => p.classList.remove("show"));
         
-        if (!isShowing) {
-          pop.classList.add("show");
-        }
+        // ターゲットを表示
+        pop.classList.add("show");
+        overlay.classList.add("show"); // 🌑 オーバーレイを表示
       });
     });
 
+    // オーバーレイまたはポップアップ以外のクリックで閉じる
     document.addEventListener("click", () => {
-      document.querySelectorAll(".info-pop").forEach(p => {
-        p.classList.remove("show");
-      });
+      document.querySelectorAll(".info-pop").forEach(p => p.classList.remove("show"));
+      overlay.classList.remove("show"); // 🌑 オーバーレイを隠す
     });
 
+    // 難易度選択ボタン
     document.querySelectorAll("button[data-level]").forEach(button => {
       button.addEventListener("click", () => {
+        // ポップアップが表示されているときはボタンを反応させない
+        if (overlay.classList.contains("show")) return;
         goToNext(button.dataset.level);
       });
     });
