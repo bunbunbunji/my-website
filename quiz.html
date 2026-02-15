@@ -306,7 +306,6 @@
 
     // 3. データ読み込み関数
     async function loadQuizzesAndMembers() {
-      // 🚀 修正：選択された難易度のカラムが 0 より大きい（出題対象）データを取得
       const { data: quizData, error: quizError } = await supabaseClient
         .from("quizzes")
         .select("*")
@@ -318,14 +317,13 @@
         return;
       }
 
-      // 🚀 修正：重み付き抽選ロジック (難易度カラムの値を重みとして10問選出)
+      // 重み付き抽選ロジック
       const selectedQuizzes = [];
       const tempPool = [...quizData];
       const maxQuestions = 10;
-      const diffKey = quizState.difficulty; // "easy", "normal", "hard", "expert"
+      const diffKey = quizState.difficulty; 
 
       for (let i = 0; i < maxQuestions && tempPool.length > 0; i++) {
-        // 現在のプール内の重みの合計を計算
         const totalWeight = tempPool.reduce((sum, q) => sum + (q[diffKey] || 0), 0);
         let random = Math.random() * totalWeight;
 
@@ -333,21 +331,19 @@
           random -= tempPool[j][diffKey];
           if (random <= 0) {
             selectedQuizzes.push(tempPool[j]);
-            tempPool.splice(j, 1); // 選ばれた問題を重複しないよう削除
+            tempPool.splice(j, 1);
             break;
           }
         }
       }
 
       quizzes = selectedQuizzes;
-      console.log("【デバッグ】重み付き抽選結果:", quizzes.map(q => ({id: q.id, weight: q[diffKey]})));
 
       if (quizzes.length === 0) {
         document.getElementById("lyrics").textContent = "条件に合う問題が見つかりませんでした";
         return;
       }
 
-      // メンバー取得
       const { data: memberData, error: memberError } = await supabaseClient
         .from("members")
         .select("*")
@@ -373,7 +369,7 @@
       const prevEl = document.getElementById("prev-lyrics");
       const nextEl = document.getElementById("next-lyrics");
 
-      // 🚀 修正：「げきむず (expert)」と「むずかしい (hard)」はヒント非表示
+      // ✨ 出題時のヒント表示（難易度別の初期表示）
       if (quizState.difficulty === "easy") {
         const prevText = [currentQuiz.lyrics_prev1, currentQuiz.lyrics_prev2].filter(t => t).join("<br>");
         const nextText = [currentQuiz.lyrics_next1, currentQuiz.lyrics_next2].filter(t => t).join("<br>");
@@ -383,13 +379,14 @@
         updateHint(prevEl, "-直前の歌詞-", currentQuiz.lyrics_prev2);
         updateHint(nextEl, "-直後の歌詞-", currentQuiz.lyrics_next1);
       } else {
-        // hard, expert の場合はヒントを隠す
+        // hard, expert の場合は最初は隠す
         prevEl.style.display = "none";
         nextEl.style.display = "none";
       }
 
       selectedMembers.clear();
       renderMembers();
+      
       const resultEl = document.getElementById("result");
       resultEl.textContent = "";
       resultEl.className = ""; 
@@ -397,10 +394,8 @@
       const explanationEl = document.getElementById("explanation");
       explanationEl.textContent = "";
 
-      const submitBtn = document.getElementById("submitBtn");
-      submitBtn.style.display = "block"; 
-      submitBtn.disabled = false;
-      
+      document.getElementById("submitBtn").style.display = "block"; 
+      document.getElementById("submitBtn").disabled = false;
       document.getElementById("nextBtn").style.display = "none";
     }
 
@@ -472,6 +467,15 @@
       res.textContent = isCorrect ? `⭕ 正解！😄（正解：${correct.join("・")}）` : `❌ 不正解！😫（正解：${correct.join("・")}）`;
       res.className = isCorrect ? "correct animate" : "incorrect animate";
 
+      // ✨ 回答後にヒントを全表示（答え合わせ用）
+      const prevEl = document.getElementById("prev-lyrics");
+      const nextEl = document.getElementById("next-lyrics");
+      const fullPrev = [currentQuiz.lyrics_prev1, currentQuiz.lyrics_prev2].filter(t => t).join("<br>");
+      const fullNext = [currentQuiz.lyrics_next1, currentQuiz.lyrics_next2].filter(t => t).join("<br>");
+      
+      updateHint(prevEl, "-直前の歌詞-", fullPrev);
+      updateHint(nextEl, "-直後の歌詞-", fullNext);
+
       document.getElementById("explanation").textContent = (currentQuiz.song_title && currentQuiz.explanation) ? `この歌詞は「${currentQuiz.song_title}」の${currentQuiz.explanation}部分でした！` : "";
       
       if (isCorrect) quizState.correctCount++;
@@ -489,9 +493,8 @@
         window.scrollTo({ top: 0, behavior: "smooth" });
       } else {
         const state = JSON.parse(localStorage.getItem("quizState") || "{}");
-        state.isComplete = true; // 10問解き終わったフラグを立てる
+        state.isComplete = true; 
         localStorage.setItem("quizState", JSON.stringify(state));
-        
         location.href = "result.html";
       }
     };
