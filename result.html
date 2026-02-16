@@ -76,16 +76,20 @@
     // 1. データの読み込み
     const state = JSON.parse(localStorage.getItem("quizState"));
 
-    // データがない、または既に「終了済み(isFinished)」の場合は追い返す
-    if (!state || state.isFinished) {
+    // ✨ 修正ポイント：より厳格なガード判定
+    // データがない、完走していない(isComplete)、または使い捨てトークン(resultToken)がない場合は追い返す
+    if (!state || !state.isComplete || !state.resultToken || state.isFinished) {
       location.href = "index.html";
-      // 処理を中断（これ以降のカウントアップ等を動かさない）
       throw new Error("Invalid access"); 
     }
-    // isCompleteをfalseにし、かつ isFinishedをtrueに更新
-    state.isComplete = false; 
-    state.isFinished = true;
-    localStorage.setItem("quizState", JSON.stringify(state));
+
+    // ✨ 重要：表示が始まった瞬間に「トークン」を消去し、「終了フラグ」を立てる
+    // これにより、この瞬間からこのデータは「使用済み」となり、リロードや戻るボタンで再表示できなくなります
+    const usedState = { ...state };
+    delete usedState.resultToken; // トークンを破棄
+    usedState.isComplete = false; // 完走フラグを下ろす
+    usedState.isFinished = true;  // 終了フラグを立てる
+    localStorage.setItem("quizState", JSON.stringify(usedState));
 
     // --- 共通設定 ---
     const difficultyMap = { 
@@ -95,6 +99,7 @@
       "expert": "げきむず" 
     };
 
+    // スコアはLocalStorageの確定値を使用
     const correct = state.correctCount || 0;
     const total = 10;
     const rate = (correct / total) * 100;
@@ -106,14 +111,19 @@
     // 3. カウントアップアニメーション
     let displayNum = 0;
     const countEl = document.getElementById("correct-count");
-    const timer = setInterval(() => {
-      if (displayNum >= correct) {
-        clearInterval(timer);
-      } else {
-        displayNum++;
-        countEl.textContent = displayNum;
-      }
-    }, 100);
+    // 正解が0問の場合も考慮して、1問以上あるときだけタイマーを作動
+    if (correct > 0) {
+      const timer = setInterval(() => {
+        if (displayNum >= correct) {
+          clearInterval(timer);
+        } else {
+          displayNum++;
+          countEl.textContent = displayNum;
+        }
+      }, 100);
+    } else {
+      countEl.textContent = "0";
+    }
 
     // 4. ランク判定ロジック
     let rank = "";
@@ -167,7 +177,7 @@
     // 6. X（Twitter）シェア機能
     document.getElementById("share-btn").onclick = () => {
       const rankName = document.getElementById("rank").textContent;
-      const score = document.getElementById("correct-count").textContent;
+      const score = correct; // 表示用数値ではなく、確定した正解数を使用
       const groupName = state.group; 
       const diffName = difficultyMap[state.difficulty] || state.difficulty;
       const siteUrl = "https://bunbunbunji.github.io/my-website/index.html";

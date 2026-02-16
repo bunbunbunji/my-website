@@ -303,6 +303,9 @@
     let currentQuiz = null;
     let members = [];
     let selectedMembers = new Set();
+    
+    // ✨ 修正ポイント：正解数を一時的に管理する変数（クイズ終了までLocalStorageには保存しない）
+    let tempCorrectCount = 0;
 
     // 3. データ読み込み関数
     async function loadQuizzesAndMembers() {
@@ -317,7 +320,6 @@
         return;
       }
 
-      // 重み付き抽選ロジック
       const selectedQuizzes = [];
       const tempPool = [...quizData];
       const maxQuestions = 10;
@@ -369,7 +371,6 @@
       const prevEl = document.getElementById("prev-lyrics");
       const nextEl = document.getElementById("next-lyrics");
 
-      // ✨ 出題時のヒント表示（難易度別の初期表示）
       if (quizState.difficulty === "easy") {
         const prevText = [currentQuiz.lyrics_prev1, currentQuiz.lyrics_prev2].filter(t => t).join("<br>");
         const nextText = [currentQuiz.lyrics_next1, currentQuiz.lyrics_next2].filter(t => t).join("<br>");
@@ -379,7 +380,6 @@
         updateHint(prevEl, "-直前の歌詞-", currentQuiz.lyrics_prev2);
         updateHint(nextEl, "-直後の歌詞-", currentQuiz.lyrics_next1);
       } else {
-        // hard, expert の場合は最初は隠す
         prevEl.style.display = "none";
         nextEl.style.display = "none";
       }
@@ -467,7 +467,6 @@
       res.textContent = isCorrect ? `⭕ 正解！😄（正解：${correct.join("・")}）` : `❌ 不正解！😫（正解：${correct.join("・")}）`;
       res.className = isCorrect ? "correct animate" : "incorrect animate";
 
-      // ✨ 回答後にヒントを全表示（答え合わせ用）
       const prevEl = document.getElementById("prev-lyrics");
       const nextEl = document.getElementById("next-lyrics");
       const fullPrev = [currentQuiz.lyrics_prev1, currentQuiz.lyrics_prev2].filter(t => t).join("<br>");
@@ -478,8 +477,8 @@
 
       document.getElementById("explanation").textContent = (currentQuiz.song_title && currentQuiz.explanation) ? `この歌詞は「${currentQuiz.song_title}」の${currentQuiz.explanation}部分でした！` : "";
       
-      if (isCorrect) quizState.correctCount++;
-      localStorage.setItem("quizState", JSON.stringify(quizState));
+      // ✨ 修正ポイント：ここではLocalStorageを更新せず、一時変数に加算するだけ
+      if (isCorrect) tempCorrectCount++;
 
       document.getElementById("submitBtn").style.display = "none";
       document.getElementById("nextBtn").style.display = "block"; 
@@ -492,8 +491,12 @@
         showQuiz(currentIndex + 1);
         window.scrollTo({ top: 0, behavior: "smooth" });
       } else {
+        // ✨ 修正ポイント：10問解き終わった時だけ「許可証（トークン）」を発行して保存
         const state = JSON.parse(localStorage.getItem("quizState") || "{}");
+        state.correctCount = tempCorrectCount; 
         state.isComplete = true; 
+        state.resultToken = Math.random().toString(36).substring(2); // ランダムな使い捨てID
+        
         localStorage.setItem("quizState", JSON.stringify(state));
         location.href = "result.html";
       }
