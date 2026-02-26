@@ -11,261 +11,229 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-</head>
 
-<style>
-  /* 全体レイアウト調整 */
-  .progress-container { 
-    width: 100%; 
-    height: 6px; 
-    background: #eee; 
-    border-radius: 4px; 
-    margin-bottom: 10px; 
-    overflow: hidden; 
-  }
-  .progress-bar { 
-    height: 100%; 
-    background: linear-gradient(90deg, #ffb6c1, #ff69b2); 
-    width: 0%; 
-    transition: width 0.4s; 
-  }
-
-  /* #1 クイズタイトルのサイズを小さく */
-  .quiz-title {
-    font-size: 1.1rem !important;
-    color: #888;
-    margin-top: 5px;
-    margin-bottom: 15px;
-    text-shadow: none;
-  }
-
-  /* #2 メイン歌詞のサイズを大きく */
-  #lyrics { 
-    font-size: 1.4rem; 
-    font-weight: normal; 
-    color: #333;
-    margin: 20px 0; 
-    line-height: 1.6;
-    padding: 0 10px;
-    letter-spacing: 0.03em;
-    word-break: break-all;
-    /* ✨ これを追加：改行コードを反映させ、端で自動折り返しもする */
-    white-space: pre-wrap;
-  }
-
-  /* ヒント歌詞の装飾 */
-  .hint-lyrics { 
-    font-size: 0.75rem;
-    font-weight: normal; 
-    color: #aaa;
-    background: #fdfdfd; 
-    border: 1px dashed #eee;
-    padding: 8px; 
-    border-radius: 8px; 
-    margin: 8px 0; 
-    line-height: 1.4;
-    letter-spacing: 0.05em;
-    white-space: pre-wrap;
-  }
-  .hint-label { font-weight: bold; color: #ffb6c1; font-size: 0.75rem; }
-
-  /* メンバーボタンのグリッド配置 */
-  .members { 
-    display: grid; 
-    grid-template-columns: 1fr 1fr; 
-    gap: 10px; 
-    width: 100%; 
-    max-width: 320px; 
-    margin: 20px auto; 
-  }
-
-  /* #3 各メンバーボタンの新しいStyle指定 */
-  .member-btn {
-    width: 100% !important;
-    max-width: 150px;
-    display: block;
-    margin: 0 auto !important;
-    font-size: 0.85rem;
-    font-weight: normal !important;
-    padding: 10px 0;
-    background-color: #ffffff !important;
-    color: #888 !important;
-    border: 1px solid #e0e0e0 !important;
-    outline: none !important;
-    border-radius: 20px;
-    box-shadow: 0 2px 0px #eee !important;
-    cursor: pointer;
-    transition: transform 0.1s, box-shadow 0.1s, background-color 0.1s;
-    position: relative;
-    top: 0 !important;
-    /* スマホでタップした時の青いハイライトを消す */
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  /* --- 🖱️ PC版（マウス操作）のみ浮き上がる設定 --- */
-  @media (hover: hover) {
-    .member-btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 0px #eee !important;
-      background-color: #fffafc !important;
+  <style>
+    /* --------------------------------------------------
+       【追加】コピーガード設定
+    -------------------------------------------------- */
+    /* 1. 文字選択を禁止（全体） */
+    body {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      /* スマホでの長押しメニューも抑制 */
+      -webkit-touch-callout: none;
     }
-    .member-btn.on:hover:not(:disabled) {
-      box-shadow: 0 4px 0px #d81b60 !important;
-    }
-  }
 
-  /* --- 📱 スマホ版（タッチ操作）ではhoverを無効化 --- */
-  @media (hover: none) {
-    .member-btn:hover {
-      /* hoverしても通常時と同じ状態を維持する */
-      transform: none !important;
+    /* 2. 印刷時に画面を隠す */
+    @media print {
+      body {
+        display: none !important;
+      }
+    }
+
+    /* --------------------------------------------------
+       既存のスタイル（調整含む）
+    -------------------------------------------------- */
+    .progress-container { 
+      width: 100%; 
+      height: 6px; 
+      background: #eee; 
+      border-radius: 4px; 
+      margin-bottom: 10px; 
+      overflow: hidden; 
+    }
+    .progress-bar { 
+      height: 100%; 
+      background: linear-gradient(90deg, #ffb6c1, #ff69b2); 
+      width: 0%; 
+      transition: width 0.4s; 
+    }
+
+    .quiz-title {
+      font-size: 1.1rem !important;
+      color: #888;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      text-shadow: none;
+    }
+
+    #lyrics { 
+      font-size: 1.4rem; 
+      font-weight: normal; 
+      color: #333;
+      margin: 20px 0; 
+      line-height: 1.6;
+      padding: 0 10px;
+      letter-spacing: 0.03em;
+      word-break: break-all;
+      white-space: pre-wrap;
+    }
+
+    .hint-lyrics { 
+      font-size: 0.75rem;
+      font-weight: normal; 
+      color: #aaa;
+      background: #fdfdfd; 
+      border: 1px dashed #eee;
+      padding: 8px; 
+      border-radius: 8px; 
+      margin: 8px 0; 
+      line-height: 1.4;
+      letter-spacing: 0.05em;
+      white-space: pre-wrap;
+    }
+    .hint-label { font-weight: bold; color: #ffb6c1; font-size: 0.75rem; }
+
+    .members { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 10px; 
+      width: 100%; 
+      max-width: 320px; 
+      margin: 20px auto; 
+    }
+
+    .member-btn {
+      width: 100% !important;
+      max-width: 150px;
+      display: block;
+      margin: 0 auto !important;
+      font-size: 0.85rem;
+      font-weight: normal !important;
+      padding: 10px 0;
       background-color: #ffffff !important;
+      color: #888 !important;
+      border: 1px solid #e0e0e0 !important;
+      outline: none !important;
+      border-radius: 20px;
       box-shadow: 0 2px 0px #eee !important;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s, background-color 0.1s;
+      position: relative;
+      top: 0 !important;
+      -webkit-tap-highlight-color: transparent;
     }
-    /* 選択中ボタンのhover維持も防ぐ */
-    .member-btn.on:hover {
-      background-color: #ff69b2 !important;
+
+    @media (hover: hover) {
+      .member-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 0px #eee !important;
+        background-color: #fffafc !important;
+      }
+      .member-btn.on:hover:not(:disabled) {
+        background-color: #ff69b2 !important; 
+        color: #ffffff !important;
+        filter: brightness(1.05);
+        box-shadow: 0 4px 0px #d81b60 !important;
+      }
+    }
+
+    @media (hover: none) {
+      .member-btn:hover {
+        transform: none !important;
+        background-color: #ffffff !important;
+        box-shadow: 0 2px 0px #eee !important;
+      }
+      .member-btn.on:hover {
+        background-color: #ff69b2 !important;
+        box-shadow: 0 2px 0px #d81b60 !important;
+      }
+    }
+
+    .member-btn:active:not(:disabled) {
+      transform: translateY(2px) !important;
+      box-shadow: 0 0px 0px #eee !important;
+      transition: 0s;
+    }
+
+    .member-btn.on { 
+      background-color: #ff69b2 !important; 
+      color: #fff !important; 
+      border-color: #ff69b2 !important; 
       box-shadow: 0 2px 0px #d81b60 !important;
     }
-  }
 
-  /* タップ・クリック時の沈み込み（全共通：押した瞬間だけ反応） */
-  .member-btn:active:not(:disabled) {
-    transform: translateY(2px) !important;
-    box-shadow: 0 0px 0px #eee !important;
-    transition: 0s; /* 押した瞬間の反応を最速に */
-  }
-
-  /* 選択時の状態 */
-  .member-btn.on { 
-    background-color: #ff69b2 !important; 
-    color: #fff !important; 
-    border-color: #ff69b2 !important; 
-    box-shadow: 0 2px 0px #d81b60 !important;
-  }
-
-  /* 全員ボタン */
-  .member-btn.all-btn { 
-    background-color: #f8f8f8 !important; 
-    border-style: dashed !important;
-    color: #777 !important;
-  }
-
-  /* 回答・次の問題へボタン */
-  .submit {
-    margin-top: 20px;
-    width: 70% !important;
-  }
-
-  /* 正解・不正解表示 */
-  #result.animate { 
-    animation: result-pop 0.5s ease-out; 
-    padding: 12px; 
-    border-radius: 12px; 
-    font-weight: bold; 
-    margin: 15px auto;
-    width: 80%;
-    max-width: 300px;
-    font-size: 0.95rem;
-    display: block;
-    text-align: center;
-    text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
-  }
-  @keyframes result-pop { 
-    0% { opacity: 0; transform: scale(0.8); } 
-    100% { opacity: 1; transform: scale(1); } 
-  }
-  .correct { 
-    background: #e8f5e9 !important; 
-    color: #2e7d32 !important; 
-    border: 2px solid #4caf50;
-  }
-  .incorrect { 
-    background: #ffebee !important; 
-    color: #d32f2f !important; 
-    border: 2px solid #f44336; 
-  }
-
-  /* 解説テキスト */
-  #explanation {
-    font-size: 0.9rem;
-    color: #666;
-    line-height: 1.6;
-    margin: 10px 0;
-    padding: 0 10px;
-  }
-
-  /* --- スマホ版の余白調整 --- */
-  @media (max-width: 480px) {
-    body {
-      align-items: flex-start !important;
-      height: auto !important; 
-      padding-top: 10px !important; 
+    .member-btn.all-btn { 
+      background-color: #f8f8f8 !important; 
+      border-style: dashed !important;
+      color: #777 !important;
     }
 
-    .box {
-      margin-top: 5px !important;
-      padding: 15px 10px !important;
-      width: 95% !important;
+    .submit {
+      margin-top: 20px;
+      width: 70% !important;
     }
 
-    .title {
-      margin-bottom: 10px !important;
-      font-size: 1.2rem !important;
+    #result.animate { 
+      animation: result-pop 0.5s ease-out; 
+      padding: 12px; 
+      border-radius: 12px; 
+      font-weight: bold; 
+      margin: 15px auto;
+      width: 80%;
+      max-width: 300px;
+      font-size: 0.95rem;
+      display: block;
+      text-align: center;
+      text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
     }
-  }
-  .warning { 
-  background: #fff3e0 !important; /* 警告らしい薄オレンジ */
-  color: #ef6c00 !important;    /* 濃いオレンジ */
-  border: 2px solid #ffb74d !important;
-  text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
-  }
-
-  body {
-  -webkit-user-select: none; /* Safari, Chrome, iOSなど */
-  -moz-user-select: none;    /* Firefox */
-  -ms-user-select: none;     /* IE / Edge */
-  user-select: none;         /* 標準の仕様 */
-  }
-
-/* 歌詞が表示される部分など、特定の場所だけに適用したい場合（推奨） */
-.lyrics-container {
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-/* --- 🖱️ PC版：ボタンON（選択中）の時のホバー挙動を修正 --- */
-  @media (hover: hover) {
-    /* 選択中（.on）のボタンにマウスが乗った時 */
-    .member-btn.on:hover:not(:disabled) {
-      /* 背景色を選択中の色のまま固定（白くならないようにする） */
-      background-color: #ff69b2 !important; 
-      /* 文字色を白のまま固定 */
-      color: #ffffff !important;
-      /* 浮き上がり効果は維持しつつ、少しだけ明るくして反応を出す（任意） */
-      filter: brightness(1.05);
-      /* 影の色も選択中の色に合わせる */
-      box-shadow: 0 4px 0px #d81b60 !important;
+    @keyframes result-pop { 
+      0% { opacity: 0; transform: scale(0.8); } 
+      100% { opacity: 1; transform: scale(1); } 
     }
-  }
-
-  /* --- 📱 スマホ版：タッチ時の色の変化を固定 --- */
-  @media (hover: none) {
-    .member-btn.on:active {
-      background-color: #ff69b2 !important;
-      color: #ffffff !important;
+    .correct { 
+      background: #e8f5e9 !important; 
+      color: #2e7d32 !important; 
+      border: 2px solid #4caf50;
     }
-  }
+    .incorrect { 
+      background: #ffebee !important; 
+      color: #d32f2f !important; 
+      border: 2px solid #f44336; 
+    }
 
-</style>
+    #explanation {
+      font-size: 0.9rem;
+      color: #666;
+      line-height: 1.6;
+      margin: 10px 0;
+      padding: 0 10px;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        align-items: flex-start !important;
+        height: auto !important; 
+        padding-top: 10px !important; 
+      }
+      .box {
+        margin-top: 5px !important;
+        padding: 15px 10px !important;
+        width: 95% !important;
+      }
+      .title {
+        margin-bottom: 10px !important;
+        font-size: 1.2rem !important;
+      }
+    }
+    .warning { 
+      background: #fff3e0 !important; 
+      color: #ef6c00 !important;    
+      border: 2px solid #ffb74d !important;
+      text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
+    }
+  </style>
+</head>
 
 <body class="scroll-page">
 
   <div class="box">
     <p id="quiz-counter" style="text-align: center; font-size: 14px; color: #888; margin-bottom: 5px;"></p>
-      <div class="progress-container">
-        <div id="progress-bar" class="progress-bar"></div>
-      </div>
+    <div class="progress-container">
+      <div id="progress-bar" class="progress-bar"></div>
+    </div>
     <h2 class="title quiz-title">だれが歌ってる？</h2>
     <div id="prev-lyrics" class="hint-lyrics" style="display:none;"></div>
     <p id="lyrics">読み込み中…</p>
@@ -278,7 +246,20 @@
   </div>
 
   <script>
-    // 1. まずSupabaseクライアントを即座に作成する
+    /* --------------------------------------------------
+       【追加】JavaScriptによるコピーガード
+    -------------------------------------------------- */
+    // 1. 右クリックメニューの禁止
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    // 2. キーボードショートカットの禁止 (Ctrl+C, Ctrl+P, Ctrl+U, Ctrl+S)
+    document.addEventListener('keydown', e => {
+      if (e.ctrlKey && (e.key === 'c' || e.key === 'p' || e.key === 'u' || e.key === 's')) {
+        e.preventDefault();
+      }
+    });
+
+    // --- Supabase & クイズロジック ---
     const SUPABASE_URL = "https://atinpqtedmrfrtdlkpkd.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0aW5wcXRlZG1yZnJ0ZGxrcGtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwOTU0NjcsImV4cCI6MjA4NDY3MTQ2N30.Oor6oUuuIxa0pSxIRuwEw7ZzGYM4hOGfywHqv2FaBHg";
     
@@ -294,7 +275,6 @@
       }
     });
 
-    // 2. その他の変数設定
     const quizState = JSON.parse(localStorage.getItem("quizState"));
     if (!quizState) location.href = "index.html";
 
@@ -303,11 +283,8 @@
     let currentQuiz = null;
     let members = [];
     let selectedMembers = new Set();
-    
-    // ✨ 修正ポイント：正解数を一時的に管理する変数（クイズ終了までLocalStorageには保存しない）
     let tempCorrectCount = 0;
 
-    // 3. データ読み込み関数
     async function loadQuizzesAndMembers() {
       const { data: quizData, error: quizError } = await supabaseClient
         .from("quizzes")
@@ -340,7 +317,6 @@
       }
 
       quizzes = selectedQuizzes;
-
       if (quizzes.length === 0) {
         document.getElementById("lyrics").textContent = "条件に合う問題が見つかりませんでした";
         return;
@@ -435,7 +411,6 @@
       allBtn.onclick = () => {
         const memberButtons = document.querySelectorAll(".member-btn:not(.all-btn)");
         const allOn = [...memberButtons].every(b => b.classList.contains("on"));
-
         memberButtons.forEach(b => {
           if (allOn) { 
             b.classList.remove("on"); 
@@ -477,9 +452,7 @@
 
       document.getElementById("explanation").textContent = (currentQuiz.song_title && currentQuiz.explanation) ? `この歌詞は「${currentQuiz.song_title}」の${currentQuiz.explanation}部分でした！` : "";
       
-      // ✨ 修正ポイント：ここではLocalStorageを更新せず、一時変数に加算するだけ
       if (isCorrect) tempCorrectCount++;
-
       document.getElementById("submitBtn").style.display = "none";
       document.getElementById("nextBtn").style.display = "block"; 
       
@@ -491,12 +464,10 @@
         showQuiz(currentIndex + 1);
         window.scrollTo({ top: 0, behavior: "smooth" });
       } else {
-        // ✨ 修正ポイント：10問解き終わった時だけ「許可証（トークン）」を発行して保存
         const state = JSON.parse(localStorage.getItem("quizState") || "{}");
         state.correctCount = tempCorrectCount; 
         state.isComplete = true; 
-        state.resultToken = Math.random().toString(36).substring(2); // ランダムな使い捨てID
-        
+        state.resultToken = Math.random().toString(36).substring(2);
         localStorage.setItem("quizState", JSON.stringify(state));
         location.href = "result.html";
       }
