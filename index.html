@@ -16,15 +16,12 @@
   .subtitle, .description {
     font-size: 0.85rem;
     font-weight: normal !important;
-    color: #777;             /* さっきより少し濃くして視認性を確保 */
-    line-height: 1.6;        /* 標準的な読みやすい行間 */
-    letter-spacing: 0.04em;  /* 適度な余白 */
-    
-    /* 削る設定を削除 */
+    color: #777;
+    line-height: 1.6;
+    letter-spacing: 0.04em;
     -webkit-text-stroke: 0; 
     transform: none;
-    opacity: 1;              /* 透明度を戻して文字をハッキリさせる */
-    
+    opacity: 1;
     display: block;
     text-align: center;
   }
@@ -33,38 +30,54 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 4px; /* 隙間を少し詰める */
-    
-    /* 画面幅に合わせて 12pxから16pxの間で可変 */
+    gap: 4px;
     font-size: clamp(12px, 3.5vw, 16px); 
-    
     color: #555;
     font-weight: bold;
-    white-space: nowrap; /* 絶対に折り返さない */
+    white-space: nowrap;
   }
-  .start-btn { width: 70%; max-width: 220px; background: linear-gradient(45deg, #ff9a9e, #fad0c4, #ffecd2, #a1c4fd, #c2e9fb); background-size: 300% 300%; animation: gradientMove 5s ease infinite; }
+  .start-btn { width: 70%; max-width: 220px; background: linear-gradient(45deg, #ff9a9e, #fad0c4, #ffecd2, #a1c4fd, #c2e9fb); background-size: 300% 300%; animation: gradientMove 5s ease infinite; margin-bottom: 15px; }
   @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+  /* ✨ 追加：アンケートボタンのスタイル */
+  .survey-btn {
+    display: block;
+    width: 65%;
+    max-width: 200px;
+    margin: 10px auto;
+    padding: 8px 0;
+    font-size: 0.7rem;
+    color: #ff69b2;
+    background: #fff;
+    border: 2px solid #ffb6c1;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .survey-btn:active {
+    background: #fff0f5;
+    transform: translateY(1px);
+  }
+
   .disclaimer {
-    /* 画面幅に合わせて 10pxから12pxの間で可変 */
     font-size: clamp(10px, 2.5vw, 12px);
-    
     color: #888;
     line-height: 1.5;
-    margin-top: 15px;
-    white-space: nowrap; /* 絶対に折り返さない */
-    
-    /* 万が一、極端に狭い画面でハミ出た時のために中央寄せ */
+    margin-top: 20px;
+    white-space: nowrap;
     text-align: center;
   }
 
   .title-sub {
-  display: block;
-  font-family: "Mochiy Pop One", sans-serif;
-  font-size: 2.0rem;
-  line-height: 1.5; /* 行間を 1.3 から 1.5 に少し広げて、上下の文字が重ならないようにします */
-  margin-top: 10px; /* ロゴとの間隔を少し確保 */
-  transform: rotate(-2deg);
-}
+    display: block;
+    font-family: "Mochiy Pop One", sans-serif;
+    font-size: 2.0rem;
+    line-height: 1.5;
+    margin-top: 10px;
+    transform: rotate(-2deg);
+  }
 </style>
 
 <body class="locked">
@@ -88,6 +101,10 @@
 
     <button class="start-btn" onclick="startQuiz()">検定開始！</button>
 
+    <a href="https://forms.gle/EguRX6uWZYmJJLZx5" target="_blank" class="survey-btn">
+      💬 アンケートにご協力ください
+    </a>
+
     <p class="disclaimer">
       歌割りはKAWAII LAB公式歌割り画像を参考にしています。<br>
       歌割り画像が存在しない歌は、ファンブログやライブ映像を参考にしています。
@@ -96,7 +113,6 @@
 
   <script>
     function startQuiz() {
-      // quizState 初期化
       const quizState = {
         group: null,
         difficulty: null,
@@ -105,12 +121,9 @@
         quizIds: []
       };
       localStorage.setItem("quizState", JSON.stringify(quizState));
-
-      // グループ選択画面に遷移
       location.href = "group.html";
     }
   </script>
 
 </body>
-
 </html>
