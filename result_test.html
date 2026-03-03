@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <link rel="icon" href="icon.png" type="image/png">
   <link rel="apple-touch-icon" href="icon.png">
-  <title>検定結果 - 歌割り検定</title>
+  <title>[TEST] 検定結果 - 歌割り検定</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,41 +13,43 @@
 </head>
 
 <style>
-  /* 基本レイアウト */
+  /* 基本スタイル（本番同様） */
   .rank-display { font-family: "Mochiy Pop One", sans-serif; font-size: 1.8rem; color: #ff69b2; margin: 20px 0; text-shadow: 2px 2px 0 #fff; }
   .score-circle { width: 120px; height: 120px; border: 6px solid #ff69b2; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 20px auto; background: #fff; box-shadow: 0 5px 15px rgba(255,105,178,0.2); }
   .score-num { font-size: 2.5rem; font-weight: 900; color: #ff69b2; }
-  
   .info-badges { margin-bottom: 15px; display: flex; justify-content: center; gap: 8px; }
   .badge { background: #fdfdfd; border: 1px solid #ffb6c1; color: #ff69b2; padding: 4px 12px; border-radius: 15px; font-size: 0.75rem; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-
-  /* ボタンレイアウト：間隔を狭く (6px) 設定 */
+  
+  /* ボタンレイアウト：間隔 6px */
   .result-buttons { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-top: 20px; }
   .result-buttons button, .survey-btn {
     width: 85%; max-width: 260px; height: 42px; display: flex; align-items: center; justify-content: center;
     font-size: 0.9rem; font-weight: bold; border-radius: 25px; box-sizing: border-box; cursor: pointer; transition: all 0.2s; text-decoration: none;
   }
-
-  /* シェアボタン（壁面グレー仕様） */
-  .share-btn { 
-    background: #000 !important; color: #fff !important; border: none !important;
-    box-shadow: 0 4px 0 #888 !important; position: relative; top: -4px;
-    margin-bottom: 4px; 
-  }
+  .share-btn { background: #000 !important; color: #fff !important; border: none !important; box-shadow: 0 4px 0 #888 !important; position: relative; top: -4px; margin-bottom: 4px; }
   .share-btn:active { top: 0; box-shadow: none !important; margin-bottom: 0; }
-
-  /* 各ボタンのカラー */
   .retry-btn { background: #ff69b2 !important; color: #fff !important; border: none; }
   .group-btn { background: #fff !important; color: #ff69b2 !important; border: 2px solid #ffb6c1 !important; }
   .survey-btn { background: #fff !important; color: #ff69b2 !important; border: 2px solid #ffb6c1 !important; }
   .back-btn { background: #ccc !important; color: #fff !important; border: none !important; }
 
-  /* コピーガード */
-  @media print { body { display: none !important; } }
+  /* 検証用パネル */
+  .test-panel {
+    position: fixed; bottom: 5px; right: 5px; background: rgba(0,0,0,0.9);
+    padding: 8px; border-radius: 8px; display: flex; flex-wrap: wrap; gap: 4px; max-width: 150px; z-index: 9999;
+    border: 2px solid #ff69b2; box-shadow: 0 0 15px rgba(255,105,178,0.5);
+  }
+  .test-btn { font-size: 11px; padding: 6px 0; background: #333; color: #fff; border: 1px solid #ff69b2; cursor: pointer; border-radius: 4px; flex: 1 1 calc(33% - 4px); text-align: center; font-weight: bold; }
+  .test-btn:active { background: #ff69b2; transform: scale(0.9); }
+  .test-label { color: #ffb6c1; font-size: 10px; width: 100%; text-align: center; font-weight: bold; margin-top: 6px; border-top: 1px solid #444; padding-top: 4px;}
+  .test-label:first-child { margin-top: 0; border-top: none; padding-top: 0; }
+
   body { -webkit-user-select: none; user-select: none; }
 </style>
 
 <body class="locked">
+
+  <div style="position:fixed; top:0; left:0; background:red; color:white; padding:2px 8px; font-size:11px; z-index:9999; font-weight:bold; border-radius: 0 0 5px 0;">VERIFICATION MODE</div>
 
   <div class="box result-box">
     <p class="result-label">あなたの検定結果は…</p>
@@ -70,45 +72,66 @@
     </div>
 
     <div class="result-buttons">
-      <button id="share-btn" class="share-btn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
-            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
-        </svg>
-        結果をXでつぶやく
-      </button>
+      <button id="share-btn" class="share-btn">結果をXでつぶやく</button>
       <button id="retry-btn" class="retry-btn">もう一回やる</button>
-      <button class="group-btn" onclick="location.href='group.html'">グループ選択に戻る</button>
-      <a href="https://forms.gle/YOUR_FORM_URL" target="_blank" class="survey-btn">アンケートにご協力ください</a>
-      <button class="back-btn" onclick="location.href='index.html'">トップに戻る</button>
+      <button class="group-btn" onclick="alert('本番はgroup.htmlへ')">グループ選択に戻る</button>
+      <a class="survey-btn" onclick="alert('本番はアンケートへ')">アンケートにご協力ください</a>
+      <button class="back-btn" onclick="alert('本番はindex.htmlへ')">トップに戻る</button>
     </div>
+  </div>
+
+  <div class="test-panel">
+    <div class="test-label">SCORE (代表点)</div>
+    <button class="test-btn" onclick="setScore(0)">0点</button>
+    <button class="test-btn" onclick="setScore(2)">2点</button>
+    <button class="test-btn" onclick="setScore(5)">5点</button>
+    <button class="test-btn" onclick="setScore(8)">8点</button>
+    <button class="test-btn" onclick="setScore(10)">10点</button>
+    
+    <div class="test-label">DIFF (難易度)</div>
+    <button class="test-btn" onclick="setDiff('easy')">やさ</button>
+    <button class="test-btn" onclick="setDiff('normal')">ふつ</button>
+    <button class="test-btn" onclick="setDiff('hard')">むず</button>
+    <button class="test-btn" onclick="setDiff('expert')">げき</button>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <script>
-    // 1. データの読み込みとガード
-    const state = JSON.parse(localStorage.getItem("quizState"));
-
-    if (!state || !state.isComplete || !state.resultToken || state.isFinished) {
-      location.href = "index.html";
-      throw new Error("Invalid access"); 
+    // --- 検証用関数 ---
+    function getTestState() {
+      let s = JSON.parse(localStorage.getItem("quizState"));
+      if (!s) s = { group: "検証グループ", difficulty: "normal", correctCount: 5 };
+      s.isComplete = true;
+      s.isFinished = false; 
+      s.resultToken = "test-token";
+      return s;
     }
 
-    // 終了フラグの更新
-    const usedState = { ...state };
-    delete usedState.resultToken;
-    usedState.isComplete = false;
-    usedState.isFinished = true;
-    localStorage.setItem("quizState", JSON.stringify(usedState));
+    function setScore(num) {
+      let s = getTestState();
+      s.correctCount = num;
+      localStorage.setItem("quizState", JSON.stringify(s));
+      location.reload();
+    }
 
+    function setDiff(level) {
+      let s = getTestState();
+      s.difficulty = level;
+      localStorage.setItem("quizState", JSON.stringify(s));
+      location.reload();
+    }
+
+    // --- メインロジック ---
+    const state = getTestState();
     const difficultyMap = { "easy": "やさしい", "normal": "ふつう", "hard": "むずかしい", "expert": "げきむず" };
-    const correct = state.correctCount || 0;
-    const diff = state.difficulty || "normal";
+    const correct = state.correctCount;
+    const diff = state.difficulty;
 
-    document.getElementById("display-group").textContent = state.group || "---";
-    document.getElementById("display-diff").textContent = difficultyMap[diff] || diff;
+    document.getElementById("display-group").textContent = state.group;
+    document.getElementById("display-diff").textContent = difficultyMap[diff];
 
-    // 2. 称号（ランク）の決定
+    // 1. 称号（ランク）の判定
     let rank = "";
     if (correct === 10) {
       rank = "🌟神推し級🌟";
@@ -120,14 +143,14 @@
     } else if (correct >= 1) {
       rank = "🥉ビギナー級";
     } else {
-      rank = "💩オワコン級"; // 0点
+      rank = "💩オワコン級";
     }
 
-    // 3. メッセージの決定
+    // 2. メッセージの判定
     const messages = {
-      easy: { zero: "わざと間違えました…？<br>一つも当たらないのは、逆にある意味すごいかも。", low: "本当にファンですか…？<br>まずは曲をしっかり聴き込みましょう！", mid: "もう少し頑張りましょう！<br>「やさしい」なら全問正解を目指したいところ。", high: "合格です！<br>基礎はバッチリ。次は上の難易度挑戦！", perfect: "完璧です！全問正解！<br>「やさしい」は余裕でしたね。お見事！" },
+      easy: { zero: "わざと間違えました…？<br>一つも当たらないのは、逆にある意味すごいかも。", low: "本当にファンですか…？<br>まずは曲をしっかり聴き込みましょう！", mid: "もう少し頑張りましょう！<br>「やさしい」なら全問正解を目指したいところ。", high: "合格です！<br>基礎はバッチリ。次は上の難易度に挑戦！", perfect: "完璧です！全問正解！<br>「やさしい」は余裕でしたね。お見事！" },
       normal: { zero: "全滅…だと…！？<br>ショックを受けずに、もう一度チャレンジです！", low: "まだまだ修行が足りません！<br>歌声をよく聴き分けるのがコツです。", mid: "まずまずの結果です。<br>さらに聴き込めばもっと正解できるはず！", high: "素晴らしい！<br>このグループのファンを名乗る資格アリです。", perfect: "完璧です！全問正解！<br>あなたの耳はかなり正確ですね。素晴らしい！" },
-      hard: { zero: "全問不正解…。<br>「むずかしい」の壁は高かったようです。", low: "この難易度はまだ早かったかも…？<br>でも挑戦する姿勢は素晴らしいです！", mid: "大健闘です！<br>「むずかしい」でこれだけ解ければ相当なもの。", high: "プロ級の耳の持ち主！<br>細かい歌割りまで完璧に把握していますね。", perfect: "完璧です！全問正解！<br>この難易度で満点は、もはや職人の域です！" },
+      hard: { zero: "全問不正解…。<br>「むずかしい」の壁は高かったようです。", low: "この難易度はまだ早かったかも…？<br>進んで挑戦する姿勢は素晴らしいです！", mid: "大健闘です！<br>「むずかしい」でこれだけ解ければ相当なもの。", high: "プロ級の耳の持ち主！<br>細かい歌割りまで完璧に把握していますね。", perfect: "完璧です！全問正解！<br>この難易度で満点は、もはや職人の域です！" },
       expert: { zero: "0点でも落ち込まないで！<br>「げきむず」は、当てる方がおかしいレベルですから。", low: "相手が悪すぎました…。<br>「げきむず」は伊達じゃない！ドンマイです！", mid: "凄すぎます！<br>この難問揃いで半分以上解けるのは本物の証。", high: "もはや神の領域！<br>メンバー本人よりも詳しいのでは…！？", perfect: "🌸伝説の誕生です🌸<br>この難易度で満点！？あなたは一体何者なんですか…！？" }
     };
 
@@ -149,38 +172,19 @@
     document.getElementById("rank").textContent = rank;
     document.getElementById("comment").innerHTML = comment;
 
-    // 4. カウントアップ演出
+    // 演出
     let displayNum = 0;
     const countEl = document.getElementById("correct-count");
     if (correct > 0) {
       const timer = setInterval(() => {
         if (displayNum >= correct) clearInterval(timer);
         else { displayNum++; countEl.textContent = displayNum; }
-      }, 100);
+      }, 50);
     } else { countEl.textContent = "0"; }
 
     function launchConfetti() {
       confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#ff69b2', '#ffb6c1', '#ffffff', '#4ecdc4'] });
-      setTimeout(() => {
-        confetti({ particleCount: 50, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff69b2', '#ffb6c1'] });
-        confetti({ particleCount: 50, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff69b2', '#ffb6c1'] });
-      }, 500);
     }
-
-    // 5. ボタンアクション
-    document.getElementById("retry-btn").onclick = () => {
-      localStorage.setItem("quizState", JSON.stringify({ group: state.group, difficulty: state.difficulty, correctCount: 0, isComplete: false, isFinished: false }));
-      location.href = "quiz.html";
-    };
-
-    document.getElementById("share-btn").onclick = () => {
-      const rankName = document.getElementById("rank").textContent;
-      const text = encodeURIComponent(`歌割り検定の結果は…\n【${rankName}】でした！(正解：${correct}/10問)\nグループ：${state.group}\n難易度：${difficultyMap[diff]}\nhttps://bunbunbunji.github.io/my-website/index.html\n\n#KAWAIILAB歌割り検定`);
-      window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank', 'width=600,height=400');
-    };
-
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    document.addEventListener('copy', e => e.preventDefault());
   </script>
 </body>
 </html>
