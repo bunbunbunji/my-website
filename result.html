@@ -175,7 +175,7 @@
 
     document.getElementById("share-btn").onclick = () => {
       const rankName = document.getElementById("rank").textContent;
-      const text = encodeURIComponent(`歌割り検定の結果は…\n【${rankName}】でした！(正解：${correct}/10問)\nグループ：${state.group}\n難易度：${difficultyMap[diff]}\nhttps://bunbunbunji.github.io/my-website/index.html\n\n#KAWAIILAB歌割り検定`);
+      const text = encodeURIComponent(`歌割り検定の結果は…\n【${rankName}】でした！(正解：${correct}/10問)\nグループ：${state.group}\n難易度：${difficultyMap[diff]}\nhttps://kawalab-utaken.jp/\n\n#KAWAIILAB歌割り検定`);
       window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank', 'width=600,height=400');
     };
 
