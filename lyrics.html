@@ -16,8 +16,9 @@
       max-height: 70vh; 
       overflow-y: auto; 
       padding: 10px;
-      background: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.6);
       border-radius: 15px;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
     }
 
     .group-section { margin-bottom: 25px; }
@@ -46,7 +47,7 @@
     /* 未実装の曲（灰色） */
     .song-unreleased { 
       color: #bbb !important; 
-      font-weight: normal;
+      font-weight: normal !important;
     }
 
     .song-info { display: flex; align-items: center; gap: 8px; }
@@ -73,12 +74,19 @@
       font-size: 0.8rem;
       color: #ff69b2;
       margin: 20px 0;
+      font-weight: bold;
     }
 
     .back-btn {
       background: #ccc !important;
       margin-top: 15px;
       width: 100%;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 25px;
+      font-weight: bold;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -92,7 +100,7 @@
     <div id="list-content" class="list-container">
       </div>
 
-    <button class="start-btn back-btn" onclick="location.href='index.html'">戻る</button>
+    <button class="back-btn" onclick="location.href='index.html'">戻る</button>
   </div>
 
   <script>
@@ -108,66 +116,83 @@
       { id: 'cs', name: 'CUTIE STREET', table: 'cs_sounds' }
     ];
 
+    function superNormalize(str) {
+      if (!str) return "";
+      return str
+        .replace(/[！-～]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0))
+        .replace(/[^a-zA-Z0-9ぁ-んァ-ヶー一-龠]/g, "")
+        .toLowerCase()
+        .trim();
+    }
+
     async function fetchAllData() {
       const container = document.getElementById('list-content');
-      
       try {
-        // 1. quizzesテーブルから「song_title」を取得
-        const { data: quizData, error: qError } = await db
-          .from('quizzes')
-          .select('song_title'); // ここを修正しました
+        // --- 全件取得ロジック (1000件以上の壁を突破) ---
+        let allQuizTitles = [];
+        let from = 0;
+        let to = 999;
+        let hasMore = true;
 
-        if (qError) throw qError;
+        while (hasMore) {
+          const { data, error } = await db
+            .from('quizzes')
+            .select('song_title')
+            .range(from, to);
 
-        // Setに song_title を格納
-        const activeSongs = new Set(quizData?.map(q => q.song_title?.trim()) || []);
+          if (error) throw error;
+          if (data.length === 0) {
+            hasMore = false;
+          } else {
+            allQuizTitles = allQuizTitles.concat(data);
+            from += 1000;
+            to += 1000;
+            // 取得データが1000件未満ならこれ以上データはないと判断
+            if (data.length < 1000) hasMore = false;
+          }
+        }
+
+        const activeSongsSet = new Set(allQuizTitles.map(q => superNormalize(q.song_title)));
+        
+        console.log("最終的に取得したユニークな曲数:", activeSongsSet.size);
 
         for (const group of groups) {
-          // 2. 楽曲テーブルから「name」を取得
-          // (もし楽曲テーブルも song_title に変えたら、ここを song_title に書き換えてください)
           const { data: songs, error } = await db
             .from(group.table)
-            .select('name, easy_flag')
-            .order('name', { ascending: true });
+            .select('song_title, easy_flag')
+            .order('song_title', { ascending: true });
 
           if (error) continue;
 
           const section = document.createElement('div');
           section.className = 'group-section';
           section.innerHTML = `<div class="group-name">${group.name}</div>`;
-
           const list = document.createElement('div');
+          
           songs.forEach(song => {
-            // quizzesの「song_title」と楽曲テーブルの「name」を照合
-            const hasQuiz = activeSongs.has(song.name?.trim());
-            
+            const rawTitle = song.song_title || "";
+            const hasQuiz = activeSongsSet.has(superNormalize(rawTitle));
+
             const itemClass = hasQuiz ? 'song-item' : 'song-item song-unreleased';
             const easyTag = song.easy_flag === 1 ? '<span class="easy-badge">やさしい対象</span>' : '';
             const statusText = hasQuiz ? '' : '<span class="status-tag">準備中</span>';
 
             list.innerHTML += `
               <div class="${itemClass}">
-                <div class="song-info">
-                  <span>♪ ${song.name}</span>
-                  ${easyTag}
+                <div class="song-info"><span>♪ ${rawTitle}</span></div>
+                <div style="display:flex; align-items:center; gap:5px;">
+                  ${easyTag}${statusText}
                 </div>
-                ${statusText}
-              </div>
-            `;
+              </div>`;
           });
-
           section.appendChild(list);
           container.appendChild(section);
         }
-        
         document.getElementById('loading').style.display = 'none';
-
       } catch (err) {
-        console.error("エラー:", err);
-        document.getElementById('loading').textContent = '接続に失敗しました。';
+        console.error("Error:", err);
       }
     }
-
     window.addEventListener('load', fetchAllData);
   })();
 </script>
