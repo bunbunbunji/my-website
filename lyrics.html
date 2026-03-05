@@ -113,7 +113,8 @@
       { id: 'fz', name: 'FRUITS ZIPPER', table: 'fz_sounds' },
       { id: 'cd', name: 'CANDY TUNE', table: 'cd_sounds' },
       { id: 'ss', name: 'SWEET STEADY', table: 'ss_sounds' },
-      { id: 'cs', name: 'CUTIE STREET', table: 'cs_sounds' }
+      { id: 'cs', name: 'CUTIE STREET', table: 'cs_sounds' },
+      { id: 'ms', name: 'MORE STAR', table: 'ms_sounds' } 
     ];
 
     function superNormalize(str) {
@@ -128,38 +129,53 @@
     async function fetchAllData() {
       const container = document.getElementById('list-content');
       try {
-        // --- 全件取得ロジック (1000件以上の壁を突破) ---
-        let allQuizTitles = [];
+        let allQuizData = [];
         let from = 0;
         let to = 999;
         let hasMore = true;
 
+        // --- 全件取得ロジック (song_title と easy を取得) ---
         while (hasMore) {
           const { data, error } = await db
             .from('quizzes')
-            .select('song_title')
+            .select('song_title, easy') // easyカラムも取得
             .range(from, to);
 
           if (error) throw error;
           if (data.length === 0) {
             hasMore = false;
           } else {
-            allQuizTitles = allQuizTitles.concat(data);
+            allQuizData = allQuizData.concat(data);
             from += 1000;
             to += 1000;
-            // 取得データが1000件未満ならこれ以上データはないと判断
             if (data.length < 1000) hasMore = false;
           }
         }
 
-        const activeSongsSet = new Set(allQuizTitles.map(q => superNormalize(q.song_title)));
-        
-        console.log("最終的に取得したユニークな曲数:", activeSongsSet.size);
+        // 判定用のSetを2つ作成
+        const activeSongsSet = new Set();
+        const easySongsSet = new Set();
+
+        allQuizData.forEach(q => {
+          if (q.song_title) {
+            const norm = superNormalize(q.song_title);
+            activeSongsSet.add(norm); // クイズが存在する曲
+            
+            // easyカラムが 1 (数値または文字列) の場合、やさしいリストに追加
+            if (String(q.easy) === "1") {
+              easySongsSet.add(norm);
+            }
+          }
+        });
+
+        console.log("全取得件数:", allQuizData.length);
+        console.log("実装済み曲数:", activeSongsSet.size);
+        console.log("やさしい対応曲数:", easySongsSet.size);
 
         for (const group of groups) {
           const { data: songs, error } = await db
             .from(group.table)
-            .select('song_title, easy_flag')
+            .select('song_title') // ms_soundsからも自動でsong_titleを取得
             .order('song_title', { ascending: true });
 
           if (error) continue;
@@ -171,10 +187,14 @@
           
           songs.forEach(song => {
             const rawTitle = song.song_title || "";
-            const hasQuiz = activeSongsSet.has(superNormalize(rawTitle));
+            const normTitle = superNormalize(rawTitle);
+            
+            // 判定ロジック
+            const hasQuiz = activeSongsSet.has(normTitle);
+            const isEasy = easySongsSet.has(normTitle);
 
             const itemClass = hasQuiz ? 'song-item' : 'song-item song-unreleased';
-            const easyTag = song.easy_flag === 1 ? '<span class="easy-badge">やさしい対象</span>' : '';
+            const easyTag = isEasy ? '<span class="easy-badge">やさしい対象</span>' : '';
             const statusText = hasQuiz ? '' : '<span class="status-tag">準備中</span>';
 
             list.innerHTML += `
