@@ -16,19 +16,92 @@ body {
 .box {
   background: white;
   padding: 25px 20px;
-  border-radius: 20px; /* 少し角を丸く */
+  border-radius: 20px;
   text-align: center;
   max-width: 550px;
-  width: 90%; /* 左右に少し余白を作る */
-  box-shadow: 0 10px 30px rgba(255, 105, 180, 0.15); /* ピンクがかった柔らかい影 */
+  width: 90%;
+  box-shadow: 0 10px 30px rgba(255, 105, 180, 0.15);
   margin: auto;
   position: relative;
-  border: 4px solid #fff; /* 箱自体にも白フチをつけてクッキリさせる */
+  border: 4px solid #fff;
 }
 
 body.locked { position: fixed; width: 100%; height: 100dvh; overflow: hidden; }
 body.locked .box { max-height: 90vh; overflow-y: auto; }
 body.scroll-page { height: auto; min-height: 100vh; align-items: flex-start; padding-top: 20px; }
+
+/* --- 修正：プライバシーポリシー（画面固定） --- */
+.global-footer-link {
+  position: fixed !important; 
+  top: 10px !important;
+  left: 10px !important;
+  z-index: 99999 !important; /* 最前面 */
+  text-align: left !important;
+}
+
+.global-footer-link span {
+  display: block !important;
+  font-size: 10px !important;
+  line-height: 1.6 !important;
+  color: #aaa !important;
+  text-decoration: underline !important;
+  cursor: pointer !important;
+  padding: 4px 8px !important;
+  background: rgba(255, 255, 255, 0.6); /* 背景に馴染みつつ読みやすく */
+  border-radius: 4px;
+  margin-bottom: 2px;
+  pointer-events: auto !important; /* タップを有効化 */
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+/* --- モーダル --- */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 100000 !important; /* 固定リンクのすぐ後ろ */
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+}
+
+.modal-content {
+  background: white;
+  width: 85%;
+  max-width: 400px;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  text-align: left;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-content h2 { font-size: 1.1rem; text-align: center; color: #333; margin-bottom: 15px; }
+.modal-content h3 { font-size: 0.9rem; color: #ff69b2; border-bottom: 1px solid #eee; margin-top: 15px; padding-bottom: 5px; }
+.modal-content p { font-size: 0.8rem; line-height: 1.6; color: #666; margin: 8px 0; }
+
+.modal-close-btn {
+  display: block;
+  width: 100%;
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #ff8a65 !important;
+  color: #ffffff !important;
+  border: none;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px #e64a19;
+  transition: transform 0.1s;
+}
+
+.modal-close-btn:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
 
 /* ==========================================
    2. タイトル & ロゴ共通設定
@@ -62,7 +135,6 @@ body.scroll-page { height: auto; min-height: 100vh; align-items: flex-start; pad
   animation: bounce 2s ease-in-out infinite;
   text-shadow: 2px 2px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 3px 3px 0 rgba(0,0,0,0.1);
 }
-/* タイトルの色分け */
 .title-sub span:nth-child(4n+1) { color: #ff69b2; }
 .title-sub span:nth-child(4n+2) { color: #4ecdc4; }
 .title-sub span:nth-child(4n+3) { color: #ffbe0b; }
@@ -71,7 +143,7 @@ body.scroll-page { height: auto; min-height: 100vh; align-items: flex-start; pad
 @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 
 /* ==========================================
-   3. ボタン共通（立体的・ポップ）
+   3. ボタン共通
    ========================================== */
 button, .submit, .member-btn {
   font-family: "Mochiy Pop One", sans-serif;
@@ -80,15 +152,13 @@ button, .submit, .member-btn {
   display: block;
   margin: 12px auto;
   font-size: 1.0rem;
-  font-weight: normal;
   padding: 14px 16px;
   background-color: #ff69b2;
   border: 3px solid #fff;
-  /* 修正：outlineが個別の色指定を邪魔していたので、少し調整 */
   outline: 2px solid transparent; 
   color: #fff;
-  border-radius: 50px; /* ボタンは思い切り丸い方が可愛い */
-  box-shadow: 0 4px 0px #d81b60; /* 影を真下に少し厚く */
+  border-radius: 50px;
+  box-shadow: 0 4px 0px #d81b60;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
@@ -96,38 +166,26 @@ button, .submit, .member-btn {
   text-decoration: none;
 }
 
-/* ホバーで少し浮く演出を追加 */
-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 0px #d81b60;
-}
+button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 0px #d81b60; }
+button:active:not(:disabled) { top: 3px; box-shadow: 0 1px 0px #d81b60; transform: translateY(0) scale(0.98); }
+button:disabled { background-color: #f0f0f0 !important; color: #888 !important; box-shadow: 0 2px 0px #ccc !important; cursor: not-allowed; }
 
-button:active:not(:disabled) {
-  top: 3px;
-  box-shadow: 0 1px 0px #d81b60;
-  transform: translateY(0) scale(0.98);
+.back-btn {
+  margin-top: 20px !important;
+  background-color: #f0f0f0 !important;
+  color: #666666 !important;
+  box-shadow: 3px 3px 0px #bbbbbb !important;
+  font-size: 0.8rem !important;
+  width: 80% !important;
 }
-
-button:disabled { background-color: #f0f0f0 !important; color: #888 !important; box-shadow: 0 2px 0px #ccc !important; cursor: not-allowed; border-color: #ddd !important; }
-
-/* 戻るボタンの基本共通設定 */
-.back-btn { 
-  background: #fff !important; 
-  color: #ff69b2 !important; 
-  border: 3px solid #ff69b2 !important; 
-  box-shadow: 0 4px 0px #ffc1e3 !important; 
-  width: 70% !important; 
-  max-width: 220px !important; 
-}
-.back-btn:active { box-shadow: 0 1px 0px #ffc1e3 !important; }
 
 /* ==========================================
-   4. レスポンシブ (共通)
+   4. レスポンシブ
    ========================================== */
 .mobile-only { display: none; }
 @media (max-width: 480px) {
   .mobile-only { display: inline; }
   .title-sub { font-size: 1.4rem; }
   .box { width: 92%; padding: 20px 15px; }
-  button, .submit, .back-btn { width: 85% !important; } /* スマホでも幅を保つ */
+  button, .submit, .back-btn { width: 85% !important; }
 }

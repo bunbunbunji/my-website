@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="styles.css">
 
   <style>
-    /* index固有のスタイル（既存のものを維持） */
+    /* index固有のスタイル */
     .subtitle, .description { font-size: 0.85rem; color: #777; text-align: center; }
     .rules { display: flex; flex-direction: column; align-items: center; margin: 5px 0; }
     .rule-item { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: clamp(12px, 3.5vw, 16px); color: #555; font-weight: bold; }
@@ -22,32 +22,17 @@
     .list-btn { display: block; width: 65%; max-width: 200px; margin: 8px auto; padding: 8px 0; font-size: 0.7rem; color: #887a70; background: #fdfaf2; border: 1px solid #dcd5c5; border-radius: 20px; font-weight: bold; text-decoration: none; text-align: center; }
     .disclaimer { font-size: clamp(10px, 2.5vw, 12px); color: #888; margin-top: 20px; text-align: center; }
     .title-sub { display: block; font-family: "Mochiy Pop One", sans-serif; font-size: 2.0rem; margin-top: 10px; transform: rotate(-2deg); }
-    .box { position: relative; }
-    .global-footer-link span { display: block; margin-bottom: 5px; }
-
-    /* モバイルでリンクが隠れたりずれたりするのを防ぐ */
-    .global-footer-link {
-      pointer-events: auto !important; /* クリックを確実に有効化 */
-    }
-    .global-footer-link span {
-      -webkit-tap-highlight-color: rgba(0,0,0,0); /* タップ時の青枠消去 */
-      padding: 5px 0; /* タップしやすくする */
-    }
-    /* モーダルが他の要素の下に回り込まないようにする */
-    .modal-overlay {
-      z-index: 10000 !important;
-    }
   </style>
 </head>
 
 <body class="locked">
 
-  <div class="box">
-    <div class="global-footer-link" style="position: absolute; top: 10px; left: 15px; z-index: 9999; text-align: left;">
-      <span onclick="openPolicy()" style="cursor:pointer; display: block; font-size: 10px; line-height: 1.4; color: #aaa; text-decoration: underline;">プライバシーポリシー</span>
-      <span onclick="openProfile()" style="cursor:pointer; display: block; font-size: 10px; line-height: 1.4; color: #aaa; text-decoration: underline;">運営者情報</span>
-    </div>
+  <div class="global-footer-link">
+    <span onclick="openPolicy()">プライバシーポリシー</span>
+    <span onclick="openProfile()">運営者情報</span>
+  </div>
 
+  <div class="box">
     <h1 class="title">
       <img src="logo.png" alt="KAWAII LAB検定" class="site-logo">
       <span class="title-sub">
@@ -116,12 +101,9 @@
     function closeProfile() { document.getElementById('profileModal').style.display = 'none'; }
 
     window.addEventListener('click', function(event) {
-      const policyModal = document.getElementById('policyModal');
-      const profileModal = document.getElementById('profileModal');
-      if (event.target === policyModal) closePolicy();
-      if (event.target === profileModal) closeProfile();
+      if (event.target === document.getElementById('policyModal')) closePolicy();
+      if (event.target === document.getElementById('profileModal')) closeProfile();
     });
   </script>
 </body>
-
 </html>
