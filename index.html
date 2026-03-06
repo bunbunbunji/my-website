@@ -10,100 +10,31 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+
+  <style>
+    /* index固有のスタイル（既存のものを維持） */
+    .subtitle, .description { font-size: 0.85rem; color: #777; text-align: center; }
+    .rules { display: flex; flex-direction: column; align-items: center; margin: 5px 0; }
+    .rule-item { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: clamp(12px, 3.5vw, 16px); color: #555; font-weight: bold; }
+    .start-btn { width: 70%; max-width: 220px; background: linear-gradient(45deg, #ff9a9e, #fad0c4, #ffecd2, #a1c4fd, #c2e9fb); background-size: 300% 300%; animation: gradientMove 5s ease infinite; margin-bottom: 15px; }
+    @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+    .survey-btn { display: block; width: 65%; max-width: 200px; margin: 10px auto; padding: 8px 0; font-size: 0.7rem; color: #ff69b2; background: #fff; border: 2px solid #ffb6c1; border-radius: 20px; font-weight: bold; text-decoration: none; text-align: center; }
+    .list-btn { display: block; width: 65%; max-width: 200px; margin: 8px auto; padding: 8px 0; font-size: 0.7rem; color: #887a70; background: #fdfaf2; border: 1px solid #dcd5c5; border-radius: 20px; font-weight: bold; text-decoration: none; text-align: center; }
+    .disclaimer { font-size: clamp(10px, 2.5vw, 12px); color: #888; margin-top: 20px; text-align: center; }
+    .title-sub { display: block; font-family: "Mochiy Pop One", sans-serif; font-size: 2.0rem; margin-top: 10px; transform: rotate(-2deg); }
+    .box { position: relative; }
+    .global-footer-link span { display: block; margin-bottom: 5px; }
+  </style>
 </head>
-
-<style>
-  .subtitle, .description {
-    font-size: 0.85rem;
-    font-weight: normal !important;
-    color: #777;
-    line-height: 1.6;
-    letter-spacing: 0.04em;
-    -webkit-text-stroke: 0; 
-    transform: none;
-    opacity: 1;
-    display: block;
-    text-align: center;
-  }
-  .rules { display: flex; flex-direction: column; align-items: center; margin: 5px 0; }
-  .rule-item {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    font-size: clamp(12px, 3.5vw, 16px); 
-    color: #555;
-    font-weight: bold;
-    white-space: nowrap;
-  }
-  .start-btn { width: 70%; max-width: 220px; background: linear-gradient(45deg, #ff9a9e, #fad0c4, #ffecd2, #a1c4fd, #c2e9fb); background-size: 300% 300%; animation: gradientMove 5s ease infinite; margin-bottom: 15px; }
-  @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
-  /* ✨ 追加：アンケートボタンのスタイル */
-  .survey-btn {
-    display: block;
-    width: 65%;
-    max-width: 200px;
-    margin: 10px auto;
-    padding: 8px 0;
-    font-size: 0.7rem;
-    color: #ff69b2;
-    background: #fff;
-    border: 2px solid #ffb6c1;
-    border-radius: 20px;
-    cursor: pointer;
-    font-weight: bold;
-    text-decoration: none;
-    transition: background 0.2s;
-  }
-  .survey-btn:active {
-    background: #fff0f5;
-    transform: translateY(1px);
-  }
-
-  .disclaimer {
-    font-size: clamp(10px, 2.5vw, 12px);
-    color: #888;
-    line-height: 1.5;
-    margin-top: 20px;
-    white-space: nowrap;
-    text-align: center;
-  }
-
-  .title-sub {
-    display: block;
-    font-family: "Mochiy Pop One", sans-serif;
-    font-size: 2.0rem;
-    line-height: 1.5;
-    margin-top: 10px;
-    transform: rotate(-2deg);
-  }
-
-  .list-btn {
-    display: block;
-    width: 65%;
-    max-width: 200px;
-    margin: 8px auto;
-    padding: 8px 0;
-    font-size: 0.7rem;
-    color: #887a70; /* 落ち着いた色 */
-    background: #fdfaf2;
-    border: 1px solid #dcd5c5;
-    border-radius: 20px;
-    cursor: pointer;
-    font-weight: bold;
-    text-decoration: none;
-    transition: all 0.2s;
-  }
-  .list-btn:active {
-    background: #f5f0e1;
-    transform: translateY(1px);
-  }
-</style>
 
 <body class="locked">
 
   <div class="box">
+    <div class="global-footer-link">
+      <span onclick="openPolicy()" style="cursor:pointer;">プライバシーポリシー</span>
+      <span onclick="openProfile()" style="cursor:pointer;">運営者情報</span>
+    </div>
+
     <h1 class="title">
       <img src="logo.png" alt="KAWAII LAB検定" class="site-logo">
       <span class="title-sub">
@@ -121,34 +52,62 @@
     </div>
 
     <button class="start-btn" onclick="startQuiz()">検定開始！</button>
-
-    <a href="https://forms.gle/EguRX6uWZYmJJLZx5" target="_blank" class="survey-btn">
-      💬 アンケートにご協力ください
-    </a>
-
-    <a href="lyrics.html" class="list-btn">
-      🎵 収録楽曲リスト
-    </a>
+    <a href="https://forms.gle/EguRX6uWZYmJJLZx5" target="_blank" class="survey-btn">💬 アンケートにご協力ください</a>
+    <a href="lyrics.html" class="list-btn">🎵 楽曲リスト</a>
 
     <p class="disclaimer">
       歌割りはKAWAII LAB公式歌割り画像を参考にしています。<br>
       歌割り画像が存在しない歌は、ファンブログやライブ映像を参考にしています。
     </p>
+
+    <div id="policyModal" class="modal-overlay">
+      <div class="modal-content">
+        <h2>プライバシーポリシー</h2>
+        <h3>広告の配信について</h3>
+        <p>当サイトでは、第三者配信の広告サービス「Google アドセンス」を利用しています。広告配信事業者は、Cookieを使用して、当サイトや他サイトへのアクセス情報に基づき広告を配信します。ユーザーは、Googleの<a href="https://adssettings.google.com/authenticated" target="_blank" style="color: #ff69b2;">広告設定</a>で、パーソナライズ広告を無効にできます。</p>
+        <h3>アクセス解析ツールについて</h3>
+        <p>当サイトでは「Google アナリティクス」を利用する可能性があります。データは匿名で収集されており、個人を特定するものではありません。</p>
+        <h3>免責事項</h3>
+        <p>当サイトのクイズ内容や歌割り情報は正確を期しておりますが、安全性を保証するものではありません。生じた損害等の一切の責任を負いかねます。</p>
+        <h3>著作権・肖像権</h3>
+        <p>当サイトはファン活動の一環であり、権利は各権利所有者に帰属します。問題がある場合はアンケートフォームよりご連絡ください。速やかに対応いたします。</p>
+        <button class="modal-close-btn" onclick="closePolicy()">とじる</button>
+      </div>
+    </div>
+
+    <div id="profileModal" class="modal-overlay">
+      <div class="modal-content">
+        <h2>運営者情報</h2>
+        <h3>運営者</h3>
+        <p>鈴木バンバンビガロ</p>
+        <h3>サイトの目的</h3>
+        <p>KAWAII LAB.のグループの楽曲や歌割りをより深く楽しむためのファンサイトです。</p>
+        <h3>お問い合わせ</h3>
+        <p>ご意見・ご感想、掲載情報の誤り等は、以下のアンケートフォームよりご連絡ください。</p>
+        <p><a href="https://forms.gle/EguRX6uWZYmJJLZx5" target="_blank" style="color: #ff69b2;">アンケートフォーム</a></p>
+        <button class="modal-close-btn" onclick="closeProfile()">とじる</button>
+      </div>
+    </div>
   </div>
 
   <script>
     function startQuiz() {
-      const quizState = {
-        group: null,
-        difficulty: null,
-        currentIndex: 0,
-        correctCount: 0,
-        quizIds: []
-      };
+      const quizState = { group: null, difficulty: null, currentIndex: 0, correctCount: 0, quizIds: [] };
       localStorage.setItem("quizState", JSON.stringify(quizState));
       location.href = "group.html";
     }
-  </script>
 
+    function openPolicy() { document.getElementById('policyModal').style.display = 'flex'; }
+    function closePolicy() { document.getElementById('policyModal').style.display = 'none'; }
+    function openProfile() { document.getElementById('profileModal').style.display = 'flex'; }
+    function closeProfile() { document.getElementById('profileModal').style.display = 'none'; }
+
+    window.addEventListener('click', function(event) {
+      const policyModal = document.getElementById('policyModal');
+      const profileModal = document.getElementById('profileModal');
+      if (event.target === policyModal) closePolicy();
+      if (event.target === profileModal) closeProfile();
+    });
+  </script>
 </body>
 </html>

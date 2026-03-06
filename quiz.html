@@ -14,28 +14,25 @@
 
   <style>
     /* --------------------------------------------------
-       【追加】コピーガード設定
+       【継続】コピーガード設定
     -------------------------------------------------- */
-    /* 1. 文字選択を禁止（全体） */
     body {
       -webkit-user-select: none;
       -moz-user-select: none;
       -ms-user-select: none;
       user-select: none;
-      /* スマホでの長押しメニューも抑制 */
       -webkit-touch-callout: none;
     }
 
-    /* 2. 印刷時に画面を隠す */
     @media print {
-      body {
-        display: none !important;
-      }
+      body { display: none !important; }
     }
 
     /* --------------------------------------------------
        既存のスタイル（調整含む）
     -------------------------------------------------- */
+    .box { position: relative; } /* 左上リンク用 */
+
     .progress-container { 
       width: 100%; 
       height: 6px; 
@@ -116,6 +113,7 @@
       -webkit-tap-highlight-color: transparent;
     }
 
+    /* ホバー・アクティブ演出 */
     @media (hover: hover) {
       .member-btn:hover:not(:disabled) {
         transform: translateY(-2px);
@@ -125,27 +123,8 @@
       .member-btn.on:hover:not(:disabled) {
         background-color: #ff69b2 !important; 
         color: #ffffff !important;
-        filter: brightness(1.05);
         box-shadow: 0 4px 0px #d81b60 !important;
       }
-    }
-
-    @media (hover: none) {
-      .member-btn:hover {
-        transform: none !important;
-        background-color: #ffffff !important;
-        box-shadow: 0 2px 0px #eee !important;
-      }
-      .member-btn.on:hover {
-        background-color: #ff69b2 !important;
-        box-shadow: 0 2px 0px #d81b60 !important;
-      }
-    }
-
-    .member-btn:active:not(:disabled) {
-      transform: translateY(2px) !important;
-      box-shadow: 0 0px 0px #eee !important;
-      transition: 0s;
     }
 
     .member-btn.on { 
@@ -155,16 +134,7 @@
       box-shadow: 0 2px 0px #d81b60 !important;
     }
 
-    .member-btn.all-btn { 
-      background-color: #f8f8f8 !important; 
-      border-style: dashed !important;
-      color: #777 !important;
-    }
-
-    .submit {
-      margin-top: 20px;
-      width: 70% !important;
-    }
+    .submit { margin-top: 20px; width: 70% !important; }
 
     #result.animate { 
       animation: result-pop 0.5s ease-out; 
@@ -177,59 +147,28 @@
       font-size: 0.95rem;
       display: block;
       text-align: center;
-      text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
     }
     @keyframes result-pop { 
       0% { opacity: 0; transform: scale(0.8); } 
       100% { opacity: 1; transform: scale(1); } 
     }
-    .correct { 
-      background: #e8f5e9 !important; 
-      color: #2e7d32 !important; 
-      border: 2px solid #4caf50;
-    }
-    .incorrect { 
-      background: #ffebee !important; 
-      color: #d32f2f !important; 
-      border: 2px solid #f44336; 
-    }
+    .correct { background: #e8f5e9 !important; color: #2e7d32 !important; border: 2px solid #4caf50; }
+    .incorrect { background: #ffebee !important; color: #d32f2f !important; border: 2px solid #f44336; }
+    .warning { background: #fff3e0 !important; color: #ef6c00 !important; border: 2px solid #ffb74d !important; }
 
-    #explanation {
-      font-size: 0.9rem;
-      color: #666;
-      line-height: 1.6;
-      margin: 10px 0;
-      padding: 0 10px;
-    }
-
-    @media (max-width: 480px) {
-      body {
-        align-items: flex-start !important;
-        height: auto !important; 
-        padding-top: 10px !important; 
-      }
-      .box {
-        margin-top: 5px !important;
-        padding: 15px 10px !important;
-        width: 95% !important;
-      }
-      .title {
-        margin-bottom: 10px !important;
-        font-size: 1.2rem !important;
-      }
-    }
-    .warning { 
-      background: #fff3e0 !important; 
-      color: #ef6c00 !important;    
-      border: 2px solid #ffb74d !important;
-      text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
-    }
+    /* 左上リンクのスタイル微調整 */
+    .global-footer-link span { display: block; margin-bottom: 5px; font-size: 0.65rem; opacity: 0.7; }
   </style>
 </head>
 
 <body class="scroll-page">
 
   <div class="box">
+    <div class="global-footer-link">
+      <span onclick="openPolicy()" style="cursor:pointer;">プライバシーポリシー</span>
+      <span onclick="openProfile()" style="cursor:pointer;">運営者情報</span>
+    </div>
+
     <p id="quiz-counter" style="text-align: center; font-size: 14px; color: #888; margin-bottom: 5px;"></p>
     <div class="progress-container">
       <div id="progress-bar" class="progress-bar"></div>
@@ -243,37 +182,47 @@
     <p id="result"></p>
     <div id="explanation"></div>
     <button class="submit" id="nextBtn" style="display:none;">次の問題へ</button>
+
+    <div id="policyModal" class="modal-overlay">
+      <div class="modal-content">
+        <h2>プライバシーポリシー</h2>
+        <p>当サイトでは、第三者配信の広告サービス「Google アドセンス」を利用しています。広告配信事業者は、Cookieを使用して、過去のアクセス情報に基づき広告を配信します。ユーザーは、Googleの<a href="https://adssettings.google.com/authenticated" target="_blank" style="color: #ff69b2;">広告設定</a>でパーソナライズ広告を無効にできます。</p>
+        <h3>アクセス解析について</h3>
+        <p>サイト利用状況把握のため「Google アナリティクス」を利用する可能性があります。データは匿名で収集されます。</p>
+        <h3>免責事項</h3>
+        <p>クイズ内容の正確性には努めておりますが、利用により生じた損害等の責任は負いかねます。</p>
+        <h3>著作権・肖像権</h3>
+        <p>当サイトはファン活動の一環であり、権利は各権利所有者に帰属します。問題がある場合はアンケートフォームよりご連絡ください。</p>
+        <button class="modal-close-btn" onclick="closePolicy()">とじる</button>
+      </div>
+    </div>
+
+    <div id="profileModal" class="modal-overlay">
+      <div class="modal-content">
+        <h2>運営者情報</h2>
+        <h3>運営者</h3>
+        <p>鈴木バンバンビガロ</p>
+        <h3>サイトの目的</h3>
+        <p>KAWAII LAB.のグループの楽曲や歌割りをより深く楽しむためのファンサイトです。</p>
+        <h3>お問い合わせ</h3>
+        <p>お問い合わせは以下のフォームよりお願いいたします。</p>
+        <p><a href="https://forms.gle/EguRX6uWZYmJJLZx5" target="_blank" style="color: #ff69b2;">アンケートフォーム</a></p>
+        <button class="modal-close-btn" onclick="closeProfile()">とじる</button>
+      </div>
+    </div>
   </div>
 
   <script>
-    /* --------------------------------------------------
-       【追加】JavaScriptによるコピーガード
-    -------------------------------------------------- */
-    // 1. 右クリックメニューの禁止
+    // --- コピーガード機能 ---
     document.addEventListener('contextmenu', e => e.preventDefault());
-
-    // 2. キーボードショートカットの禁止 (Ctrl+C, Ctrl+P, Ctrl+U, Ctrl+S)
     document.addEventListener('keydown', e => {
-      if (e.ctrlKey && (e.key === 'c' || e.key === 'p' || e.key === 'u' || e.key === 's')) {
-        e.preventDefault();
-      }
+      if (e.ctrlKey && (e.key === 'c' || e.key === 'p' || e.key === 'u' || e.key === 's')) e.preventDefault();
     });
 
-    // --- Supabase & クイズロジック ---
+    // --- Supabase 設定 ---
     const SUPABASE_URL = "https://atinpqtedmrfrtdlkpkd.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0aW5wcXRlZG1yZnJ0ZGxrcGtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwOTU0NjcsImV4cCI6MjA4NDY3MTQ2N30.Oor6oUuuIxa0pSxIRuwEw7ZzGYM4hOGfywHqv2FaBHg";
-    
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-      auth: {
-        persistSession: false,
-        storageKey: 'sb-temp',
-        storage: {
-          getItem: () => null,
-          setItem: () => {},
-          removeItem: () => {}
-        }
-      }
-    });
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const quizState = JSON.parse(localStorage.getItem("quizState"));
     if (!quizState) location.href = "index.html";
@@ -305,7 +254,6 @@
       for (let i = 0; i < maxQuestions && tempPool.length > 0; i++) {
         const totalWeight = tempPool.reduce((sum, q) => sum + (q[diffKey] || 0), 0);
         let random = Math.random() * totalWeight;
-
         for (let j = 0; j < tempPool.length; j++) {
           random -= tempPool[j][diffKey];
           if (random <= 0) {
@@ -315,12 +263,7 @@
           }
         }
       }
-
       quizzes = selectedQuizzes;
-      if (quizzes.length === 0) {
-        document.getElementById("lyrics").textContent = "条件に合う問題が見つかりませんでした";
-        return;
-      }
 
       const { data: memberData, error: memberError } = await supabaseClient
         .from("members")
@@ -337,39 +280,28 @@
     function showQuiz(index) {
       currentIndex = index;
       currentQuiz = quizzes[index];
-      
       document.getElementById("quiz-counter").textContent = `${index + 1} / ${quizzes.length} 問目`;
-      const progressPercent = ((index + 1) / quizzes.length) * 100;
-      document.getElementById("progress-bar").style.width = progressPercent + "%";
-
+      document.getElementById("progress-bar").style.width = ((index + 1) / quizzes.length) * 100 + "%";
       document.getElementById("lyrics").textContent = currentQuiz.lyrics_main;
 
       const prevEl = document.getElementById("prev-lyrics");
       const nextEl = document.getElementById("next-lyrics");
 
       if (quizState.difficulty === "easy") {
-        const prevText = [currentQuiz.lyrics_prev1, currentQuiz.lyrics_prev2].filter(t => t).join("<br>");
-        const nextText = [currentQuiz.lyrics_next1, currentQuiz.lyrics_next2].filter(t => t).join("<br>");
-        updateHint(prevEl, "-直前の歌詞-", prevText);
-        updateHint(nextEl, "-直後の歌詞-", nextText);
+        updateHint(prevEl, "-直前の歌詞-", [currentQuiz.lyrics_prev1, currentQuiz.lyrics_prev2].filter(t => t).join("<br>"));
+        updateHint(nextEl, "-直後の歌詞-", [currentQuiz.lyrics_next1, currentQuiz.lyrics_next2].filter(t => t).join("<br>"));
       } else if (quizState.difficulty === "normal") {
         updateHint(prevEl, "-直前の歌詞-", currentQuiz.lyrics_prev2);
         updateHint(nextEl, "-直後の歌詞-", currentQuiz.lyrics_next1);
       } else {
-        prevEl.style.display = "none";
-        nextEl.style.display = "none";
+        prevEl.style.display = "none"; nextEl.style.display = "none";
       }
 
       selectedMembers.clear();
       renderMembers();
-      
-      const resultEl = document.getElementById("result");
-      resultEl.textContent = "";
-      resultEl.className = ""; 
-      
-      const explanationEl = document.getElementById("explanation");
-      explanationEl.textContent = "";
-
+      document.getElementById("result").textContent = "";
+      document.getElementById("result").className = ""; 
+      document.getElementById("explanation").textContent = "";
       document.getElementById("submitBtn").style.display = "block"; 
       document.getElementById("submitBtn").disabled = false;
       document.getElementById("nextBtn").style.display = "none";
@@ -379,15 +311,12 @@
       if (text && text.trim() !== "") {
         el.innerHTML = `<span class="hint-label">${label}</span><br>${text}`;
         el.style.display = "block";
-      } else {
-        el.style.display = "none";
-      }
+      } else { el.style.display = "none"; }
     }
 
     function renderMembers() {
       const container = document.getElementById("members");
       container.innerHTML = "";
-      
       members.forEach(m => {
         const btn = document.createElement("button");
         btn.textContent = m.name;
@@ -407,20 +336,13 @@
       const allBtn = document.createElement("button");
       allBtn.textContent = "全員";
       allBtn.className = "member-btn all-btn";
-
       allBtn.onclick = () => {
         const memberButtons = document.querySelectorAll(".member-btn:not(.all-btn)");
         const allOn = [...memberButtons].every(b => b.classList.contains("on"));
         memberButtons.forEach(b => {
-          if (allOn) { 
-            b.classList.remove("on"); 
-            selectedMembers.delete(b.textContent); 
-          } else { 
-            b.classList.add("on"); 
-            selectedMembers.add(b.textContent); 
-          }
+          if (allOn) { b.classList.remove("on"); selectedMembers.delete(b.textContent); }
+          else { b.classList.add("on"); selectedMembers.add(b.textContent); }
         });
-        allBtn.classList.toggle("on", !allOn);
       };
       container.appendChild(allBtn);
     }
@@ -430,7 +352,6 @@
         const res = document.getElementById("result");
         res.textContent = "⚠️ メンバーを選択してください！";
         res.className = "animate warning";
-        res.style.display = "block";
         return; 
       }
 
@@ -442,19 +363,10 @@
       res.textContent = isCorrect ? `⭕ 正解！😄（正解：${correct.join("・")}）` : `❌ 不正解！😫（正解：${correct.join("・")}）`;
       res.className = isCorrect ? "correct animate" : "incorrect animate";
 
-      const prevEl = document.getElementById("prev-lyrics");
-      const nextEl = document.getElementById("next-lyrics");
-      const fullPrev = [currentQuiz.lyrics_prev1, currentQuiz.lyrics_prev2].filter(t => t).join("<br>");
-      const fullNext = [currentQuiz.lyrics_next1, currentQuiz.lyrics_next2].filter(t => t).join("<br>");
-      
-      updateHint(prevEl, "-直前の歌詞-", fullPrev);
-      updateHint(nextEl, "-直後の歌詞-", fullNext);
-
-      document.getElementById("explanation").textContent = (currentQuiz.song_title && currentQuiz.explanation) ? `この歌詞は「${currentQuiz.song_title}」の${currentQuiz.explanation}部分でした！` : "";
-      
       if (isCorrect) tempCorrectCount++;
       document.getElementById("submitBtn").style.display = "none";
       document.getElementById("nextBtn").style.display = "block"; 
+      document.getElementById("explanation").textContent = (currentQuiz.song_title && currentQuiz.explanation) ? `この歌詞は「${currentQuiz.song_title}」の${currentQuiz.explanation}部分でした！` : "";
       
       setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }), 100);
     };
@@ -467,11 +379,20 @@
         const state = JSON.parse(localStorage.getItem("quizState") || "{}");
         state.correctCount = tempCorrectCount; 
         state.isComplete = true; 
-        state.resultToken = Math.random().toString(36).substring(2);
         localStorage.setItem("quizState", JSON.stringify(state));
         location.href = "result.html";
       }
     };
+
+    // --- モーダル制御 ---
+    function openPolicy() { document.getElementById('policyModal').style.display = 'flex'; }
+    function closePolicy() { document.getElementById('policyModal').style.display = 'none'; }
+    function openProfile() { document.getElementById('profileModal').style.display = 'flex'; }
+    function closeProfile() { document.getElementById('profileModal').style.display = 'none'; }
+    window.addEventListener('click', e => {
+      if (e.target === document.getElementById('policyModal')) closePolicy();
+      if (e.target === document.getElementById('profileModal')) closeProfile();
+    });
 
     loadQuizzesAndMembers();
   </script>
