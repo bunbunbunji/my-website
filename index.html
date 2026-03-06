@@ -24,15 +24,28 @@
     .title-sub { display: block; font-family: "Mochiy Pop One", sans-serif; font-size: 2.0rem; margin-top: 10px; transform: rotate(-2deg); }
     .box { position: relative; }
     .global-footer-link span { display: block; margin-bottom: 5px; }
+
+    /* モバイルでリンクが隠れたりずれたりするのを防ぐ */
+    .global-footer-link {
+      pointer-events: auto !important; /* クリックを確実に有効化 */
+    }
+    .global-footer-link span {
+      -webkit-tap-highlight-color: rgba(0,0,0,0); /* タップ時の青枠消去 */
+      padding: 5px 0; /* タップしやすくする */
+    }
+    /* モーダルが他の要素の下に回り込まないようにする */
+    .modal-overlay {
+      z-index: 10000 !important;
+    }
   </style>
 </head>
 
 <body class="locked">
 
   <div class="box">
-    <div class="global-footer-link">
-      <span onclick="openPolicy()" style="cursor:pointer;">プライバシーポリシー</span>
-      <span onclick="openProfile()" style="cursor:pointer;">運営者情報</span>
+    <div class="global-footer-link" style="position: absolute; top: 10px; left: 15px; z-index: 9999; text-align: left;">
+      <span onclick="openPolicy()" style="cursor:pointer; display: block; font-size: 10px; line-height: 1.4; color: #aaa; text-decoration: underline;">プライバシーポリシー</span>
+      <span onclick="openProfile()" style="cursor:pointer; display: block; font-size: 10px; line-height: 1.4; color: #aaa; text-decoration: underline;">運営者情報</span>
     </div>
 
     <h1 class="title">
@@ -110,4 +123,5 @@
     });
   </script>
 </body>
+
 </html>
