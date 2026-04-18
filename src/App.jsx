@@ -62,6 +62,8 @@ function App() {
   const [debugScore, setDebugScore] = useState(0);
   const [debugGroup, setDebugGroup] = useState('FRUITS ZIPPER');
   const [debugDiff, setDebugDiff] = useState('easy');
+  const [debugQuizId, setDebugQuizId] = useState('');
+  const [debugQuizStatus, setDebugQuizStatus] = useState('');
 
   const debugGroups = ['FRUITS ZIPPER', 'CANDY TUNE', 'SWEET STEADY', 'CUTIE STREET', 'MORE STAR'];
   const debugDiffs = ['easy', 'normal', 'hard', 'expert'];
@@ -393,7 +395,7 @@ function App() {
           <button className="group-choice-btn group-btn-fz" onClick={() => { setQuizState({...quizState, group: 'FRUITS ZIPPER'}); setScreen('difficulty'); }}>🍎FRUITS ZIPPER🍎</button>
           <button className="group-choice-btn group-btn-cd" onClick={() => { setQuizState({...quizState, group: 'CANDY TUNE'}); setScreen('difficulty'); }}>🍬CANDY TUNE🍬</button>
           <button className="group-choice-btn group-btn-ss" onClick={() => { setQuizState({...quizState, group: 'SWEET STEADY'}); setScreen('difficulty'); }}>💐SWEET STEADY💐</button>
-          <button className="group-choice-btn group-btn-cs" onClick={() => { setQuizState({...quizState, group: 'CUTIE STREET'}); setScreen('difficulty'); }}>🛣️CUTIE STREET🛣️</button>
+          <button className="group-choice-btn group-btn-cs" onClick={() => { setQuizState({...quizState, group: 'CUTIE STREET'}); setScreen('difficulty'); }}>💎CUTIE STREET💎</button>
           <button className="group-choice-btn group-btn-ms" onClick={() => { setQuizState({...quizState, group: 'MORE STAR'}); setScreen('difficulty'); }}>🌟MORE STAR🌟</button>
           <button className="back-btn-group back-btn-top" onClick={() => setScreen('top')}>トップに戻る</button>
         </div>
@@ -630,6 +632,32 @@ function App() {
             setDisplayScore(debugScore);
             setScreen('result');
           }}>▶ リザルト画面へジャンプ</button>
+
+          <div className="debug-section" style={{marginTop: '10px'}}>
+            <div className="debug-label">クイズID指定</div>
+            <input
+              className="debug-id-input"
+              type="number"
+              placeholder="quizzes.id"
+              value={debugQuizId}
+              onChange={e => { setDebugQuizId(e.target.value); setDebugQuizStatus(''); }}
+            />
+            <button className="debug-jump-btn" style={{marginTop: '6px'}} onClick={async () => {
+              if (!debugQuizId) return;
+              setDebugQuizStatus('取得中…');
+              const { data: qData, error } = await supabase.from('quizzes').select('*').eq('id', Number(debugQuizId)).single();
+              if (error || !qData) { setDebugQuizStatus('❌ 見つかりません'); return; }
+              const { data: mData } = await supabase.from('members').select('*').eq('group_name', qData.group_name).order('sort_order');
+              setMembers(mData || []);
+              setQuizState(p => ({ ...p, group: qData.group_name, difficulty: debugDiff, quizzes: [qData], currentIndex: 0, correctCount: 0 }));
+              setSelectedMembers(new Set());
+              setAnswered(false);
+              setResultMsg({ text: '', type: '' });
+              setDebugQuizStatus(`✅ ID:${qData.id} / ${qData.song_title}`);
+              setScreen('quiz');
+            }}>▶ このクイズをテスト</button>
+            {debugQuizStatus && <div style={{marginTop: '4px', fontSize: '0.65rem', color: '#aaa', wordBreak: 'break-all'}}>{debugQuizStatus}</div>}
+          </div>
         </div>
       )}
     </div>
