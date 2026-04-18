@@ -9,6 +9,12 @@ const supabaseUrl = "https://atinpqtedmrfrtdlkpkd.supabase.co";
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0aW5wcXRlZG1yZnJ0ZGxrcGtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwOTU0NjcsImV4cCI6MjA4NDY3MTQ2N30.Oor6oUuuIxa0pSxIRuwEw7ZzGYM4hOGfywHqv2FaBHg";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+const memberColorCSS = {
+  '紫': '#9c27b0', 'オレンジ': '#ff8a65', '空': '#87ceeb', '赤': '#f44336',
+  'ミントグリーン': '#4db6ac', 'ベビーピンク': '#ffb6c1', '黄': '#ffd54f',
+  '水': '#81d4fa', 'ピンク': '#ff69b2', '青': '#2196f3', '黄色': '#ffee58', 'シルバー': '#9e9e9e',
+};
+
 // 文字列の正規化（空白と記号を完全に排除）
 const superNormalize = (str) => {
   if (!str) return "";
@@ -52,6 +58,40 @@ function App() {
 
   const [songListData, setSongListData] = useState([]);
   const [isLoadingList, setIsLoadingList] = useState(false);
+  const [songModal, setSongModal] = useState(null);
+  const [songModalData, setSongModalData] = useState([]);
+  const [songModalMembers, setSongModalMembers] = useState([]);
+  const [isLoadingSongModal, setIsLoadingSongModal] = useState(false);
+
+  const openSongModal = async (title, groupName) => {
+    setSongModal({ title, groupName });
+    setSongModalData([]);
+    setSongModalMembers([]);
+    setIsLoadingSongModal(true);
+    const cols = 'lyrics_main, correct_members, explanation, all_flag, unit_flag, solo_flag';
+    const { data } = await supabase
+      .from('quizzes')
+      .select(cols)
+      .eq('group_name', groupName)
+      .eq('song_title', title)
+      .order('id');
+    if (data && data.length > 0) {
+      setSongModalData(data);
+    } else {
+      const { data: allData } = await supabase
+        .from('quizzes')
+        .select(cols + ', song_title')
+        .eq('group_name', groupName);
+      const normTitle = superNormalize(title);
+      setSongModalData((allData || []).filter(q => superNormalize(q.song_title) === normTitle));
+    }
+    const { data: mData } = await supabase
+      .from('members')
+      .select('name, Last_name, color')
+      .eq('group_name', groupName);
+    setSongModalMembers(mData || []);
+    setIsLoadingSongModal(false);
+  };
 
   const lyricsRef = useRef(null);
   const hintPrevRef = useRef(null);
@@ -371,7 +411,10 @@ function App() {
                 <div key={idx} className="group-section">
                   <div className="group-name-title">{group.groupName}</div>
                   {group.songs.map((song, sIdx) => (
-                    <div key={sIdx} className={`song-item-row ${!song.hasQuiz ? 'song-unreleased' : ''}`}>
+                    <div key={sIdx}
+                      className={`song-item-row ${!song.hasQuiz ? 'song-unreleased' : 'song-clickable'}`}
+                      onClick={() => song.hasQuiz && openSongModal(song.title, group.groupName)}
+                    >
                       <div className="song-title-cell">♪ {song.title}</div>
                       <div className="badge-area">
                         {song.isEasy && <span className="diff-badge-inline easy-badge-color">やさしい</span>}
@@ -554,6 +597,53 @@ function App() {
           </div>
         </div>
       )}
+
+      {/* --- 楽曲歌詞モーダル --- */}
+      {songModal && (() => {
+        const memberLookup = {};
+        songModalMembers.forEach(m => {
+          memberLookup[m.name] = { lastName: m.Last_name, color: memberColorCSS[m.color] || '#333' };
+        });
+        return (
+          <div className="modal-overlay" onClick={() => setSongModal(null)}>
+            <div className="modal-content song-lyrics-modal" onClick={e => e.stopPropagation()}>
+              <h2>{songModal.title}</h2>
+              <div className="song-modal-group-badge">{songModal.groupName}</div>
+              {isLoadingSongModal ? (
+                <div className="song-modal-loading">データを取得中...</div>
+              ) : songModalData.length === 0 ? (
+                <div className="song-modal-loading">データがありません</div>
+              ) : (
+                <div className="song-modal-list">
+                  {songModalData.map((row, i) => {
+                    const isSolo = String(row.solo_flag) === '1';
+                    const isAll = String(row.all_flag) === '1';
+                    const correctArr = row.correct_members.split(',').map(s => s.trim());
+                    const lyricsColor = isSolo
+                      ? (memberLookup[correctArr[0]]?.color || '#333')
+                      : '#000';
+                    const memberNameNodes = isAll
+                      ? <span>全員</span>
+                      : correctArr.map((n, ni) => (
+                          <span key={ni} style={{ color: memberLookup[n]?.color || '#333' }}>
+                            {ni > 0 && <span style={{ color: '#333' }}>・</span>}
+                            {memberLookup[n]?.lastName || n}
+                          </span>
+                        ));
+                    return (
+                      <div key={i} className="song-modal-row">
+                        <div className="song-modal-lyrics" style={{ color: lyricsColor }}>{row.lyrics_main}</div>
+                        <div className="song-modal-members">🎤 {memberNameNodes}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              <button className="modal-close-btn" onClick={() => setSongModal(null)}>とじる</button>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* --- モーダル --- */}
       {showPolicy && (
