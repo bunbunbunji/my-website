@@ -18,10 +18,19 @@ html {
   html, body { visibility: hidden; }
 }
 
+@keyframes bgScroll {
+  from { background-position: 0 0; }
+  to   { background-position: 607px 458px; }
+}
+
 body {
   margin: 0;
   font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
   background-color: var(--bg);
+  background-image: url('./assets/Wallpaper.png');
+  background-repeat: repeat;
+  background-size: 607px 458px;
+  animation: bgScroll 60s linear infinite;
   color: #333;
 }
 
@@ -1049,6 +1058,75 @@ body {
   line-height: 1.6;
   animation: slideUp 0.2s ease-out;
 }
+
+/* --- セッション復元バナー --- */
+.resume-card {
+  background: #fff;
+  border: 2px solid #ff69b2;
+  border-radius: 20px;
+  padding: 16px 20px;
+  width: 100%;
+  max-width: 480px;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+  box-shadow: 0 6px 20px rgba(255, 105, 180, 0.2);
+  text-align: center;
+}
+
+.resume-title {
+  font-family: 'Mochiy Pop One', sans-serif;
+  font-size: 0.9rem;
+  color: #ff69b2;
+  margin-bottom: 8px;
+}
+
+.resume-info {
+  font-size: 0.8rem;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+.resume-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.resume-continue-btn {
+  font-family: 'Mochiy Pop One', sans-serif;
+  width: 80%;
+  max-width: 240px;
+  padding: 11px 0;
+  background: linear-gradient(135deg, #ff69b2, #ff8a65);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #d81b60;
+  transition: all 0.2s;
+  position: relative;
+  top: 0;
+}
+
+.resume-continue-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 0 #d81b60; }
+.resume-continue-btn:active:not(:disabled) { top: 3px; box-shadow: 0 1px 0 #d81b60; }
+.resume-continue-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.resume-discard-btn {
+  font-family: 'Mochiy Pop One', sans-serif;
+  background: none;
+  border: none;
+  color: #bbb;
+  font-size: 0.72rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 4px;
+}
+
+.resume-discard-btn:hover { color: #999; }
 
 /* --- デバッグパネル --- */
 .debug-panel {

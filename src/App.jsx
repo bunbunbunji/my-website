@@ -63,6 +63,11 @@ function App() {
   const [songModalMembers, setSongModalMembers] = useState([]);
   const [isLoadingSongModal, setIsLoadingSongModal] = useState(false);
 
+  const [sessionId, setSessionId] = useState(null);
+  const [pendingResume, setPendingResume] = useState(null);
+  const [isResumingSession, setIsResumingSession] = useState(false);
+  const [showResumeModal, setShowResumeModal] = useState(false);
+
   const openSongModal = async (title, groupName) => {
     setSongModal({ title, groupName });
     setSongModalData([]);
@@ -126,6 +131,73 @@ function App() {
     normal: { zero: "全滅…だと…！？<br>泣きたい気持ちを抑えて、もう1回チャレンジ！", low: "まだまだ聴き込み不足！<br>曲をたくさん聴いて耳を鍛えよう。", mid: "まずまずの結果です。<br>さらに聴き込めばもっと正解できるはず！", high: "素晴らしい！<br>そろそろファンを名乗ってもいいかもね？", perfect: "全問正解！よくできました！<br>素晴らしい結果です！次は「むずかしい」に挑戦だ！" },
     hard: { zero: "全問不正解…。<br>「むずかしい」の壁はかなり高かったようだ。", low: "この難易度はまだ早かったかも…？<br>でも挑戦する姿勢は最高にかっこいいぜ。", mid: "大健闘！<br>「むずかしい」でこれだけ解ければ相当なもの。", high: "すごい！よくここまで正解できましたね！<br>全問正解までもうちょっと。もう一回チャレンジだ！", perfect: "全問正解！コングラッチュレーション！！<br>この難易度で満点はもはや職人の域ですな！" },
     expert: { zero: "へんじがない。ただのしかばねのようだ。<br>0点でも泣かないで。当てる方がおかしいレベルですから。", low: "相手が悪すぎた…。<br>一筋縄ではいかないね。ドンマイドンマイ！", mid: "素晴らしい！<br>この難問揃いで半分解けるとは、なかなかやるな？", high: "素晴らしすぎて鳥肌ものです。<br>もしかしたらメンバー本人よりも詳しいかも…！？", perfect: "👼⛩️✨神、降臨✨⛩️👼。<br>あなたは一体何者…？まさか本人？？" }
+  };
+
+  // --- セッション復元チェック（マウント時） ---
+  useEffect(() => {
+    const sid = localStorage.getItem('quiz_session_id');
+    if (!sid) return;
+    supabase.from('sessions').select('*').eq('session_id', sid).maybeSingle()
+      .then(({ data }) => {
+        if (data) setPendingResume(data);
+        else localStorage.removeItem('quiz_session_id');
+      });
+  }, []);
+
+  // --- クイズ開始（セッション作成） ---
+  const startQuiz = async () => {
+    const oldId = sessionId || pendingResume?.session_id;
+    if (oldId) {
+      await supabase.from('sessions').delete().eq('session_id', oldId);
+      localStorage.removeItem('quiz_session_id');
+    }
+    setSessionId(null);
+    setPendingResume(null);
+    const ids = quizState.quizzes.map(q => q.id);
+    const { data } = await supabase.from('sessions').insert({
+      group_name: quizState.group,
+      difficulty: quizState.difficulty,
+      current_step: 1,
+      quiz_ids: ids,
+      correct_count: 0
+    }).select('session_id').single();
+    if (data?.session_id) {
+      localStorage.setItem('quiz_session_id', data.session_id);
+      setSessionId(data.session_id);
+    }
+    setScreen('quiz');
+  };
+
+  // --- セッション復元 ---
+  const resumeQuiz = async () => {
+    setIsResumingSession(true);
+    const s = pendingResume;
+    const ids = s.quiz_ids;
+    const { data: qData } = await supabase.from('quizzes').select('*').in('id', ids);
+    const sorted = ids.map(id => (qData || []).find(q => q.id === id)).filter(Boolean);
+    const { data: mData } = await supabase.from('members').select('*').eq('group_name', s.group_name).order('sort_order');
+    setMembers(mData || []);
+    setQuizState({
+      group: s.group_name,
+      difficulty: s.difficulty,
+      currentIndex: s.current_step - 1,
+      correctCount: s.correct_count,
+      quizzes: sorted
+    });
+    setSessionId(s.session_id);
+    setPendingResume(null);
+    setIsResumingSession(false);
+    setSelectedMembers(new Set());
+    setAnswered(false);
+    setResultMsg({ text: '', type: '' });
+    setScreen('quiz');
+  };
+
+  // --- セッション破棄 ---
+  const discardSession = () => {
+    supabase.from('sessions').delete().eq('session_id', pendingResume.session_id).then(() => {});
+    localStorage.removeItem('quiz_session_id');
+    setPendingResume(null);
   };
 
   // --- クイズ準備 ---
@@ -231,14 +303,24 @@ function App() {
     }
   };
 
+  const normalizeMemberName = (name) => name.trim().replace(/[\s　]/g, '');
+
   const handleAnswer = () => {
     if (selectedMembers.size === 0) {
       setResultMsg({ text: "⚠️ メンバーを選択してください！", type: "warning" });
       return;
     }
     const current = quizState.quizzes[quizState.currentIndex];
-    const correctArray = current.correct_members.split(",").map(s => s.trim()).sort();
-    const isCorrect = JSON.stringify(correctArray) === JSON.stringify(Array.from(selectedMembers).sort());
+    const correctArray = current.correct_members
+      .split(/[,、]/)
+      .map(normalizeMemberName)
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b, 'ja'));
+    const selectedArray = Array.from(selectedMembers)
+      .map(normalizeMemberName)
+      .sort((a, b) => a.localeCompare(b, 'ja'));
+    const isCorrect = JSON.stringify(correctArray) === JSON.stringify(selectedArray);
+    const newCorrectCount = isCorrect ? quizState.correctCount + 1 : quizState.correctCount;
 
     if (isCorrect) {
       setQuizState(prev => ({ ...prev, correctCount: prev.correctCount + 1 }));
@@ -247,6 +329,19 @@ function App() {
       setResultMsg({ text: `❌ 不正解！😫（正解：${correctArray.join("・")}）`, type: "incorrect" });
     }
     setAnswered(true);
+    if (sessionId) {
+      const isLast = quizState.currentIndex + 1 === quizState.quizzes.length;
+      if (isLast) {
+        supabase.from('sessions').delete().eq('session_id', sessionId).then(() => {});
+        localStorage.removeItem('quiz_session_id');
+        setSessionId(null);
+      } else {
+        supabase.from('sessions').update({
+          correct_count: newCorrectCount,
+          current_step: quizState.currentIndex + 2
+        }).eq('session_id', sessionId).then(() => {});
+      }
+    }
     setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }), 100);
   };
 
@@ -381,7 +476,13 @@ function App() {
     <div className="app-root" onClick={() => setInfoLevel(null)}>
       <div className="global-footer-link">
         {screen !== 'top' && (
-          <span onClick={() => setScreen('top')}>🏠 トップにもどる</span>
+          <span onClick={async () => {
+            if (sessionId) {
+              const { data } = await supabase.from('sessions').select('*').eq('session_id', sessionId).maybeSingle();
+              if (data) setPendingResume(data);
+            }
+            setScreen('top');
+          }}>🏠 トップにもどる</span>
         )}
       </div>
       <div className="legal-links">
@@ -404,7 +505,7 @@ function App() {
           <p className="catch-text">✨たくさん正解して推しへの愛を証明しよう！✨</p>
 
           <div className="top-buttons">
-            <button className="start-btn-sparkle" onClick={() => setScreen('group')}>
+            <button className="start-btn-sparkle" onClick={() => pendingResume ? setShowResumeModal(true) : setScreen('group')}>
               <span className="btn-inner">検定開始！</span>
             </button>
             <button className="sub-btn list-btn" onClick={fetchSongList}>
@@ -512,7 +613,7 @@ function App() {
             <div className="confirm-item"><span className="confirm-label">難易度</span><span className="confirm-value">{difficultyLabel[quizState.difficulty]}</span></div>
             <p className="preparing-status">{statusMsg}</p>
           </div>
-          <button className="start-btn" disabled={isPreparing || quizState.quizzes.length === 0} onClick={() => setScreen('quiz')}>クイズを始める！</button>
+          <button className="start-btn" disabled={isPreparing || quizState.quizzes.length === 0} onClick={startQuiz}>クイズを始める！</button>
           <button className="back-btn" onClick={() => setScreen('difficulty')}>難易度選択に戻る</button>
         </div>
       )}
@@ -662,6 +763,24 @@ function App() {
           </div>
         );
       })()}
+
+      {/* --- セッション再開モーダル --- */}
+      {showResumeModal && pendingResume && (
+        <div className="modal-overlay" onClick={() => setShowResumeModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{textAlign: 'center'}}>
+            <h2>📖 途中のクイズが見つかりました</h2>
+            <p style={{marginBottom: '6px'}}>{pendingResume.group_name}・{difficultyLabel[pendingResume.difficulty]}</p>
+            <p style={{marginBottom: '20px'}}>{pendingResume.current_step}問目から再開できます</p>
+            <button className="resume-continue-btn" onClick={() => { setShowResumeModal(false); resumeQuiz(); }} disabled={isResumingSession}>
+              {isResumingSession ? '読み込み中…' : '▶ 続きから始める'}
+            </button>
+            <br />
+            <button className="resume-discard-btn" style={{marginTop: '12px'}} onClick={() => { setShowResumeModal(false); discardSession(); setScreen('group'); }}>
+              はじめからやり直す
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* --- モーダル --- */}
       {showPolicy && (
