@@ -68,13 +68,13 @@ function App() {
     setSongModalData([]);
     setSongModalMembers([]);
     setIsLoadingSongModal(true);
-    const cols = 'lyrics_main, correct_members, explanation, all_flag, unit_flag, solo_flag';
+    const cols = 'lyrics_main, correct_members, explanation, all_flag, unit_flag, solo_flag, "order"';
     const { data } = await supabase
       .from('quizzes')
       .select(cols)
       .eq('group_name', groupName)
       .eq('song_title', title)
-      .order('id');
+      .order('order');
     if (data && data.length > 0) {
       setSongModalData(data);
     } else {
@@ -83,7 +83,11 @@ function App() {
         .select(cols + ', song_title')
         .eq('group_name', groupName);
       const normTitle = superNormalize(title);
-      setSongModalData((allData || []).filter(q => superNormalize(q.song_title) === normTitle));
+      setSongModalData(
+        (allData || [])
+          .filter(q => superNormalize(q.song_title) === normTitle)
+          .sort((a, b) => (a.order || 0) - (b.order || 0))
+      );
     }
     const { data: mData } = await supabase
       .from('members')
@@ -316,6 +320,20 @@ function App() {
     fitText(hintPrevRef.current, 0.75, 0.45);
     fitText(hintNextRef.current, 0.75, 0.45);
   }, [quizState.currentIndex, quizState.quizzes]);
+
+  useEffect(() => {
+    if (!songModalData.length) return;
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.song-modal-lyrics').forEach(el => {
+        const base = 0.75;
+        el.style.fontSize = base + 'rem';
+        if (el.clientWidth > 0 && el.scrollWidth > el.clientWidth) {
+          const ratio = el.clientWidth / el.scrollWidth;
+          el.style.fontSize = Math.max(base * ratio * 0.93, 0.4) + 'rem';
+        }
+      });
+    });
+  }, [songModalData]);
 
   useLayoutEffect(() => {
     if (screen !== 'result') return;

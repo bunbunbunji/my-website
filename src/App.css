@@ -330,7 +330,13 @@ body {
 }
 .song-clickable:hover { background: #fff0f5; }
 
-.song-lyrics-modal { max-height: 75vh; }
+.song-lyrics-modal {
+  max-height: 75vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 20px;
+}
 
 .song-modal-group-badge {
   display: inline-block;
@@ -345,33 +351,44 @@ body {
 
 .song-modal-loading { color: #aaa; font-size: 0.85rem; padding: 20px 0; }
 
-.song-modal-list { display: flex; flex-direction: column; gap: 10px; }
+.song-modal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  padding-right: 4px;
+}
+
+.song-modal-list::-webkit-scrollbar { width: 4px; }
+.song-modal-list::-webkit-scrollbar-track { background: #fff0f5; border-radius: 2px; }
+.song-modal-list::-webkit-scrollbar-thumb { background: #ffb6c1; border-radius: 2px; }
 
 .song-modal-row {
   background: #fdfdfd;
   border: 1px solid #f0d0e0;
   border-radius: 10px;
-  padding: 10px 12px;
+  padding: 7px 12px;
   text-align: left;
 }
 
 .song-modal-lyrics {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: normal;
   margin-bottom: 4px;
   line-height: 1.6;
-  white-space: pre-wrap;
-  overflow-wrap: break-word;
-  word-break: break-all;
+  white-space: pre;
+  overflow: hidden;
 }
 
 .song-modal-members {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: normal;
 }
 
 .song-modal-explanation {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: normal;
   color: #aaa;
   margin-top: 3px;
