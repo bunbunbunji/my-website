@@ -106,6 +106,11 @@ function App() {
   const hintPrevRef = useRef(null);
   const hintNextRef = useRef(null);
   const commentRef = useRef(null);
+  const descTextRef = useRef(null);
+  const catchText1Ref = useRef(null);
+  const catchText2Ref = useRef(null);
+  const listBtnRef = useRef(null);
+  const surveyBtnRef = useRef(null);
 
   const debugMode = new URLSearchParams(window.location.search).has('debug');
   const [debugScore, setDebugScore] = useState(0);
@@ -403,6 +408,40 @@ function App() {
   }, [screen]);
 
   useLayoutEffect(() => {
+    if (screen !== 'top') return;
+    const fitEl = (el, startRem, minPx) => {
+      if (!el) return;
+      el.style.fontSize = startRem + 'rem';
+      const cs = window.getComputedStyle(el);
+      const rect = el.getBoundingClientRect();
+      const availWidth = rect.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      if (availWidth <= 0) return;
+      const ruler = document.createElement('span');
+      ruler.style.cssText = 'position:absolute;top:-9999px;left:0;visibility:hidden;white-space:nowrap;pointer-events:none;';
+      ruler.style.fontFamily = cs.fontFamily;
+      ruler.style.fontSize = cs.fontSize;
+      ruler.style.fontWeight = cs.fontWeight;
+      ruler.textContent = el.textContent.trim();
+      document.body.appendChild(ruler);
+      const textWidth = ruler.getBoundingClientRect().width;
+      document.body.removeChild(ruler);
+      if (textWidth > availWidth) {
+        const newSize = Math.max(parseFloat(cs.fontSize) * (availWidth / textWidth) * 0.95, minPx);
+        el.style.fontSize = `${newSize}px`;
+      }
+    };
+    const fitAll = () => {
+      fitEl(descTextRef.current, 0.88, 8);
+      fitEl(catchText1Ref.current, 0.88, 8);
+      fitEl(catchText2Ref.current, 0.88, 8);
+      fitEl(listBtnRef.current, 1.05, 8);
+      fitEl(surveyBtnRef.current, 0.78, 8);
+    };
+    fitAll();
+    document.fonts.ready.then(fitAll);
+  }, [screen]);
+
+  useLayoutEffect(() => {
     const fitText = (el, startRem, minPx) => {
       if (!el) return;
       el.style.fontSize = startRem + 'rem';
@@ -554,19 +593,19 @@ function App() {
               <span>だ</span><span>れ</span><span>が</span><span>う</span><span>た</span><span>っ</span><span>て</span><span>る</span><span>？</span><span>？</span>
             </h1>
           </div>
-          <p className="desc-text">歌詞の一部を見て、誰のパートか当てるクイズです。</p>
-          <p className="catch-text">✨正解数で理解度を測定！✨</p>
-          <p className="catch-text">✨たくさん正解して推しへの愛を証明しよう！✨</p>
+          <p ref={descTextRef} className="desc-text">歌詞の一部を見て、誰のパートか当てるクイズです。</p>
+          <p ref={catchText1Ref} className="catch-text">✨正解数で理解度を測定！✨</p>
+          <p ref={catchText2Ref} className="catch-text">✨たくさん正解して推しへの愛を証明しよう！✨</p>
 
           <div className="top-buttons">
             <button className="start-btn-sparkle" onClick={() => pendingResume ? setShowResumeModal(true) : setScreen('group')}>
               <span className="btn-inner">検定開始！</span>
             </button>
-            <button className="sub-btn list-btn" onClick={fetchSongList}>
+            <button ref={listBtnRef} className="sub-btn list-btn" onClick={fetchSongList}>
               🎵 出題楽曲リスト 🎵
             </button>
-            <a href="https://forms.gle/EguRX6uWZYmJJLZx5" target="_blank" className="sub-btn survey-btn">
-              💬 アンケート協力にご協力ください！ 💬
+            <a ref={surveyBtnRef} href="https://forms.gle/EguRX6uWZYmJJLZx5" target="_blank" className="sub-btn survey-btn">
+              アンケート協力にご協力ください
             </a>
           </div>
         </div>
