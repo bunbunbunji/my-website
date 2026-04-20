@@ -61,11 +61,12 @@ body {
 /* --- 画面タイトル共通 --- */
 .title {
   font-family: 'Mochiy Pop One', sans-serif;
-  font-size: 1.4rem;
+  font-size: clamp(1rem, 6vw, 1.4rem);
   color: #ff69b2;
   text-shadow: 2px 2px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
   letter-spacing: 0.05em;
   margin-bottom: 22px;
+  white-space: nowrap;
 }
 
 /* --- トップ画面 --- */
@@ -332,12 +333,21 @@ body {
 .song-item-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   padding: 10px 0;
   border-bottom: 1px dashed #eee;
+  overflow: hidden;
 }
 
-.song-title-cell { font-size: 0.9rem; font-weight: 600; color: #444; }
+.song-title-cell {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #444;
+  white-space: pre;
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
+}
 .song-unreleased .song-title-cell { color: #bbb; font-weight: normal; }
 
 .song-clickable {
@@ -412,7 +422,15 @@ body {
   margin-top: 3px;
 }
 
-.status-tag-unreleased { font-size: 0.6rem; color: #bbb; font-weight: normal; }
+.badge-area {
+  display: flex;
+  flex-shrink: 0;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+  margin-left: 6px;
+}
+
+.status-tag-unreleased { font-size: 0.6rem; color: #bbb; font-weight: normal; white-space: nowrap; }
 
 .diff-badge-inline {
   font-size: 0.6rem;
@@ -420,6 +438,7 @@ body {
   border-radius: 6px;
   color: white;
   margin-left: 4px;
+  white-space: nowrap;
 }
 
 .easy-badge-color { background: #81c784; }
@@ -430,7 +449,7 @@ body {
   text-align: center;
   font-size: 14px;
   color: #888;
-  margin-bottom: 5px;
+  margin-bottom: clamp(2px, 0.5svh, 5px);
 }
 
 .progress-container {
@@ -438,7 +457,7 @@ body {
   height: 6px;
   background: #eee;
   border-radius: 4px;
-  margin-bottom: 10px;
+  margin-bottom: clamp(4px, 1svh, 10px);
   overflow: hidden;
 }
 
@@ -453,8 +472,8 @@ body {
   font-size: 1.1rem !important;
   color: #888 !important;
   text-shadow: none !important;
-  margin-top: 5px;
-  margin-bottom: 4px;
+  margin-top: clamp(2px, 0.5svh, 5px) !important;
+  margin-bottom: clamp(2px, 0.5svh, 4px) !important;
 }
 
 .quiz-challenge-label {
@@ -466,15 +485,15 @@ body {
   border-radius: 20px;
   display: inline-block;
   padding: 2px 12px;
-  margin-bottom: 8px;
+  margin-bottom: clamp(3px, 0.8svh, 8px);
 }
 
 #lyrics {
-  font-size: 1.4rem;
+  font-size: clamp(12px, min(4vw, 3.5svh), 1.4rem);
   font-weight: normal;
   color: #333;
-  margin: 20px 0;
-  line-height: 1.6;
+  margin: clamp(6px, 2svh, 20px) 0;
+  line-height: 1.5;
   padding: 0 10px;
   letter-spacing: 0.03em;
   white-space: pre;
@@ -486,9 +505,9 @@ body {
   color: #aaa;
   background: #fdfdfd;
   border: 1px dashed #eee;
-  padding: 8px;
+  padding: clamp(4px, 1svh, 8px);
   border-radius: 8px;
-  margin: 8px 0;
+  margin: clamp(3px, 0.8svh, 8px) 0;
   line-height: 1.4;
   letter-spacing: 0.05em;
   text-align: center;
@@ -496,7 +515,7 @@ body {
 }
 
 .hint-text {
-  font-size: 0.75rem;
+  font-size: clamp(7px, min(2.2vw, 1.6svh), 0.62rem);
   white-space: pre;
   overflow: hidden;
 }
@@ -510,10 +529,10 @@ body {
 .members {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: clamp(5px, 1svh, 10px);
   width: 100%;
   max-width: 320px;
-  margin: 20px auto;
+  margin: clamp(6px, 1.5svh, 20px) auto;
 }
 
 .member-btn {
@@ -522,9 +541,9 @@ body {
   max-width: 150px;
   display: block;
   margin: 0 auto;
-  font-size: 0.85rem;
+  font-size: clamp(0.65rem, min(3vw, 2svh), 0.85rem);
   font-weight: normal;
-  padding: 10px 0;
+  padding: clamp(5px, 1.2svh, 10px) 0;
   background-color: #ffffff;
   color: #888;
   border: 1px solid #e0e0e0;
@@ -545,10 +564,10 @@ body {
 .submit {
   font-family: 'Mochiy Pop One', sans-serif;
   display: block;
-  margin: 20px auto 0;
+  margin: clamp(6px, 1.5svh, 20px) auto 0;
   width: 70%;
   max-width: 280px;
-  padding: 14px 16px;
+  padding: clamp(8px, 1.5svh, 14px) 16px;
   background-color: #ff69b2;
   color: #fff;
   border: 3px solid #fff;
@@ -569,12 +588,14 @@ body {
   padding: 12px;
   border-radius: 12px;
   font-weight: bold;
-  margin: 15px auto;
+  margin: clamp(6px, 1.5svh, 15px) auto;
   width: 80%;
   max-width: 300px;
   font-size: 0.95rem;
   display: block;
   text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 @keyframes result-pop {
@@ -586,7 +607,14 @@ body {
 .incorrect { background: #ffebee !important; color: #d32f2f !important; border: 2px solid #f44336; }
 .warning   { background: #fff3e0 !important; color: #ef6c00 !important; border: 2px solid #ffb74d !important; }
 
-#explanation { font-size: 14px; line-height: 1.6; color: #888; margin: 10px 20px; }
+#explanation {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #888;
+  margin: clamp(4px, 1svh, 10px) 20px;
+  white-space: pre;
+  overflow: hidden;
+}
 
 /* --- アニメーション・補助 --- */
 .fade-in { animation: fadeIn 0.6s ease-out; }
@@ -1062,7 +1090,7 @@ body {
   max-width: 90vw;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   text-align: left;
-  white-space: pre;
+  white-space: pre-wrap;
   font-size: 0.8rem;
   line-height: 1.6;
   animation: slideUp 0.2s ease-out;

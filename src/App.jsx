@@ -403,17 +403,23 @@ function App() {
   }, [screen]);
 
   useLayoutEffect(() => {
-    const fitText = (el, maxRem, minRem) => {
+    const fitText = (el, startRem, minPx) => {
       if (!el) return;
-      el.style.fontSize = maxRem + 'rem';
-      if (el.scrollWidth > el.clientWidth) {
-        const ratio = el.clientWidth / el.scrollWidth;
-        el.style.fontSize = Math.max(maxRem * ratio * 0.95, minRem) + 'rem';
+      el.style.fontSize = startRem + 'rem';
+      let size = parseFloat(window.getComputedStyle(el).fontSize);
+      while (el.scrollWidth > el.clientWidth && size > minPx) {
+        size -= 0.5;
+        el.style.fontSize = `${size}px`;
+        if (size <= minPx) break;
       }
     };
-    fitText(lyricsRef.current, 1.4, 0.65);
-    fitText(hintPrevRef.current, 0.75, 0.45);
-    fitText(hintNextRef.current, 0.75, 0.45);
+    const fitAll = () => {
+      fitText(lyricsRef.current, 1.4, 10);
+      fitText(hintPrevRef.current, 0.62, 7);
+      fitText(hintNextRef.current, 0.62, 7);
+    };
+    fitAll();
+    document.fonts.ready.then(fitAll);
   }, [quizState.currentIndex, quizState.quizzes]);
 
   useEffect(() => {
@@ -429,6 +435,54 @@ function App() {
       });
     });
   }, [songModalData]);
+
+  useEffect(() => {
+    if (!songListData.length) return;
+    document.fonts.ready.then(() => requestAnimationFrame(() => {
+      document.querySelectorAll('.song-title-cell').forEach(el => {
+        el.style.fontSize = '';
+        let currentSize = parseFloat(window.getComputedStyle(el).fontSize);
+        const minSize = 8;
+        while (el.scrollWidth > el.clientWidth && currentSize > minSize) {
+          currentSize -= 0.5;
+          el.style.fontSize = `${currentSize}px`;
+          if (currentSize <= minSize) break;
+        }
+      });
+    }));
+  }, [songListData]);
+
+  useEffect(() => {
+    if (!resultMsg.text) return;
+    requestAnimationFrame(() => {
+      const el = document.getElementById('result');
+      if (!el) return;
+      el.style.fontSize = '';
+      let size = parseFloat(window.getComputedStyle(el).fontSize);
+      const minSize = 9;
+      while (el.scrollWidth > el.clientWidth && size > minSize) {
+        size -= 0.5;
+        el.style.fontSize = `${size}px`;
+        if (size <= minSize) break;
+      }
+    });
+  }, [resultMsg]);
+
+  useEffect(() => {
+    if (!answered) return;
+    requestAnimationFrame(() => {
+      const el = document.getElementById('explanation');
+      if (!el) return;
+      el.style.fontSize = '';
+      let size = parseFloat(window.getComputedStyle(el).fontSize);
+      const minSize = 9;
+      while (el.scrollWidth > el.clientWidth && size > minSize) {
+        size -= 0.5;
+        el.style.fontSize = `${size}px`;
+        if (size <= minSize) break;
+      }
+    });
+  }, [answered]);
 
   useLayoutEffect(() => {
     if (screen !== 'result') return;
@@ -470,7 +524,7 @@ function App() {
     ? [quizCurr?.lyrics_next1, quizCurr?.lyrics_next2].filter(Boolean)
     : quizState.difficulty === 'normal' ? [quizCurr?.lyrics_next1].filter(Boolean) : [];
   const quizExplanation = (quizCurr?.song_title && quizCurr?.explanation)
-    ? `この歌詞は「${quizCurr.song_title}」の${quizCurr.explanation}部分でした！` : "";
+    ? `この歌詞は「${quizCurr.song_title}」の\n${quizCurr.explanation}部分でした！` : "";
 
   return (
     <div className="app-root" onClick={() => setInfoLevel(null)}>
