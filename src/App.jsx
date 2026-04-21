@@ -118,6 +118,7 @@ function App() {
   const [debugDiff, setDebugDiff] = useState('easy');
   const [debugQuizId, setDebugQuizId] = useState('');
   const [debugQuizStatus, setDebugQuizStatus] = useState('');
+  const [debugPanelOpen, setDebugPanelOpen] = useState(true);
 
   const debugGroups = ['FRUITS ZIPPER', 'CANDY TUNE', 'SWEET STEADY', 'CUTIE STREET', 'MORE STAR'];
   const debugDiffs = ['easy', 'normal', 'hard', 'expert'];
@@ -327,11 +328,22 @@ function App() {
     const isCorrect = JSON.stringify(correctArray) === JSON.stringify(selectedArray);
     const newCorrectCount = isCorrect ? quizState.correctCount + 1 : quizState.correctCount;
 
+    const formatCorrectLabel = (members, allFlag) => {
+      if (String(allFlag) === '1') return '全員';
+      if (members.length < 3) return members.join('・');
+      const pairs = [];
+      for (let i = 0; i < members.length; i += 2) {
+        pairs.push(members.slice(i, i + 2).join('・'));
+      }
+      return pairs.join('<br>');
+    };
+    const correctLabel = formatCorrectLabel(correctArray, current.all_flag);
+
     if (isCorrect) {
       setQuizState(prev => ({ ...prev, correctCount: prev.correctCount + 1 }));
-      setResultMsg({ text: `⭕ 正解！😄（正解：${correctArray.join("・")}）`, type: "correct" });
+      setResultMsg({ text: `<span style="font-size:1.15em">⭕ 正解！😄</span><br><span style="font-size:0.8em">( 正解：${correctLabel} )</span>`, type: "correct" });
     } else {
-      setResultMsg({ text: `❌ 不正解！😫（正解：${correctArray.join("・")}）`, type: "incorrect" });
+      setResultMsg({ text: `<span style="font-size:1.15em">❌ 不正解！😫</span><br><span style="font-size:0.8em">( 正解：${correctLabel} )</span>`, type: "incorrect" });
     }
     setAnswered(true);
     if (sessionId) {
@@ -913,7 +925,11 @@ function App() {
       {/* --- デバッグパネル (URL: ?debug) --- */}
       {debugMode && (
         <div className="debug-panel">
-          <div className="debug-header">🛠 Debug Mode</div>
+          <button className="debug-toggle-btn" onClick={() => setDebugPanelOpen(p => !p)}>
+            {debugPanelOpen ? '▲ パネルを隠す' : '▼ デバッグパネル'}
+          </button>
+
+          {debugPanelOpen && <><div className="debug-header">🛠 Debug Mode</div>
 
           <div className="debug-section">
             <div className="debug-label">グループ</div>
@@ -978,6 +994,7 @@ function App() {
             }}>▶ このクイズをテスト</button>
             {debugQuizStatus && <div style={{marginTop: '4px', fontSize: '0.65rem', color: '#aaa', wordBreak: 'break-all'}}>{debugQuizStatus}</div>}
           </div>
+          </>}
         </div>
       )}
     </div>

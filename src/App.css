@@ -1188,6 +1188,22 @@ body {
   border: 1px solid #333;
 }
 
+.debug-toggle-btn {
+  display: block;
+  width: 100%;
+  background: #333;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-family: monospace;
+  font-size: 0.75rem;
+  cursor: pointer;
+  margin-bottom: 8px;
+  text-align: center;
+}
+.debug-toggle-btn:hover { background: #444; }
+
 .debug-header {
   font-size: 0.8rem;
   font-weight: bold;
