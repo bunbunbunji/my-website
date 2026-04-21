@@ -446,7 +446,7 @@ function App() {
       fitEl(descTextRef.current, 0.88, 8);
       fitEl(catchText1Ref.current, 0.88, 8);
       fitEl(catchText2Ref.current, 0.88, 8);
-      fitEl(listBtnRef.current, 1.05, 8);
+      fitEl(listBtnRef.current, 0.82, 8);
       fitEl(surveyBtnRef.current, 0.78, 8);
     };
     fitAll();
