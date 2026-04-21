@@ -568,12 +568,16 @@ function App() {
   };
 
   const quizCurr = quizState.quizzes[quizState.currentIndex];
-  const quizPrevLines = quizState.difficulty === 'easy'
-    ? [quizCurr?.lyrics_prev1, quizCurr?.lyrics_prev2].filter(Boolean)
-    : quizState.difficulty === 'normal' ? [quizCurr?.lyrics_prev2].filter(Boolean) : [];
-  const quizNextLines = quizState.difficulty === 'easy'
+  const quizPrevLines = (answered && quizState.difficulty !== 'easy')
+    ? [quizCurr?.lyrics_prev2, quizCurr?.lyrics_prev1].filter(Boolean)
+    : quizState.difficulty === 'easy'
+      ? [quizCurr?.lyrics_prev1, quizCurr?.lyrics_prev2].filter(Boolean)
+      : quizState.difficulty === 'normal' ? [quizCurr?.lyrics_prev2].filter(Boolean) : [];
+  const quizNextLines = (answered && quizState.difficulty !== 'easy')
     ? [quizCurr?.lyrics_next1, quizCurr?.lyrics_next2].filter(Boolean)
-    : quizState.difficulty === 'normal' ? [quizCurr?.lyrics_next1].filter(Boolean) : [];
+    : quizState.difficulty === 'easy'
+      ? [quizCurr?.lyrics_next1, quizCurr?.lyrics_next2].filter(Boolean)
+      : quizState.difficulty === 'normal' ? [quizCurr?.lyrics_next1].filter(Boolean) : [];
   const quizExplanation = (quizCurr?.song_title && quizCurr?.explanation)
     ? `この歌詞は「${quizCurr.song_title}」の\n${quizCurr.explanation}部分でした！` : "";
 
