@@ -569,7 +569,7 @@ function App() {
 
   const quizCurr = quizState.quizzes[quizState.currentIndex];
   const quizPrevLines = (answered && quizState.difficulty !== 'easy')
-    ? [quizCurr?.lyrics_prev2, quizCurr?.lyrics_prev1].filter(Boolean)
+    ? [quizCurr?.lyrics_prev1, quizCurr?.lyrics_prev2].filter(Boolean)
     : quizState.difficulty === 'easy'
       ? [quizCurr?.lyrics_prev1, quizCurr?.lyrics_prev2].filter(Boolean)
       : quizState.difficulty === 'normal' ? [quizCurr?.lyrics_prev2].filter(Boolean) : [];
