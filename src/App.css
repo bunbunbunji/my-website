@@ -292,11 +292,11 @@ body {
 
 .back-btn-group {
   font-family: 'Mochiy Pop One', sans-serif;
-  width: 70%;
-  max-width: 220px;
+  width: 85%;
+  max-width: 280px;
   display: block;
   margin: 20px auto 0;
-  font-size: 1.0rem;
+  font-size: clamp(10px, 3.8vw, 16px);
   padding: 14px 16px;
   background-color: #f0f0f0;
   color: #666;
@@ -315,6 +315,32 @@ body {
 .back-btn-top { width: 85%; max-width: 280px; font-size: clamp(10px, 3.8vw, 16px); }
 
 /* --- 楽曲リスト --- */
+.list-back-btn {
+  display: block;
+  width: 75%;
+  margin-left: auto;
+  margin-right: auto;
+  padding: clamp(4px, 0.8svh, 9px) 12px;
+  margin-top: clamp(4px, 0.8svh, 10px);
+  border-radius: 50px;
+  font-family: 'Mochiy Pop One', sans-serif;
+  font-size: clamp(0.6rem, 3vw, 0.82rem);
+  white-space: nowrap;
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-sizing: border-box;
+  cursor: pointer;
+  position: relative;
+  top: 0;
+  background: #f0f0f0;
+  color: #666;
+  border: 2px solid #ddd;
+  box-shadow: 3px 3px 0px #bbb;
+}
+
+.list-back-btn:hover  { background: #e0e0e0; transform: translateY(-2px); box-shadow: 5px 5px 0px #bbb; }
+.list-back-btn:active { top: 3px; transform: translateY(0) scale(0.98); box-shadow: none; }
+
 .list-container {
   text-align: left;
   max-height: 55vh;
@@ -845,7 +871,7 @@ body {
   font-family: 'Mochiy Pop One', sans-serif;
   display: block;
   margin: 20px auto 0;
-  width: 80%;
+  width: 85%;
   max-width: 280px;
   padding: 14px 16px;
   background-color: #f0f0f0;
@@ -853,7 +879,7 @@ body {
   border: 3px solid #fff;
   border-radius: 50px;
   box-shadow: 3px 3px 0px #bbb;
-  font-size: 0.8rem;
+  font-size: clamp(10px, 3.8vw, 16px);
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
@@ -923,6 +949,21 @@ body {
 
 .legal-links span:hover { color: #888; background: rgba(255, 255, 255, 0.85); }
 
+.survey-corner-link {
+  display: block;
+  font-size: 10px;
+  line-height: 1.6;
+  color: #aaa;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.82);
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.survey-corner-link:hover { color: #888; background: rgba(255, 255, 255, 0.95); }
+
 /* --- 難易度選択 --- */
 .button-row {
   display: flex;
@@ -947,7 +988,7 @@ body {
   width: 70%;
   max-width: 220px;
   padding: 14px 16px;
-  border: 3px solid #fff;
+  border: 3px solid rgba(255,255,255,0.4);
   border-radius: 50px;
   font-size: 1.0rem;
   color: white;

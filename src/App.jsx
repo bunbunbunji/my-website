@@ -110,7 +110,7 @@ function App() {
   const catchText1Ref = useRef(null);
   const catchText2Ref = useRef(null);
   const listBtnRef = useRef(null);
-  const surveyBtnRef = useRef(null);
+
 
   const debugMode = new URLSearchParams(window.location.search).has('debug');
   const [debugScore, setDebugScore] = useState(0);
@@ -447,7 +447,7 @@ function App() {
       fitEl(catchText1Ref.current, 0.88, 8);
       fitEl(catchText2Ref.current, 0.88, 8);
       fitEl(listBtnRef.current, 0.82, 8);
-      fitEl(surveyBtnRef.current, 0.78, 8);
+
     };
     fitAll();
     document.fonts.ready.then(fitAll);
@@ -593,6 +593,9 @@ function App() {
             setScreen('top');
           }}>🏠 トップにもどる</span>
         )}
+        {screen === 'top' && (
+          <a href="https://forms.gle/EguRX6uWZYmJJLZx5" target="_blank" rel="noreferrer" className="survey-corner-link">アンケートにご協力ください</a>
+        )}
       </div>
       <div className="legal-links">
         <span onClick={() => setShowPolicy(true)}>プライバシーポリシー</span>
@@ -620,9 +623,6 @@ function App() {
             <button ref={listBtnRef} className="sub-btn list-btn" onClick={fetchSongList}>
               🎵 出題楽曲リスト 🎵
             </button>
-            <a ref={surveyBtnRef} href="https://forms.gle/EguRX6uWZYmJJLZx5" target="_blank" className="sub-btn survey-btn">
-              アンケート協力にご協力ください
-            </a>
           </div>
         </div>
       )}
@@ -655,7 +655,7 @@ function App() {
               ))}
             </div>
           )}
-          <button className="sub-btn" onClick={() => setScreen('top')}>戻る</button>
+          <button className="list-back-btn" onClick={() => setScreen('top')}>戻る</button>
         </div>
       )}
 
