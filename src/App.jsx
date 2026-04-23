@@ -4,6 +4,10 @@ import confetti from 'canvas-confetti'
 import './App.css'
 import logo from './assets/logo.png'
 
+// ===== 機能の一時無効化フラグ（true=無効, false=有効） =====
+const DISABLE_SHARE = true;
+const DISABLE_SURVEY = true;
+
 // ===== Supabase 設定 =====
 const supabaseUrl = "https://atinpqtedmrfrtdlkpkd.supabase.co";
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0aW5wcXRlZG1yZnJ0ZGxrcGtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwOTU0NjcsImV4cCI6MjA4NDY3MTQ2N30.Oor6oUuuIxa0pSxIRuwEw7ZzGYM4hOGfywHqv2FaBHg";
@@ -502,7 +506,7 @@ function App() {
       }
     };
     const fitAll = () => {
-      fitText(lyricsRef.current, 1.4, 10);
+      fitText(lyricsRef.current, 1.4, 8);
       fitText(hintPrevRef.current, 0.62, 7);
       fitText(hintNextRef.current, 0.62, 7);
     };
@@ -672,7 +676,7 @@ function App() {
           }}>🏠 トップにもどる</span>
         )}
         {(screen === 'top' || screen === 'result') && (
-          <a href="https://forms.gle/EguRX6uWZYmJJLZx5" target="_blank" rel="noreferrer" className="survey-corner-link">アンケートにご協力ください</a>
+          <a href={DISABLE_SURVEY ? undefined : "https://forms.gle/EguRX6uWZYmJJLZx5"} target="_blank" rel="noreferrer" className="survey-corner-link" style={DISABLE_SURVEY ? {pointerEvents:'none', opacity:0.5} : {}}>アンケートにご協力ください</a>
         )}
       </div>
       <div className="legal-links">
@@ -905,7 +909,7 @@ function App() {
           </div>
 
           <div className="result-buttons">
-            <button className="share-btn" onClick={shareOnX}>
+            <button className="share-btn" onClick={DISABLE_SHARE ? undefined : shareOnX} disabled={DISABLE_SHARE}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{marginRight: '8px'}}>
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
               </svg>

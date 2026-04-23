@@ -867,8 +867,10 @@ body {
 
 .result-buttons .share-btn { background: #000; color: #fff; border: none; box-shadow: 0 4px 0 #888; position: relative; top: -4px; }
 .result-buttons .share-btn:active { top: 0; box-shadow: none; }
-.result-btn-row .retry-btn { background: #ff69b2; color: #fff; border: none; box-shadow: 0 4px 0 #d81b60; }
-.result-btn-row .group-btn { background: #fff; color: #ff69b2; border: 2px solid #ffb6c1; box-shadow: 0 4px 0 #ffb6c1; }
+.result-btn-row .retry-btn { background: #ff69b2; color: #fff; border: none; box-shadow: 0 4px 0 #d81b60; position: relative; top: -4px; }
+.result-btn-row .retry-btn:active { top: 0; box-shadow: none; }
+.result-btn-row .group-btn { background: #fff; color: #ff69b2; border: 2px solid #ffb6c1; box-shadow: 0 4px 0 #ffb6c1; position: relative; top: -4px; }
+.result-btn-row .group-btn:active { top: 0; box-shadow: none; }
 
 .result-back-link {
   background: none;
