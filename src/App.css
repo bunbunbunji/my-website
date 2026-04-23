@@ -209,9 +209,45 @@ body {
   transition: transform 0.08s, box-shadow 0.08s;
 }
 
+.start-btn-list {
+  background: #fffde7;
+  color: #c17900;
+  border: 2px solid #f9a825;
+  margin-top: clamp(15px, 2svh, 20px);
+  padding: clamp(1px, 1.5svh, 5px) 8px;
+  border-radius: 50px;
+  font-size: clamp(0.10rem, min(5vw, 4svh), 0.7rem);
+  white-space: nowrap;
+  font-family: 'Mochiy Pop One', sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  width: 50%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0 4px 0 #c17900;
+  position: relative;
+  top: 0;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  margin-bottom: clamp(8px, 1.5svh, 22px);
+}
+
+.start-btn-list:hover {
+  background: #fff59d;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 #c17900;
+}
+
+.start-btn-list:active {
+  top: 4px;
+  box-shadow: none;
+  transform: translateY(0);
+}
+
 .sub-btn {
   display: block;
-  width: 75%;
+  width: 50%;
   margin-left: auto;
   margin-right: auto;
   padding: clamp(4px, 0.8svh, 9px) 12px;
@@ -230,10 +266,11 @@ body {
 }
 
 .list-btn {
-  background: #fff0f5;
-  color: var(--primary);
-  border: 2px solid var(--primary);
-  box-shadow: 3px 3px 0px #e8569a;
+  background: #fffde7;
+  color: #c17900;
+  border: 2px solid #f9a825;
+  box-shadow: 3px 3px 0px #c17900;
+  margin-top: clamp(14px, 2.5svh, 28px);
 }
 .survey-btn {
   text-align: center;
@@ -244,7 +281,7 @@ body {
   padding-top: 7px;
   padding-bottom: 7px;
 }
-.list-btn:hover   { background: #ffd6e7; transform: translateY(-2px); box-shadow: 5px 5px 0px #e8569a; }
+.list-btn:hover   { background: #fff59d; transform: translateY(-2px); box-shadow: 5px 5px 0px #c17900; }
 .survey-btn:hover { background: #b2dfdb; transform: translateY(-2px); box-shadow: 5px 5px 0px #00695c; }
 .sub-btn:active   { top: 3px; transform: translateY(0) scale(0.98); box-shadow: none !important; }
 
@@ -982,6 +1019,23 @@ body {
   padding-left: 28px;
   box-sizing: border-box;
 }
+
+.selected-group-badge {
+  display: inline-block;
+  font-family: 'Mochiy Pop One', sans-serif;
+  font-size: clamp(0.65rem, 3vw, 0.85rem);
+  color: #fff;
+  padding: 4px 16px;
+  border-radius: 50px;
+  margin-bottom: clamp(6px, 1.2svh, 12px);
+  letter-spacing: 0.06em;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.15);
+}
+.selected-group-badge--fz { background: #ff8a65; }
+.selected-group-badge--cd { background: #00838f; }
+.selected-group-badge--ss { background: #ba68c8; }
+.selected-group-badge--cs { background: #ff007f; }
+.selected-group-badge--ms { background: #7e57c2; }
 
 .diff-btn {
   font-family: 'Mochiy Pop One', sans-serif;

@@ -471,7 +471,7 @@ function App() {
     };
     fitAll();
     document.fonts.ready.then(fitAll);
-  }, [quizState.currentIndex, quizState.quizzes]);
+  }, [screen, quizState.currentIndex, quizState.quizzes]);
 
   useEffect(() => {
     if (!songModalData.length) return;
@@ -620,8 +620,8 @@ function App() {
             <button className="start-btn-sparkle" onClick={() => pendingResume ? setShowResumeModal(true) : setScreen('group')}>
               <span className="btn-inner">検定開始！</span>
             </button>
-            <button ref={listBtnRef} className="sub-btn list-btn" onClick={fetchSongList}>
-              🎵 出題楽曲リスト 🎵
+            <button className="start-btn-list" onClick={fetchSongList}>
+              <span className="btn-inner">♫楽曲リスト♫</span>
             </button>
           </div>
         </div>
@@ -675,6 +675,7 @@ function App() {
       {/* --- 難易度選択 --- */}
       {screen === 'difficulty' && (
         <div className="box difficulty-card zoom-in">
+          <div className={`selected-group-badge selected-group-badge--${{ 'FRUITS ZIPPER': 'fz', 'CANDY TUNE': 'cd', 'SWEET STEADY': 'ss', 'CUTIE STREET': 'cs', 'MORE STAR': 'ms' }[quizState.group] || 'fz'}`}>{quizState.group}</div>
           <h2 className="title">難易度を選択しましょう！</h2>
           <div className="button-row">
             {['easy', 'normal', 'hard', 'expert'].map(level => (
