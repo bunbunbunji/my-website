@@ -89,6 +89,7 @@ function App() {
   const [pendingResume, setPendingResume] = useState(null);
   const [isResumingSession, setIsResumingSession] = useState(false);
   const [showResumeModal, setShowResumeModal] = useState(false);
+  const [resumeModalSource, setResumeModalSource] = useState('group');
 
   const openSongModal = async (title, groupName) => {
     setSongModal({ title, groupName });
@@ -694,10 +695,10 @@ function App() {
           <p ref={catchText2Ref} className="catch-text">✨たくさん正解して推しへの愛を証明しよう！✨</p>
 
           <div className="top-buttons">
-            <button className="start-btn-sparkle" onClick={() => pendingResume ? setShowResumeModal(true) : setScreen('group')}>
+            <button className="start-btn-sparkle" onClick={() => pendingResume ? (setResumeModalSource('group'), setShowResumeModal(true)) : setScreen('group')}>
               <span className="btn-inner">検定開始！</span>
             </button>
-            <button className="start-btn-list" onClick={() => pendingResume ? setShowResumeModal(true) : fetchSongList()}>
+            <button className="start-btn-list" onClick={() => pendingResume ? (setResumeModalSource('songlist'), setShowResumeModal(true)) : fetchSongList()}>
               <span className="btn-inner">♫楽曲リスト♫</span>
             </button>
           </div>
@@ -977,7 +978,7 @@ function App() {
               {isResumingSession ? '読み込み中…' : '▶ 続きから始める'}
             </button>
             <br />
-            <button className="resume-discard-btn" style={{marginTop: '12px'}} onClick={() => { closeResumeModal(); discardSession(); setScreen('group'); }}>
+            <button className="resume-discard-btn" style={{marginTop: '12px'}} onClick={() => { closeResumeModal(); discardSession(); if (resumeModalSource === 'songlist') { fetchSongList(); } else { setScreen('group'); } }}>
               クイズのセッションをリセットする
             </button>
           </div>
