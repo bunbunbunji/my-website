@@ -697,7 +697,15 @@ body {
 @keyframes zoomInCentered { from { transform: translate(-50%, -50%) scale(0.9); opacity: 0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
 
 /* --- リザルト画面 --- */
-.result-label { color: #888; font-size: 0.9rem; margin-bottom: 5px; }
+.result-label { color: #aaa; font-size: 0.8rem; margin-bottom: 8px; letter-spacing: 0.05em; }
+
+.result-hero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin: 4px 0 12px;
+}
 
 .drumroll-overlay {
   position: fixed;
@@ -746,9 +754,16 @@ body {
   font-family: 'Mochiy Pop One', sans-serif;
   font-size: 1.8rem;
   color: #ff69b2;
-  margin: 15px 0;
+  margin: 0;
+  white-space: nowrap;
   text-shadow: 2px 2px 0 #fff;
 }
+
+.rank-display--perfect { color: #f9a825; text-shadow: 2px 2px 0 #fff, 0 0 12px rgba(249,168,37,0.4); }
+.rank-display--high    { color: #00acc1; text-shadow: 2px 2px 0 #fff; }
+.rank-display--mid     { color: #7e57c2; text-shadow: 2px 2px 0 #fff; }
+.rank-display--low     { color: #ff7043; text-shadow: 2px 2px 0 #fff; }
+.rank-display--zero    { color: #9e9e9e; text-shadow: 2px 2px 0 #fff; }
 
 .rank-display.genius {
   animation: geniusRainbow 0.6s ease-in-out infinite;
@@ -765,23 +780,36 @@ body {
 }
 
 .score-circle {
-  width: 110px;
-  height: 110px;
-  border: 6px solid #ff69b2;
+  width: 100px;
+  height: 100px;
+  border: 5px solid #ff69b2;
   border-radius: 50%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 15px auto;
+  margin: 0;
   background: #fff;
-  box-shadow: 0 5px 15px rgba(255, 105, 178, 0.2);
+  box-shadow: 0 4px 12px rgba(255, 105, 178, 0.2);
+  flex-shrink: 0;
 }
+
+.score-circle--perfect { border-color: #f9a825; box-shadow: 0 4px 14px rgba(249,168,37,0.35); }
+.score-circle--high    { border-color: #00acc1; box-shadow: 0 4px 14px rgba(0,172,193,0.3); }
+.score-circle--mid     { border-color: #7e57c2; box-shadow: 0 4px 14px rgba(126,87,194,0.3); }
+.score-circle--low     { border-color: #ff7043; box-shadow: 0 4px 14px rgba(255,112,67,0.3); }
+.score-circle--zero    { border-color: #9e9e9e; box-shadow: 0 4px 14px rgba(158,158,158,0.2); }
+
+.score-circle--perfect .score-num { color: #f9a825; }
+.score-circle--high    .score-num { color: #00acc1; }
+.score-circle--mid     .score-num { color: #7e57c2; }
+.score-circle--low     .score-num { color: #ff7043; }
+.score-circle--zero    .score-num { color: #9e9e9e; }
 
 .score-num { font-size: 2.2rem; font-weight: 900; color: #ff69b2; line-height: 1; }
 .score-unit { font-size: 0.85rem; color: #aaa; margin-top: 4px; }
 
-.info-badges { margin-bottom: 15px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.info-badges { margin-bottom: 14px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
 .badge { background: #fdfdfd; border: 1px solid #ffb6c1; color: #ff69b2; padding: 4px 12px; border-radius: 15px; font-size: 0.75rem; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 
 .message-area { container-type: inline-size; overflow: hidden; }
@@ -793,11 +821,10 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  margin-top: 15px;
+  margin-top: 16px;
 }
 
-.result-buttons button,
-.result-buttons .survey-btn {
+.result-buttons button {
   font-family: 'Mochiy Pop One', sans-serif;
   width: 85%;
   max-width: 260px;
@@ -815,12 +842,49 @@ body {
   margin: 0;
 }
 
+.result-btn-row {
+  display: flex;
+  gap: 8px;
+  width: 85%;
+  max-width: 260px;
+}
+
+.result-btn-row button {
+  font-family: 'Mochiy Pop One', sans-serif;
+  flex: 1;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  font-weight: bold;
+  border-radius: 25px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin: 0;
+}
+
 .result-buttons .share-btn { background: #000; color: #fff; border: none; box-shadow: 0 4px 0 #888; position: relative; top: -4px; }
 .result-buttons .share-btn:active { top: 0; box-shadow: none; }
-.result-buttons .retry-btn { background: #ff69b2; color: #fff; border: none; box-shadow: 0 4px 0 #d81b60; }
-.result-buttons .group-btn { background: #fff; color: #ff69b2; border: 2px solid #ffb6c1; box-shadow: 0 4px 0 #ffb6c1; }
-.result-buttons .survey-btn { background: #fff; color: #ff69b2; border: 2px solid #ffb6c1; box-shadow: 0 4px 0 #ffb6c1; }
-.result-buttons .back-btn { background: #ccc; color: #fff; border: none; box-shadow: 0 4px 0 #999; }
+.result-btn-row .retry-btn { background: #ff69b2; color: #fff; border: none; box-shadow: 0 4px 0 #d81b60; }
+.result-btn-row .group-btn { background: #fff; color: #ff69b2; border: 2px solid #ffb6c1; box-shadow: 0 4px 0 #ffb6c1; }
+
+.result-back-link {
+  background: none;
+  border: none;
+  color: #bbb;
+  font-size: 0.78rem;
+  font-family: 'Mochiy Pop One', sans-serif;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 4px 8px;
+  margin-top: 2px;
+  transition: color 0.2s;
+  width: auto !important;
+  height: auto !important;
+  box-shadow: none !important;
+}
 
 .back-btn-minimal {
   background: none;
@@ -829,6 +893,69 @@ body {
   text-decoration: underline;
   margin-top: 15px;
   cursor: pointer;
+}
+
+/* --- アクセスゲート --- */
+.access-gate-box {
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.access-gate-title {
+  font-family: 'Mochiy Pop One', sans-serif;
+  font-size: 0.95rem;
+  color: #888;
+  margin: 0;
+}
+
+.access-gate-input {
+  width: 100%;
+  max-width: 240px;
+  padding: 10px 16px;
+  border: 2px solid #ffb6c1;
+  border-radius: 25px;
+  font-size: 1rem;
+  text-align: center;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+  letter-spacing: 0.1em;
+}
+
+.access-gate-input:focus {
+  border-color: #ff69b2;
+  box-shadow: 0 0 0 3px rgba(255,105,178,0.15);
+}
+
+.access-gate-btn {
+  font-family: 'Mochiy Pop One', sans-serif;
+  background: #ff69b2;
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 40px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #d81b60;
+  transition: all 0.15s;
+  position: relative;
+  top: 0;
+}
+
+.access-gate-btn:active {
+  top: 4px;
+  box-shadow: none;
+}
+
+.access-gate-error {
+  font-family: 'Mochiy Pop One', sans-serif;
+  color: #e53935;
+  font-size: 0.85rem;
+  margin: 0;
+  animation: fadeIn 0.2s ease-out;
 }
 
 /* --- 確認画面 --- */
@@ -1037,7 +1164,7 @@ body {
   text-decoration: underline;
   cursor: pointer;
   padding: 3px 8px;
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.6);
   border-radius: 4px;
   white-space: nowrap;
 }

@@ -27,7 +27,24 @@ const superNormalize = (str) => {
 };
 
 function App() {
-  const [screen, setScreen] = useState('top'); 
+  const [accessGranted, setAccessGranted] = useState(() =>
+    localStorage.getItem('kawaii_access') === import.meta.env.VITE_ACCESS_CODE
+  );
+  const [accessInput, setAccessInput] = useState('');
+  const [accessError, setAccessError] = useState(false);
+
+  const handleAccessSubmit = () => {
+    if (accessInput === import.meta.env.VITE_ACCESS_CODE) {
+      localStorage.setItem('kawaii_access', import.meta.env.VITE_ACCESS_CODE);
+      setAccessGranted(true);
+    } else {
+      setAccessError(true);
+      setAccessInput('');
+      setTimeout(() => setAccessError(false), 1800);
+    }
+  };
+
+  const [screen, setScreen] = useState('top');
   const [showPolicy, setShowPolicy] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [closingPolicy, setClosingPolicy] = useState(false);
@@ -37,8 +54,12 @@ function App() {
   const closeProfile = () => { setClosingProfile(true); setTimeout(() => { setShowProfile(false); setClosingProfile(false); }, 220); };
   const [infoLevel, setInfoLevel] = useState(null);
   const [closingInfo, setClosingInfo] = useState(false);
+  const [closingResumeModal, setClosingResumeModal] = useState(false);
+  const [closingSongModal, setClosingSongModal] = useState(false);
 
   const closeInfo = () => { setClosingInfo(true); setTimeout(() => { setInfoLevel(null); setClosingInfo(false); }, 220); };
+  const closeResumeModal = () => { setClosingResumeModal(true); setTimeout(() => { setShowResumeModal(false); setClosingResumeModal(false); }, 220); };
+  const closeSongModal = () => { setClosingSongModal(true); setTimeout(() => { setSongModal(null); setClosingSongModal(false); }, 220); };
 
   const [quizState, setQuizState] = useState({
     group: null,
@@ -107,6 +128,7 @@ function App() {
   const hintPrevRef = useRef(null);
   const hintNextRef = useRef(null);
   const commentRef = useRef(null);
+  const rankRef = useRef(null);
   const descTextRef = useRef(null);
   const catchText1Ref = useRef(null);
   const catchText2Ref = useRef(null);
@@ -550,6 +572,17 @@ function App() {
   }, [answered]);
 
   useLayoutEffect(() => {
+    if (screen !== 'result' || resultPhase !== 'reveal') return;
+    const el = rankRef.current;
+    if (!el) return;
+    el.style.fontSize = '1.8rem';
+    if (el.scrollWidth > el.clientWidth) {
+      const ratio = el.clientWidth / el.scrollWidth;
+      el.style.fontSize = Math.max(1.8 * ratio * 0.95, 0.9) + 'rem';
+    }
+  }, [screen, resultPhase, quizState.correctCount]);
+
+  useLayoutEffect(() => {
     if (screen !== 'result') return;
     const el = commentRef.current;
     if (!el) return;
@@ -558,7 +591,7 @@ function App() {
       const ratio = el.clientWidth / el.scrollWidth;
       el.style.fontSize = Math.max(1.1 * ratio * 0.95, 0.6) + 'rem';
     }
-  }, [screen, quizState.correctCount, quizState.difficulty]);
+  }, [screen, resultPhase, quizState.correctCount, quizState.difficulty]);
 
   const getRank = (score) => {
     if (score === 10) return "🌟神推し級🌟";
@@ -566,6 +599,14 @@ function App() {
     if (score >= 4) return "🥈ファン級";
     if (score >= 1) return "🥉ビギナー級";
     return "💩オワコン級";
+  };
+
+  const getRankTier = (score) => {
+    if (score === 10) return 'perfect';
+    if (score >= 7) return 'high';
+    if (score >= 4) return 'mid';
+    if (score >= 1) return 'low';
+    return 'zero';
   };
 
   const shareOnX = () => {
@@ -595,10 +636,32 @@ function App() {
   const quizExplanation = (quizCurr?.song_title && quizCurr?.explanation)
     ? `この歌詞は「${quizCurr.song_title}」の\n${quizCurr.explanation}部分でした！` : "";
 
+  if (!accessGranted) {
+    return (
+      <div className="app-root">
+        <div className="box access-gate-box fade-in">
+          <img src={logo} alt="KAWAII LAB検定" className="site-logo" style={{marginBottom: '16px'}} />
+          <p className="access-gate-title">アクセスコードを入力してください</p>
+          <input
+            className="access-gate-input"
+            type="password"
+            value={accessInput}
+            onChange={e => setAccessInput(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleAccessSubmit()}
+            placeholder="アクセスコード"
+            autoFocus
+          />
+          <button className="access-gate-btn" onClick={handleAccessSubmit}>確認</button>
+          {accessError && <p className="access-gate-error">コードが違います</p>}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="app-root" onClick={() => setInfoLevel(null)}>
       <div className="global-footer-link">
-        {screen !== 'top' && (
+        {screen !== 'top' && screen !== 'result' && (
           <span onClick={async () => {
             if (sessionId) {
               const { data } = await supabase.from('sessions').select('*').eq('session_id', sessionId).maybeSingle();
@@ -607,7 +670,7 @@ function App() {
             setScreen('top');
           }}>🏠 トップにもどる</span>
         )}
-        {screen === 'top' && (
+        {(screen === 'top' || screen === 'result') && (
           <a href="https://forms.gle/EguRX6uWZYmJJLZx5" target="_blank" rel="noreferrer" className="survey-corner-link">アンケートにご協力ください</a>
         )}
       </div>
@@ -822,10 +885,10 @@ function App() {
       {screen === 'result' && resultPhase === 'reveal' && (
         <div className="box result-box zoom-in">
           <p className="result-label">あなたの検定結果は…</p>
-          <h2 className={`rank-display${quizState.difficulty === 'expert' && quizState.correctCount === 10 ? ' genius' : ''}`}>{getRank(quizState.correctCount)}</h2>
 
-          <div className="score-container">
-            <div className="score-circle">
+          <div className="result-hero">
+            <h2 ref={rankRef} className={`rank-display rank-display--${getRankTier(quizState.correctCount)}${quizState.difficulty === 'expert' && quizState.correctCount === 10 ? ' genius' : ''}`}>{getRank(quizState.correctCount)}</h2>
+            <div className={`score-circle score-circle--${getRankTier(quizState.correctCount)}`}>
               <span className="score-num">{displayScore}</span>
               <span className="score-unit">/ 10 問</span>
             </div>
@@ -847,25 +910,26 @@ function App() {
               </svg>
               結果をXでつぶやく
             </button>
-            <button className="retry-btn" onClick={() => { setScreen('confirm'); prepareQuiz(quizState.group, quizState.difficulty); setAnswered(false); setQuizState(p=>({...p, correctCount:0, currentIndex:0})); setSelectedMembers(new Set()); }}>もう一回やる</button>
-            <button className="group-btn" onClick={() => setScreen('group')}>グループ選択に戻る</button>
-            <a href="https://forms.gle/EguRX6uWZYmJJLZx5" target="_blank" className="survey-btn">アンケートにご協力ください</a>
-            <button className="back-btn" onClick={() => setScreen('top')}>トップに戻る</button>
+            <div className="result-btn-row">
+              <button className="retry-btn" onClick={() => { setScreen('confirm'); prepareQuiz(quizState.group, quizState.difficulty); setAnswered(false); setQuizState(p=>({...p, correctCount:0, currentIndex:0})); setSelectedMembers(new Set()); }}>もう一回やる</button>
+              <button className="group-btn" onClick={() => setScreen('group')}>グループ選択</button>
+            </div>
+            <button className="result-back-link" onClick={() => setScreen('top')}>トップに戻る</button>
           </div>
         </div>
       )}
 
       {/* --- 楽曲歌詞モーダル --- */}
-      {songModal && (() => {
+      {(songModal || closingSongModal) && (() => {
         const memberLookup = {};
         songModalMembers.forEach(m => {
           memberLookup[m.name] = { lastName: m.Last_name, color: memberColorCSS[m.color] || '#333' };
         });
         return (
-          <div className="modal-overlay" onClick={() => setSongModal(null)}>
+          <div className={`modal-overlay${closingSongModal ? ' closing' : ''}`} onClick={closeSongModal}>
             <div className="modal-content song-lyrics-modal" onClick={e => e.stopPropagation()}>
-              <h2>{songModal.title}</h2>
-              <div className="song-modal-group-badge">{songModal.groupName}</div>
+              <h2>{songModal?.title}</h2>
+              <div className="song-modal-group-badge">{songModal?.groupName}</div>
               {isLoadingSongModal ? (
                 <div className="song-modal-loading">データを取得中...</div>
               ) : songModalData.length === 0 ? (
@@ -896,24 +960,24 @@ function App() {
                   })}
                 </div>
               )}
-              <button className="modal-close-btn" onClick={() => setSongModal(null)}>とじる</button>
+              <button className="modal-close-btn" onClick={closeSongModal}>とじる</button>
             </div>
           </div>
         );
       })()}
 
       {/* --- セッション再開モーダル --- */}
-      {showResumeModal && pendingResume && (
-        <div className="modal-overlay" onClick={() => setShowResumeModal(false)}>
+      {(showResumeModal || closingResumeModal) && pendingResume && (
+        <div className={`modal-overlay${closingResumeModal ? ' closing' : ''}`} onClick={closeResumeModal}>
           <div className="modal-content" onClick={e => e.stopPropagation()} style={{textAlign: 'center'}}>
             <h2>📖 途中のクイズが見つかりました</h2>
             <p style={{marginBottom: '6px'}}>{pendingResume.group_name}・{difficultyLabel[pendingResume.difficulty]}</p>
             <p style={{marginBottom: '20px'}}>{pendingResume.current_step}問目から再開できます</p>
-            <button className="resume-continue-btn" onClick={() => { setShowResumeModal(false); resumeQuiz(); }} disabled={isResumingSession}>
+            <button className="resume-continue-btn" onClick={() => { closeResumeModal(); resumeQuiz(); }} disabled={isResumingSession}>
               {isResumingSession ? '読み込み中…' : '▶ 続きから始める'}
             </button>
             <br />
-            <button className="resume-discard-btn" style={{marginTop: '12px'}} onClick={() => { setShowResumeModal(false); discardSession(); setScreen('group'); }}>
+            <button className="resume-discard-btn" style={{marginTop: '12px'}} onClick={() => { closeResumeModal(); discardSession(); setScreen('group'); }}>
               クイズのセッションをリセットする
             </button>
           </div>
