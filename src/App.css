@@ -298,7 +298,7 @@ body {
   margin: 12px auto;
   font-size: clamp(10px, 3.8vw, 16px);
   padding: 14px 16px;
-  border: 3px solid #fff;
+  border: 3px solid rgba(255,255,255,0.4);
   border-radius: 50px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -318,8 +318,8 @@ body {
 .group-btn-cd { background-color: #00838f; box-shadow: 3px 3px 0px #006064; }
 .group-btn-cd:hover { box-shadow: 5px 5px 0px #006064; }
 
-.group-btn-ss { background-color: #e1bee7; color: #6a1b9a; box-shadow: 3px 3px 0px #ba68c8; }
-.group-btn-ss:hover { box-shadow: 5px 5px 0px #ba68c8; }
+.group-btn-ss { background-color: #e1bee7; color: #6a1b9a; box-shadow: 3px 3px 0px #ce93d8; }
+.group-btn-ss:hover { box-shadow: 5px 5px 0px #ce93d8; }
 
 .group-btn-cs { background-color: #ff007f; box-shadow: 3px 3px 0px #c2185b; }
 .group-btn-cs:hover { box-shadow: 5px 5px 0px #c2185b; }
@@ -699,6 +699,49 @@ body {
 /* --- リザルト画面 --- */
 .result-label { color: #888; font-size: 0.9rem; margin-bottom: 5px; }
 
+.drumroll-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.78);
+  z-index: 8000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.drumroll-announce {
+  font-family: 'Mochiy Pop One', sans-serif;
+  font-size: clamp(1.4rem, 6vw, 2.2rem);
+  color: #fff;
+  letter-spacing: 0.12em;
+  text-shadow: 0 0 24px rgba(255, 105, 180, 0.9);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.drumroll-circle {
+  width: 160px !important;
+  height: 160px !important;
+  background: #111 !important;
+  border: 5px solid #ff69b2 !important;
+  box-shadow: 0 0 30px rgba(255, 105, 180, 0.7), 0 0 60px rgba(255, 105, 180, 0.3) !important;
+  animation: drumrollPulse 0.18s ease-in-out infinite alternate, fadeIn 0.3s ease-out !important;
+}
+
+.drumroll-circle .score-num {
+  font-size: 3rem !important;
+  color: #ff69b2 !important;
+  text-shadow: 0 0 16px rgba(255, 105, 180, 0.9) !important;
+}
+
+.drumroll-circle .score-unit { color: #aaa !important; }
+
+@keyframes drumrollPulse {
+  from { transform: scale(1);    box-shadow: 0 0 20px rgba(255,105,180,0.5), 0 0 40px rgba(255,105,180,0.2); }
+  to   { transform: scale(1.05); box-shadow: 0 0 40px rgba(255,105,180,0.9), 0 0 80px rgba(255,105,180,0.4); }
+}
+
 .rank-display {
   font-family: 'Mochiy Pop One', sans-serif;
   font-size: 1.8rem;
@@ -1033,7 +1076,7 @@ body {
 }
 .selected-group-badge--fz { background: #ff8a65; }
 .selected-group-badge--cd { background: #00838f; }
-.selected-group-badge--ss { background: #ba68c8; }
+.selected-group-badge--ss { background: #e1bee7; color: #6a1b9a; }
 .selected-group-badge--cs { background: #ff007f; }
 .selected-group-badge--ms { background: #7e57c2; }
 

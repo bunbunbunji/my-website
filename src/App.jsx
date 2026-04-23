@@ -55,6 +55,7 @@ function App() {
   const [answered, setAnswered] = useState(false);
   const [resultMsg, setResultMsg] = useState({ text: "", type: "" });
   const [displayScore, setDisplayScore] = useState(0);
+  const [resultPhase, setResultPhase] = useState('idle');
 
   const [songListData, setSongListData] = useState([]);
   const [isLoadingList, setIsLoadingList] = useState(false);
@@ -376,32 +377,25 @@ function App() {
 
   useEffect(() => {
     if (screen === 'result') {
-      let start = 0;
+      setDisplayScore(0);
+      setResultPhase('announce');
       const target = quizState.correctCount;
-      if (target > 0) {
-        const timer = setInterval(() => {
-          if (start >= target) clearInterval(timer);
-          else { start++; setDisplayScore(start); }
-        }, 100);
-      }
-      if (target === 10) {
+
+      const fireConfetti = () => {
+        if (target !== 10) return;
         if (quizState.difficulty === 'expert') {
           const colors = ['#ff69b2', '#ffb6c1', '#ffbe0b', '#4ecdc4', '#ffffff', '#ff006e', '#8338ec'];
-          // 中央ど派手バースト
           confetti({ particleCount: 350, spread: 120, startVelocity: 65, origin: { x: 0.5, y: 0.55 }, colors, shapes: ['star', 'circle', 'square'], scalar: 1.3 });
-          // 左右キャノン
           setTimeout(() => {
             confetti({ particleCount: 250, angle: 60, spread: 60, startVelocity: 70, origin: { x: 0, y: 0.6 }, colors });
             confetti({ particleCount: 250, angle: 120, spread: 60, startVelocity: 70, origin: { x: 1, y: 0.6 }, colors });
           }, 350);
-          // 連続雨
           let rain = 0;
           const rainTimer = setInterval(() => {
             confetti({ particleCount: 60, angle: 70, spread: 50, origin: { x: 0, y: 0.2 }, colors, gravity: 0.8 });
             confetti({ particleCount: 60, angle: 110, spread: 50, origin: { x: 1, y: 0.2 }, colors, gravity: 0.8 });
             if (++rain >= 10) clearInterval(rainTimer);
           }, 350);
-          // 花火フィナーレ
           const spots = [[0.2, 0.3], [0.8, 0.3], [0.5, 0.4], [0.15, 0.6], [0.85, 0.6], [0.5, 0.7]];
           spots.forEach(([x, y], i) => {
             setTimeout(() => {
@@ -411,9 +405,29 @@ function App() {
         } else {
           confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#ff69b2', '#ffb6c1', '#ffffff', '#4ecdc4'] });
         }
-      }
+      };
+
+      const announceTimer = setTimeout(() => {
+        setResultPhase('drumroll');
+        if (target > 0) {
+          let start = 0;
+          const timer = setInterval(() => {
+            start++;
+            setDisplayScore(start);
+            if (start >= target) {
+              clearInterval(timer);
+              setTimeout(() => { setResultPhase('reveal'); fireConfetti(); }, 400);
+            }
+          }, 100);
+        } else {
+          setTimeout(() => { setResultPhase('reveal'); }, 600);
+        }
+      }, 1000);
+
+      return () => clearTimeout(announceTimer);
     }
     if (screen === 'quiz') {
+      setResultPhase('idle');
       setResultMsg({ text: "", type: "" });
       setAnswered(false);
     }
@@ -620,7 +634,7 @@ function App() {
             <button className="start-btn-sparkle" onClick={() => pendingResume ? setShowResumeModal(true) : setScreen('group')}>
               <span className="btn-inner">検定開始！</span>
             </button>
-            <button className="start-btn-list" onClick={fetchSongList}>
+            <button className="start-btn-list" onClick={() => pendingResume ? setShowResumeModal(true) : fetchSongList()}>
               <span className="btn-inner">♫楽曲リスト♫</span>
             </button>
           </div>
@@ -790,8 +804,22 @@ function App() {
         </div>
       )}
 
+      {/* --- ドラムロールオーバーレイ --- */}
+      {screen === 'result' && (resultPhase === 'announce' || resultPhase === 'drumroll') && (
+        <div className="drumroll-overlay">
+          {resultPhase === 'announce' ? (
+            <p className="drumroll-announce">あなたの得点は…</p>
+          ) : (
+            <div className="score-circle drumroll-circle">
+              <span className="score-num">{displayScore}</span>
+              <span className="score-unit">/ 10 問</span>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* --- リザルト画面 --- */}
-      {screen === 'result' && (
+      {screen === 'result' && resultPhase === 'reveal' && (
         <div className="box result-box zoom-in">
           <p className="result-label">あなたの検定結果は…</p>
           <h2 className={`rank-display${quizState.difficulty === 'expert' && quizState.correctCount === 10 ? ' genius' : ''}`}>{getRank(quizState.correctCount)}</h2>
@@ -886,7 +914,7 @@ function App() {
             </button>
             <br />
             <button className="resume-discard-btn" style={{marginTop: '12px'}} onClick={() => { setShowResumeModal(false); discardSession(); setScreen('group'); }}>
-              はじめからやり直す
+              クイズのセッションをリセットする
             </button>
           </div>
         </div>
@@ -916,7 +944,7 @@ function App() {
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <h2>運営者情報</h2>
             <h3>運営者</h3>
-            <p>鈴木バンバンビガロ</p>
+            <p>むちゅむちゅおゆい</p>
             <h3>サイトの目的</h3>
             <p>KAWAII LAB.のグループの楽曲や歌割りをより深く楽しむためのファンサイトです。</p>
             <h3>お問い合わせ</h3>
