@@ -642,8 +642,8 @@ function App() {
   const sn = quizCurr?.surroundNext || [];
   const quizPrevLines = showFull ? sp : quizState.difficulty === 'normal' ? sp.slice(-1) : [];
   const quizNextLines = showFull ? sn : quizState.difficulty === 'normal' ? sn.slice(0, 1) : [];
-  const quizExplanation = (quizCurr?.song_name && quizCurr?.explanation)
-    ? `この歌詞は「${quizCurr.song_name}」の\n${quizCurr.explanation}部分でした！` : "";
+  const quizExplanation = (quizCurr?.song_name && quizCurr?.section_name)
+    ? `この歌詞は「${quizCurr.song_name}」の\n${quizCurr.section_name}部分でした！` : "";
 
   if (!accessGranted) {
     return (
