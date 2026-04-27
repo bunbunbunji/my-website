@@ -4,10 +4,6 @@ import confetti from 'canvas-confetti'
 import './App.css'
 import logo from './assets/logo.png'
 
-// ===== 機能の一時無効化フラグ（true=無効, false=有効） =====
-const DISABLE_SHARE = true;
-const DISABLE_SURVEY = true;
-
 // ===== Supabase 設定 =====
 const supabaseUrl = "https://atinpqtedmrfrtdlkpkd.supabase.co";
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0aW5wcXRlZG1yZnJ0ZGxrcGtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwOTU0NjcsImV4cCI6MjA4NDY3MTQ2N30.Oor6oUuuIxa0pSxIRuwEw7ZzGYM4hOGfywHqv2FaBHg";
@@ -100,27 +96,13 @@ function App() {
     setSongModalData([]);
     setSongModalMembers([]);
     setIsLoadingSongModal(true);
-    const cols = 'lyrics_main, correct_members, explanation, all_flag, unit_flag, solo_flag, "order"';
     const { data } = await supabase
-      .from('quizzes')
-      .select(cols)
+      .from('quiz_full')
+      .select('lyrics, correct_members, seq, section_name')
       .eq('group_name', groupName)
-      .eq('song_title', title)
-      .order('order');
-    if (data && data.length > 0) {
-      setSongModalData(data);
-    } else {
-      const { data: allData } = await supabase
-        .from('quizzes')
-        .select(cols + ', song_title')
-        .eq('group_name', groupName);
-      const normTitle = superNormalize(title);
-      setSongModalData(
-        (allData || [])
-          .filter(q => superNormalize(q.song_title) === normTitle)
-          .sort((a, b) => (a.order || 0) - (b.order || 0))
-      );
-    }
+      .eq('song_name', title)
+      .order('seq');
+    setSongModalData(data || []);
     const { data: mData } = await supabase
       .from('members')
       .select('name, Last_name, color')
@@ -207,16 +189,17 @@ function App() {
     setIsResumingSession(true);
     const s = pendingResume;
     const ids = s.quiz_ids;
-    const { data: qData } = await supabase.from('quizzes').select('*').in('id', ids);
+    const { data: qData } = await supabase.from('quiz_full').select('*').in('id', ids);
     const sorted = ids.map(id => (qData || []).find(q => q.id === id)).filter(Boolean);
     const { data: mData } = await supabase.from('members').select('*').eq('group_name', s.group_name).order('sort_order');
+    const quizzesWithSurrounds = await fetchSurrounds(sorted);
     setMembers(mData || []);
     setQuizState({
       group: s.group_name,
       difficulty: s.difficulty,
       currentIndex: s.current_step - 1,
       correctCount: s.correct_count,
-      quizzes: sorted
+      quizzes: quizzesWithSurrounds
     });
     setSessionId(s.session_id);
     setPendingResume(null);
@@ -234,11 +217,30 @@ function App() {
     setPendingResume(null);
   };
 
+  // --- 前後歌詞をクイズオブジェクトに埋め込む ---
+  const fetchSurrounds = async (quizzes) => {
+    return Promise.all(quizzes.map(async (quiz) => {
+      const [prevRes, nextRes] = await Promise.all([
+        supabase.from('lyrics').select('lyric')
+          .eq('sounds_id', quiz.sounds_id)
+          .lt('seq', quiz.seq).order('seq', { ascending: false }).limit(2),
+        supabase.from('lyrics').select('lyric')
+          .eq('sounds_id', quiz.sounds_id)
+          .gt('seq', quiz.seq).order('seq', { ascending: true }).limit(2)
+      ]);
+      return {
+        ...quiz,
+        surroundPrev: ((prevRes.data || []).reverse()).map(r => r.lyric),
+        surroundNext: (nextRes.data || []).map(r => r.lyric)
+      };
+    }));
+  };
+
   // --- クイズ準備 ---
   const prepareQuiz = async (selectedGroup, selectedDiff) => {
     setIsPreparing(true);
     setStatusMsg("問題を準備しています…");
-    const { data: qData } = await supabase.from("quizzes").select("*").eq("group_name", selectedGroup).gt(selectedDiff, 0);
+    const { data: qData } = await supabase.from("quiz_full").select("*").eq("group_name", selectedGroup).gt(selectedDiff, 0);
     const { data: mData } = await supabase.from("members").select("*").eq("group_name", selectedGroup).order("sort_order");
 
     if (!qData || qData.length === 0) {
@@ -261,9 +263,10 @@ function App() {
         }
       }
     }
-    setQuizState(prev => ({ ...prev, quizzes: selectedQuizzes, currentIndex: 0, correctCount: 0 }));
+    const quizzesWithSurrounds = await fetchSurrounds(selectedQuizzes);
+    setQuizState(prev => ({ ...prev, quizzes: quizzesWithSurrounds, currentIndex: 0, correctCount: 0 }));
     setMembers(mData || []);
-    setStatusMsg(`${selectedQuizzes.length}問のクイズを用意しました！`);
+    setStatusMsg(`${quizzesWithSurrounds.length}問のクイズを用意しました！`);
     setIsPreparing(false);
   };
 
@@ -273,11 +276,11 @@ function App() {
     setScreen('lyrics');
     try {
       const groups = [
-        { id: 'fz', name: 'FRUITS ZIPPER', table: 'fz_sounds' },
-        { id: 'cd', name: 'CANDY TUNE', table: 'cd_sounds' },
-        { id: 'ss', name: 'SWEET STEADY', table: 'ss_sounds' },
-        { id: 'cs', name: 'CUTIE STREET', table: 'cs_sounds' },
-        { id: 'ms', name: 'MORE STAR', table: 'ms_sounds' }
+        { name: 'FRUITS ZIPPER' },
+        { name: 'CANDY TUNE' },
+        { name: 'SWEET STEADY' },
+        { name: 'CUTIE STREET' },
+        { name: 'MORE STAR' }
       ];
 
       let allQuizData = [];
@@ -286,8 +289,8 @@ function App() {
 
       while (hasMore) {
         const { data, error } = await supabase
-          .from('quizzes')
-          .select('song_title, easy, normal')
+          .from('quiz_full')
+          .select('group_name, song_name, easy, normal')
           .range(from, from + 999);
 
         if (error) throw error;
@@ -305,8 +308,8 @@ function App() {
       const normalSongsSet = new Set();
 
       allQuizData.forEach(q => {
-        if (q.song_title) {
-          const norm = superNormalize(q.song_title);
+        if (q.song_name) {
+          const norm = superNormalize(q.song_name);
           activeSongsSet.add(norm);
           if (Number(q.easy) >= 0.1) easySongsSet.add(norm);
           if (Number(q.normal) >= 0.1) normalSongsSet.add(norm);
@@ -315,12 +318,16 @@ function App() {
 
       const finalData = [];
       for (const group of groups) {
-        const { data: songs } = await supabase.from(group.table).select('song_title').order('song_title', { ascending: true });
+        const { data: songs } = await supabase
+          .from('sounds')
+          .select('song_name')
+          .eq('group_name', group.name)
+          .order('song_name', { ascending: true });
         if (songs) {
           const processedSongs = songs.map(s => {
-            const norm = superNormalize(s.song_title);
+            const norm = superNormalize(s.song_name);
             return {
-              title: s.song_title,
+              title: s.song_name,
               hasQuiz: activeSongsSet.has(norm),
               isEasy: easySongsSet.has(norm),
               isNormal: normalSongsSet.has(norm)
@@ -365,7 +372,8 @@ function App() {
       }
       return pairs.join('<br>');
     };
-    const correctLabel = formatCorrectLabel(correctArray, current.all_flag);
+    const isAll = correctArray.length === members.length && members.length > 0;
+    const correctLabel = formatCorrectLabel(correctArray, isAll ? '1' : '0');
 
     if (isCorrect) {
       setQuizState(prev => ({ ...prev, correctCount: prev.correctCount + 1 }));
@@ -506,13 +514,14 @@ function App() {
       }
     };
     const fitAll = () => {
-      fitText(lyricsRef.current, 1.4, 8);
+      fitText(lyricsRef.current, 1.4, 10);
       fitText(hintPrevRef.current, 0.62, 7);
       fitText(hintNextRef.current, 0.62, 7);
     };
     fitAll();
     document.fonts.ready.then(fitAll);
   }, [screen, quizState.currentIndex, quizState.quizzes]);
+
 
   useEffect(() => {
     if (!songModalData.length) return;
@@ -628,18 +637,13 @@ function App() {
   };
 
   const quizCurr = quizState.quizzes[quizState.currentIndex];
-  const quizPrevLines = (answered && quizState.difficulty !== 'easy')
-    ? [quizCurr?.lyrics_prev1, quizCurr?.lyrics_prev2].filter(Boolean)
-    : quizState.difficulty === 'easy'
-      ? [quizCurr?.lyrics_prev1, quizCurr?.lyrics_prev2].filter(Boolean)
-      : quizState.difficulty === 'normal' ? [quizCurr?.lyrics_prev2].filter(Boolean) : [];
-  const quizNextLines = (answered && quizState.difficulty !== 'easy')
-    ? [quizCurr?.lyrics_next1, quizCurr?.lyrics_next2].filter(Boolean)
-    : quizState.difficulty === 'easy'
-      ? [quizCurr?.lyrics_next1, quizCurr?.lyrics_next2].filter(Boolean)
-      : quizState.difficulty === 'normal' ? [quizCurr?.lyrics_next1].filter(Boolean) : [];
-  const quizExplanation = (quizCurr?.song_title && quizCurr?.explanation)
-    ? `この歌詞は「${quizCurr.song_title}」の\n${quizCurr.explanation}部分でした！` : "";
+  const showFull = answered || quizState.difficulty === 'easy';
+  const sp = quizCurr?.surroundPrev || [];
+  const sn = quizCurr?.surroundNext || [];
+  const quizPrevLines = showFull ? sp : quizState.difficulty === 'normal' ? sp.slice(-1) : [];
+  const quizNextLines = showFull ? sn : quizState.difficulty === 'normal' ? sn.slice(0, 1) : [];
+  const quizExplanation = (quizCurr?.song_name && quizCurr?.explanation)
+    ? `この歌詞は「${quizCurr.song_name}」の\n${quizCurr.explanation}部分でした！` : "";
 
   if (!accessGranted) {
     return (
@@ -676,7 +680,7 @@ function App() {
           }}>🏠 トップにもどる</span>
         )}
         {(screen === 'top' || screen === 'result') && (
-          <a href={DISABLE_SURVEY ? undefined : "https://forms.gle/EguRX6uWZYmJJLZx5"} target="_blank" rel="noreferrer" className="survey-corner-link" style={DISABLE_SURVEY ? {pointerEvents:'none', opacity:0.5} : {}}>アンケートにご協力ください</a>
+          <a href="https://forms.gle/EguRX6uWZYmJJLZx5" target="_blank" rel="noreferrer" className="survey-corner-link">アンケートにご協力ください</a>
         )}
       </div>
       <div className="legal-links">
@@ -827,7 +831,7 @@ function App() {
             </div>
           )}
 
-          <p id="lyrics" ref={lyricsRef}>{quizCurr?.lyrics_main}</p>
+          <p id="lyrics" ref={lyricsRef}>{quizCurr?.lyrics}</p>
 
           {quizNextLines.length > 0 && (
             <div className="hint-lyrics">
@@ -909,7 +913,7 @@ function App() {
           </div>
 
           <div className="result-buttons">
-            <button className="share-btn" onClick={DISABLE_SHARE ? undefined : shareOnX} disabled={DISABLE_SHARE}>
+            <button className="share-btn" onClick={shareOnX}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{marginRight: '8px'}}>
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
               </svg>
@@ -942,9 +946,9 @@ function App() {
               ) : (
                 <div className="song-modal-list">
                   {songModalData.map((row, i) => {
-                    const isSolo = String(row.solo_flag) === '1';
-                    const isAll = String(row.all_flag) === '1';
-                    const correctArr = row.correct_members.split(',').map(s => s.trim());
+                    const correctArr = row.correct_members.split(',').map(s => s.trim()).filter(Boolean);
+                    const isAll = correctArr.length === songModalMembers.length && songModalMembers.length > 0;
+                    const isSolo = correctArr.length === 1;
                     const lyricsColor = isSolo
                       ? (memberLookup[correctArr[0]]?.color || '#333')
                       : '#000';
@@ -958,7 +962,7 @@ function App() {
                         ));
                     return (
                       <div key={i} className="song-modal-row">
-                        <div className="song-modal-lyrics" style={{ color: lyricsColor }}>{row.lyrics_main}</div>
+                        <div className="song-modal-lyrics" style={{ color: lyricsColor }}>{row.lyrics}</div>
                         <div className="song-modal-members">🎤 {memberNameNodes}</div>
                       </div>
                     );
@@ -1083,15 +1087,16 @@ function App() {
             <button className="debug-jump-btn" style={{marginTop: '6px'}} onClick={async () => {
               if (!debugQuizId) return;
               setDebugQuizStatus('取得中…');
-              const { data: qData, error } = await supabase.from('quizzes').select('*').eq('id', Number(debugQuizId)).single();
+              const { data: qData, error } = await supabase.from('quiz_full').select('*').eq('id', Number(debugQuizId)).single();
               if (error || !qData) { setDebugQuizStatus('❌ 見つかりません'); return; }
               const { data: mData } = await supabase.from('members').select('*').eq('group_name', qData.group_name).order('sort_order');
+              const quizzesWithSurrounds = await fetchSurrounds([qData]);
               setMembers(mData || []);
-              setQuizState(p => ({ ...p, group: qData.group_name, difficulty: debugDiff, quizzes: [qData], currentIndex: 0, correctCount: 0 }));
+              setQuizState(p => ({ ...p, group: qData.group_name, difficulty: debugDiff, quizzes: quizzesWithSurrounds, currentIndex: 0, correctCount: 0 }));
               setSelectedMembers(new Set());
               setAnswered(false);
               setResultMsg({ text: '', type: '' });
-              setDebugQuizStatus(`✅ ID:${qData.id} / ${qData.song_title}`);
+              setDebugQuizStatus(`✅ ID:${qData.id} / ${qData.song_name}`);
               setScreen('quiz');
             }}>▶ このクイズをテスト</button>
             {debugQuizStatus && <div style={{marginTop: '4px', fontSize: '0.65rem', color: '#aaa', wordBreak: 'break-all'}}>{debugQuizStatus}</div>}
