@@ -27,6 +27,8 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          VITE_ACCESS_CODE: ${{ secrets.VITE_ACCESS_CODE }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
